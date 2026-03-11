@@ -1,0 +1,30 @@
+# Зависимости и сгенерированные файлы Node/npm
+/node_modules
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Сгенерированные папки SvelteKit и Vite (КРИТИЧНО) 
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build 
+/.vite
+
+# Файлы среды разработки и кэш
+.DS_Store
+Thumbs.db
+
+# Переменные окружения
+.env
+.env.local
+.env.*
+!.env.example
+
+# Файлы редактора 
+.vscode/
+
+# Временные файлы Vite
+*.timestamp-*
