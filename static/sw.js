@@ -1,6 +1,7 @@
 const CACHE_NAME = 'calcul-v1';
 const ASSETS = [
   '/',
+  './index.html',
   '/manifest.webmanifest',
   'icon-192.png',
   'icon-512.png'
