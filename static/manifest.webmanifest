@@ -1,0 +1,22 @@
+{
+  "short_name": "axio_calcul",
+  "name": "MegaCalculator PWA",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#1e293b",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#1e293b",
+  "description": "Fast MegaCalculator."
+}
