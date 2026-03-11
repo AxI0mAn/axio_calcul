@@ -13,10 +13,10 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "/",
-  "background_color": "#1e293b",
+  "start_url": "/axio_calcul/",
+  "scope": "/axio_calcul/",
   "display": "standalone",
-  "scope": "/",
+  "background_color": "#1e293b",
   "theme_color": "#1e293b",
   "description": "Fast MegaCalculator."
 }
