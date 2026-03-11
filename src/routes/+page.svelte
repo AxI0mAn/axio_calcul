@@ -310,7 +310,8 @@
 		margin-bottom: 1.5rem;
 		min-height: 5rem;
 		width: 90%;
-		color: rgba(120, 180, 255, 0.8);
+		color: rgba(236, 17, 17, 0.8);
+		/* color: rgba(120, 180, 255, 0.8); */
 		font-family: 'Courier New', monospace;
 
 		display: flex;
