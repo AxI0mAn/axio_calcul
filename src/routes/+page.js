@@ -1,0 +1,1 @@
+export const prerender = true;  // для сборки файла index.html
