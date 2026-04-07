@@ -16,9 +16,23 @@ declare module '*.jpeg' {
   export default src;
 }
 
+// 1. Для импорта SVG как строки (через {@html ...})
+declare module '*.svg?raw' {
+  const content: string;
+  export default content;
+}
+
+// 2. Для импорта SVG как Svelte-компонента (через <Icon />)
+declare module '*.svg?svelte' {
+  import type { Component } from 'svelte';
+  const component: Component<any>;
+  export default component;
+}
+
+// 3. Базовая декларация для обычных импортов SVG
 declare module '*.svg' {
-  const src: string;
-  export default src;
+  const content: string;
+  export default content;
 }
 
 declare module '*.json' {

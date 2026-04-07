@@ -36,6 +36,8 @@ export default defineConfig({
 				// Глобальные переменные SCSS
 				// Этот файл будет автоматически импортирован во все Svelte-компоненты
 				// БЕЗ необходимости писать @import ... в каждом файле.
+				// НО если ты поместишь _reset.scss или _layout.scss СЮДА, ТО вес твоего CSS вырастет в десятки раз.
+				// ДЛЯ _reset.scss и _layout.scss ИМПОРТИРУЙ В src/styles/app.scss, КОТОРЫЙ ИМПОРТИРУЕТСЯ В src/routes/+layout.svelte
 				additionalData: `@use '/src/styles/_variables.scss'; @use '/src/styles/_mixins.scss';`
 			}
 		},

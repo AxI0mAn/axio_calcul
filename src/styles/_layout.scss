@@ -1,0 +1,116 @@
+.app-wrapper {
+  display: grid;
+  width: 100%;
+  background-color: #1a2a3a; // Фон как на скриншоте
+
+  // --- РЕЖИМ: DESKTOP & TABLET LANDSCAPE ---
+  @media (min-width: 1024px),
+  (orientation: landscape) and (min-width: 768px) {
+    grid-template-columns: 1fr 50vh 1fr;
+    grid-template-areas:
+      "left calc right"
+      ". instr ."
+      ". hist .";
+
+
+    .field_left,
+    .field_right {
+      grid-area: left; // Привязываем к первой колонке
+      position: sticky; // ВАЖНО: не fixed, а sticky
+      top: 0;
+      height: 100vh; // Теперь они занимают экран и "залипают" при скролле
+      width: calc((100vw - 52vh) / 2); // ширина центральной части 50vh
+    }
+
+    .field_left {
+      // === -📝=TODO=📝- ===
+      background-color: rgba(127, 255, 212, .38);
+      outline: 4px dotted rgb(4, 0, 255);
+
+      left: 0;
+      grid-area: left;
+    }
+
+    .field_right {
+      // === -📝=TODO=📝- ===
+      background-color: rgba(30, 210, 30, .38);
+      outline: 4px dotted rgb(4, 0, 255);
+
+      right: 0;
+      grid-area: right;
+    }
+
+    .field_calculator {
+      // === -📝=TODO=📝- ===
+      background-color: rgba(30, 63, 210, 0.8);
+      outline: 4px dotted rgb(4, 0, 255);
+
+      margin: 0 auto;
+      grid-area: calc;
+      width: 50vh;
+      // min-height: 100vh;
+      // position: sticky;
+      // top: 0;
+    }
+
+    .instruction {
+      // === -📝=TODO=📝- ===
+      outline: 4px dotted rgb(4, 0, 255);
+
+      grid-area: instr;
+      width: 50vh;
+      // Автоматическая высота по контенту
+      min-height: 20vh;
+      padding: 2rem 0;
+    }
+
+    .history__old {
+      // === -📝=TODO=📝- ===
+      outline: 4px dotted rgb(133, 75, 60);
+
+      grid-area: hist;
+      width: 50vh;
+      // Автоматическая высота по контенту
+      min-height: 20vh;
+      padding: 2rem 0;
+    }
+  }
+
+  // --- РЕЖИМ: MOBILE & TABLET PORTRAIT ---
+  @media (max-width: 1023px) and (orientation: portrait),
+  (max-width: 767px) {
+    // === -📝=TODO=📝- ===
+    // использовать для мобильных, где высота много больше ширины
+    width: 90vw;
+    grid-template-columns: 100vw;
+    grid-template-areas:
+      "calc"
+      "left"
+      "instr"
+      "right"
+      "hist";
+
+    .field_calculator {
+      grid-area: calc;
+      width: 100vw;
+    }
+
+    .field_left {
+      grid-area: left;
+      width: 100vw;
+    }
+
+    .instruction {
+      grid-area: instr;
+    }
+
+    .field_right {
+      grid-area: right;
+      width: 100vw;
+    }
+
+    .history__old {
+      grid-area: hist;
+    }
+  }
+}
