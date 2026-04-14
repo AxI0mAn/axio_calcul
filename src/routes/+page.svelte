@@ -2,6 +2,17 @@
 	/**
 	 * домашняя страница src/routes/+page.svelte
 	 */
+
+	// ------------- ссылки с учётом локализации в будущем
+	import { base } from '$app/paths';
+	import { page } from '$app/stores';
+
+	// Получаем текущий язык из параметров пути (Svelte 5)
+	let lang = $derived($page.params.lang || 'en');
+	// Применяем в ссылках как <a href="{base}/{lang}/путь">
+
+	// -------------
+
 	import src from '$lib/assets/basic.png';
 </script>
 
@@ -9,7 +20,7 @@
 	<aside class="field_left"></aside>
 	<main class="field_calculator catalog">
 		<p>текстовая навигация с бысрым переходом на страницу калькулятора</p>
-		<a href="/basic" class="catalog__item">
+		<a href="{base}/{lang}/basic" class="catalog__item">
 			<p>arithmetic</p>
 			<img {src} alt="logo basic calculator" />
 		</a>

@@ -13,7 +13,7 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			fallback: '200.html', // Для SPA на GH Pages
+			fallback: '404.html', // Для SPA на GH Pages. 200.html используется на других хостингах (например, Surge). На GitHub Pages он не сработает как роутер.
 			// Настройка папок вывода (по умолчанию 'build', но лучше явно указать)
 			// Куда поместить сгенерированные HTML-страницы
 			pages: 'build',

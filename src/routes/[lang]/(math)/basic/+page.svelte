@@ -3,6 +3,16 @@
 	 * страница арифметического калькулятора src/routes/(math)/basic/+page.svelte
 	 */
 
+	// ------------- ссылки с учётом локализации в будущем
+	import { base } from '$app/paths';
+	import { page } from '$app/stores';
+
+	// Получаем текущий язык из параметров пути (Svelte 5)
+	let lang = $derived($page.params.lang || 'en');
+	// Применяем в ссылках как <a href="{base}/{lang}/путь">
+
+	// -------------
+
 	import { appState } from '$lib/store/appState.svelte';
 
 	import BtnBlockDigit from '$lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte';
@@ -24,7 +34,7 @@
 		</div>
 		<div class="fieldBtn_page">
 			<div class="fieldBtn_basic">
-				<a href="/" class="catalog__item">
+				<a href="{base}/{lang}/" class="catalog__item">
 					<p>catalog</p>
 					<img {src} alt="logo catalog calculators" />
 				</a>
