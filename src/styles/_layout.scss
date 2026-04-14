@@ -1,7 +1,11 @@
+//  src/styles/_layout.scss
+
 .app-wrapper {
   display: grid;
   width: 100%;
-  background-color: #1a2a3a; // Фон как на скриншоте
+  height: fit-content;
+  overflow-y: auto;
+  // background-color: #1a2a3a; // Фон как на скриншоте
 
   // --- РЕЖИМ: DESKTOP & TABLET LANDSCAPE ---
   @media (min-width: 1024px),
@@ -10,7 +14,7 @@
     grid-template-areas:
       "left calc right"
       ". instr ."
-      ". hist .";
+      ". revi .";
 
 
     .field_left,
@@ -24,8 +28,10 @@
 
     .field_left {
       // === -📝=TODO=📝- ===
-      background-color: rgba(127, 255, 212, .38);
-      outline: 4px dotted rgb(4, 0, 255);
+      background-color: rgba(127, 255, 212, .25);
+
+      box-shadow:
+        -8px 0px 16px 8px rgba(0, 0, 0, 0.75);
 
       left: 0;
       grid-area: left;
@@ -33,30 +39,23 @@
 
     .field_right {
       // === -📝=TODO=📝- ===
-      background-color: rgba(30, 210, 30, .38);
-      outline: 4px dotted rgb(4, 0, 255);
-
+      background-color: transparent;
       right: 0;
       grid-area: right;
     }
 
     .field_calculator {
-      // === -📝=TODO=📝- ===
-      background-color: rgba(30, 63, 210, 0.8);
-      outline: 4px dotted rgb(4, 0, 255);
-
-      margin: 0 auto;
+      top: 0;
       grid-area: calc;
       width: 50vh;
       // min-height: 100vh;
-      // position: sticky;
-      // top: 0;
+      position: relative;
+      box-shadow:
+        0px 0px 8px 4px rgba(1, 217, 195, 0.75);
+      background: linear-gradient(215deg, #02427e 0%, #000d37 50%, #02273e 100%);
     }
 
     .instruction {
-      // === -📝=TODO=📝- ===
-      outline: 4px dotted rgb(4, 0, 255);
-
       grid-area: instr;
       width: 50vh;
       // Автоматическая высота по контенту
@@ -64,11 +63,9 @@
       padding: 2rem 0;
     }
 
-    .history__old {
-      // === -📝=TODO=📝- ===
-      outline: 4px dotted rgb(133, 75, 60);
+    .reviews__old {
 
-      grid-area: hist;
+      grid-area: revi;
       width: 50vh;
       // Автоматическая высота по контенту
       min-height: 20vh;
@@ -81,36 +78,71 @@
   (max-width: 767px) {
     // === -📝=TODO=📝- ===
     // использовать для мобильных, где высота много больше ширины
-    width: 90vw;
-    grid-template-columns: 100vw;
+    // width: 98%; 
+    padding: 0 auto;
+    grid-template-columns: 1fr auto 1fr;
     grid-template-areas:
-      "calc"
-      "left"
-      "instr"
-      "right"
-      "hist";
+      ". calc ."
+      ". left ."
+      ". instr ."
+      ". right ."
+      ". revi .";
+    justify-content: center;
 
     .field_calculator {
       grid-area: calc;
-      width: 100vw;
     }
 
     .field_left {
       grid-area: left;
-      width: 100vw;
+      // === -📝=TODO=📝- ===
+      min-height: 4rem;
+      background-color: #02427e;
     }
 
     .instruction {
       grid-area: instr;
+      padding: 1rem;
+      // === -📝=TODO=📝- ===;
+      min-height: 4rem;
+      background-color: #1f7e02;
     }
 
     .field_right {
       grid-area: right;
-      width: 100vw;
+      padding: 1rem;
+      // === -📝=TODO=📝- ===;
+      min-height: 4rem;
+      background-color: #7e0202;
     }
 
-    .history__old {
-      grid-area: hist;
+    .reviews__old {
+      grid-area: revi;
+      padding: 1rem;
+      // === -📝=TODO=📝- ===
+      min-height: 4rem;
+      background-color: #7e5d02;
     }
+  }
+
+  // --- МОБИЛЬНЫЙ LANDSCAPE (6 строк, 12 колонок) ---
+  @media (max-height: 500px) and (orientation: landscape) {
+    padding: 0 auto;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas:
+      ". calc ."
+      ". left ."
+      ". instr ."
+      ". right ."
+      ". revi .";
+    justify-content: center;
+
+    .field_left,
+    .instruction,
+    .field_right,
+    .reviews__old {
+      width: 100%;
+    }
+
   }
 }

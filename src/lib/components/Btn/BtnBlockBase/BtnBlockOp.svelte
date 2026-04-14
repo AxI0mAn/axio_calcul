@@ -4,7 +4,7 @@
 
 */
 	import BtnText from '../BtnText.svelte';
-	import { addOperator, performCalculation } from '$lib/action/calculatorActions.svelte.js';
+	import { addOperator, performCalculation } from '$lib/services/calculatorActions.svelte.js';
 </script>
 
 <div class="operBlock">
@@ -12,16 +12,16 @@
 		<BtnText
 			customClass="op"
 			onclick={() => {
-				addOperator('+');
+				addOperator('-');
 			}}
-			buttonText="+"
+			buttonText="-"
 		/>
 		<BtnText
 			customClass="op"
 			onclick={() => {
-				addOperator('-');
+				addOperator('+');
 			}}
-			buttonText="-"
+			buttonText="+"
 		/>
 		<BtnText
 			customClass="op"

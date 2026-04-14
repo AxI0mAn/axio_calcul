@@ -3,32 +3,34 @@
 	 * страница арифметического калькулятора src/routes/(math)/basic/+page.svelte
 	 */
 
+	import { appState } from '$lib/store/appState.svelte';
+
 	import BtnBlockDigit from '$lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte';
 	import BtnBlockOp from '$lib/components/Btn/BtnBlockBase/BtnBlockOp.svelte';
 
 	import DisText from '$lib/components/Display/DisText.svelte';
+
+	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
+
+	import LinkBlockNav from '$lib/components/Links/LinkBlockNav.svelte';
+	import src from '$lib/assets/catalog.png';
 </script>
 
 <div class="app-wrapper">
-	<aside class="field_left">
-		<a href="/">catalog</a>
-	</aside>
+	<aside class="field_left"></aside>
 	<main class="field_calculator basic">
 		<div class="field_displayPad">
 			<DisText />
 		</div>
 		<div class="fieldBtn_page">
-			<div class="fieldBtn_memory">
-				<button class="btn btn__func">M1</button>
-				<button class="btn btn__func">M2</button>
-				<button class="btn btn__func">M3</button>
-				<button class="btn btn__func">M4</button>
-			</div>
 			<div class="fieldBtn_basic">
-				<button class="btn btn__interface">learn more</button>
-				<button class="btn btn__interface">see all features</button>
-				<button class="btn btn__interface">share</button>
-				<button class="btn btn__interface">install app now</button>
+				<a href="/" class="catalog__item">
+					<p>catalog</p>
+					<img {src} alt="logo catalog calculators" />
+				</a>
+			</div>
+			<div class="fieldBtn_memory">
+				<BtnBlockMemo />
 			</div>
 		</div>
 		<div class="fieldBtn_digitPad">
@@ -38,18 +40,13 @@
 			<BtnBlockOp />
 		</div>
 		<div class="fieldBtn_nav">
-			<div class="rowBtn">
-				<button class="btn btn__interface">C</button>
-				<button class="btn btn__interface">i</button>
-				<button class="btn btn__interface">H</button>
-				<button class="btn btn__interface">S</button>
-			</div>
+			<LinkBlockNav />
 		</div>
 	</main>
-	<article class="instruction">
+	<article class="instruction" id="instruction">
 		<!-- текстовые блоки  и иллюстрации -->
 	</article>
-	<section class="history__old">
+	<section class="reviews__old">
 		<!-- текстовые блоки ОТДЕЛЬНОЙ СТРАНИЦЕЙ   ????-->
 	</section>
 	<aside class="field_right">
@@ -62,7 +59,45 @@
 		flex: 1 1 0;
 		min-width: 0;
 	}
-	.field_calculator {
+	// === -📝=TODO=📝- ===
+	// это стили копия от a.catalog__item из src/routes/+page.svelte
+	a.catalog__item {
+		padding: 24px;
+		padding-top: 12px;
+		border: 1px solid white;
+		border-radius: 24px;
+		background: grey;
+		color: #0f172a;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 12px;
+		transition: all 0.5s;
+
+		&:hover {
+			background: #0f172a;
+			color: grey;
+			transition: all 0.35s;
+			p {
+				text-transform: uppercase;
+				font-weight: 800;
+			}
+		}
+		&:active {
+			color: #0f172a;
+			filter: blur(0.2px);
+			transform: scaleY(96%);
+			transition: all 0.05s;
+		}
+		img {
+			width: 10vmin;
+			aspect-ratio: 1/1;
+			border: 1px solid transparent;
+			border-radius: 16px;
+		}
+	}
+	.field_calculator.basic {
 		// По умолчанию вертикальный (12 строк, 6 колонок)
 		display: grid;
 		grid-template-columns: repeat(6, calc(50vh / 6));
@@ -72,20 +107,18 @@
 
 		// Распределение областей (Grid Areas)
 		.field_displayPad {
-			// === -📝=TODO=📝- ===
-			outline: 2px dotted coral;
 			grid-area: 1 / 1 / 7 / 7;
 		}
 
 		.fieldBtn_page {
-			// === -📝=TODO=📝- ===
-			outline: 2px dotted coral;
 			grid-area: 7 / 1 / 11 / 4;
+			display: flex;
+			flex-flow: column nowrap;
+			justify-content: space-around;
+			align-items: center;
 		}
 
 		.fieldBtn_digitPad {
-			// === -📝=TODO=📝- ===
-			outline: 2px dotted coral;
 			grid-area: 7 / 4 / 12 / 7;
 		}
 
@@ -94,16 +127,61 @@
 		}
 
 		.fieldBtn_nav {
-			// === -📝=TODO=📝- ===
-			outline: 2px dotted coral;
 			grid-area: 12 / 4 / 13 / 7;
+			align-self: center;
+			justify-content: center;
 		}
+	}
+	// --- РЕЖИМ:  TABLET PORTRAIT ---
+	@media (max-width: 1023px) and (orientation: portrait), (max-width: 767px) {
+		.field_calculator.basic {
+			grid-template-columns: repeat(6, minmax(1fr, calc(100vw / 6)));
+			grid-template-rows: repeat(12, calc(100vh / 12));
+			margin: 0 auto;
+		}
+	}
 
-		// --- МОБИЛЬНЫЙ LANDSCAPE (6 строк, 12 колонок) ---
-		@media (max-height: 500px) and (orientation: landscape) {
-			grid-template-rows: repeat(6, 1fr);
-			grid-template-columns: repeat(12, 1fr);
-			// Здесь можно переопределить grid-row/grid-column для горизонтального вида
+	// --- РЕЖИМ: MOBILE  PORTRAIT ---
+	@media (orientation: portrait) and (max-width: 432px) {
+		.field_calculator.basic {
+			grid-template-columns: repeat(6, calc(100vw / 6));
+			grid-template-rows: repeat(12, calc(100vh / 12));
+			margin: 0 auto;
+		}
+	}
+
+	// --- МОБИЛЬНЫЙ LANDSCAPE (6 строк, 12 колонок) ---
+	@media (max-height: 500px) and (orientation: landscape) {
+		.field_calculator.basic {
+			grid-template-columns: repeat(12, calc(100vw / 12));
+			grid-template-rows: repeat(6, calc(100vh / 6));
+			width: 100%;
+			// Распределение областей (Grid Areas)
+			.field_displayPad {
+				grid-area: 1 / 1 / 7 / 7;
+			}
+
+			.fieldBtn_page {
+				grid-area: 1 / 7 / 5 / 10;
+				display: flex;
+				flex-flow: column nowrap;
+				justify-content: space-around;
+				align-items: center;
+			}
+
+			.fieldBtn_digitPad {
+				grid-area: 1 / 10 / 6 / 13;
+			}
+
+			.fieldBtn_basicOperators {
+				grid-area: 5 / 7 / 7 / 10;
+			}
+
+			.fieldBtn_nav {
+				grid-area: 6 / 10 / 7 / 13;
+				align-self: center;
+				justify-content: center;
+			}
 		}
 	}
 </style>

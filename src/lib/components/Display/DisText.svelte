@@ -4,6 +4,8 @@
 	 */
 
 	import { appState } from '$lib/store/appState.svelte.js';
+	import { longpress } from '$lib/actions/longpress';
+	import { btnMemo } from '$lib/utils/btnMemo';
 
 	import { tick } from 'svelte';
 
@@ -32,52 +34,62 @@
 	</div>
 	<!-- Блок истории вычислений -->
 	<div bind:this={historyContain} class="history-section">
-		{#each appState.historySession as entry}
+		<!-- {#each appState.historySession as entry}
 			<p>{entry}</p>
+		{/each} -->
+		{#each appState.historySession as entry}
+			<p use:longpress onlongpress={() => btnMemo(null, true, entry)}>
+				{entry}
+			</p>
 		{/each}
 	</div>
+	<div class="currentAction">
+		<!-- Текущее выражение -->
+		<p class="current-expression">{appState.expression}</p>
 
-	<!-- Текущее выражение -->
-	<p class="current-expression">{appState.expression}</p>
-
-	<!-- Текущий ввод/результат -->
-	<p
-		class="main-display"
-		class:long-text={appState.display.length > 15}
-		class:extra-long-text={appState.display.length > 19}
-	>
-		{appState.display}
-	</p>
+		<!-- Текущий ввод/результат -->
+		<p
+			class="main-display"
+			class:long-text={appState.display.length > 15}
+			class:extra-long-text={appState.display.length > 19}
+		>
+			{appState.display}
+		</p>
+	</div>
 </div>
 
 <style lang="scss">
 	.display-box {
+		min-height: 100%; // 180px;
+		max-height: 48vh;
+		width: 100%;
+
 		overflow: hidden;
 		padding: 1rem;
+		margin-bottom: 1.5rem;
 
-		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+
+		position: relative;
+		bottom: 0;
+
+		background: rgba(2, 17, 85, 0.3);
 		box-shadow:
-			inset 8px 8px 16px 8px rgba(1, 217, 195, 0.33),
-			inset -8px -8px 16px 8px rgba(1, 217, 195, 0.33),
+			inset 4px 4px 8px 4px rgba(1, 217, 195, 0.33),
+			inset -4px -4px 8px 4px rgba(1, 217, 195, 0.33),
 			0px 0px 2px 4px rgba(0, 0, 0, 0.5);
 
 		// border-radius: 0.75rem;
 		// margin-bottom: 1.5rem;
 		border: 1px solid #99c3fd;
 
-		min-height: 5rem;
-		max-height: 48vh;
-		width: 100%;
-
 		font-size: 2.5rem;
 		text-align: left;
 		color: rgba(220, 224, 230, 0.8);
-
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-end;
-		position: relative;
 	}
+
 	.now_mode {
 		position: absolute;
 		top: 1px;
@@ -92,25 +104,28 @@
 		border-bottom-left-radius: 0.5rem;
 	}
 
-	.display-box {
-		background: rgba(2, 6, 23, 0.3);
-		// padding: 1rem;
-		text-align: left;
-		margin-bottom: 1.5rem;
-		display: flex;
-		flex-direction: column;
-		min-height: 100%; // 180px;
-	}
-
 	.history-section {
 		flex: 1;
-		overflow-y: scroll; /*auto*/
+		min-height: 0;
+		overflow-y: scroll;
+		overflow-x: hidden;
+
 		font-size: 1.25rem;
 		line-height: 1.75rem;
 		color: #94a3b8;
+
 		margin-bottom: 0.5rem;
 		padding-left: 5px;
+
+		display: flex;
+		flex-direction: column;
+		// justify-content: flex-end; // это ломает скролл
+
+		p:first-child {
+			margin-top: auto;
+		}
 	}
+	// Стилизация для скроллбара в history-section
 
 	.history-section::-webkit-scrollbar {
 		width: 4px;
@@ -121,16 +136,18 @@
 	}
 
 	.current-expression {
+		flex-shrink: 0; // ГАРАНТИРУЕТ, что эти блоки не будут сжиматься или уезжать
 		padding: 0.25rem;
 		font-size: 2rem;
 		color: #94a3b8;
 		margin: 0;
-		min-height: 2rem;
+		min-height: 2.5rem;
 		border-top: 1px solid #94a3b8;
-		border-bottom: 1px solid #94a3b8;
+		// border-bottom: 1px solid #94a3b8;
 	}
 
 	.main-display {
+		flex-shrink: 0; // ГАРАНТИРУЕТ, что эти блоки не будут сжиматься или уезжать
 		font-size: 3rem;
 		margin: 0;
 		color: #4ade80;

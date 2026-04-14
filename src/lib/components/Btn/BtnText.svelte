@@ -1,10 +1,11 @@
 <script>
+	// src/lib/components/Btn/BtnText.svelte
 	let {
 		buttonText = '',
 		onclick,
 		customClass = '',
-		svgContent = '', // Для ?raw
-		Icon = null // Для ?svelte
+		svgContent = '', // Для svg как ?raw
+		Icon = null // Для svg как ?svelte
 	} = $props();
 </script>
 
@@ -26,6 +27,7 @@
 	$bg-color: rgb(15, 23, 42); // Фоновый цвет
 	$bg-gradient: linear-gradient(45deg, #02427e 0%, #000d37 50%, #02273e 100%);
 	$bg-gradient__op: linear-gradient(45deg, #64748b 0%, #252c35 50%, #4b5768 100%);
+	$bg-gradient__op--memo: linear-gradient(45deg, #64748b 0%, $main-color 50%, #4b5768 100%);
 	$border-color: rgba(120, 180, 255, 0.8); // Цвет основной рамки
 	$shadow-color-light: rgba(100, 170, 255, 0.8); // Цвет тени (яркий)
 	$shadow-color-dark: rgba(100, 170, 255, 0.5); // Цвет тени (тусклый)
@@ -70,6 +72,12 @@
 			1px 1px 4px 0px rgba(0, 13, 55, 0.5),
 			inset 0px 0px 2px rgb(160, 196, 244);
 
+		// --- РЕЖИМ: MOBILE  PORTRAIT ---
+		@media (orientation: portrait) and (max-width: 432px) {
+			padding: 8px;
+			font-size: 1.5rem;
+		}
+
 		// --- Hover ---
 		@media (hover: hover) and (pointer: fine) {
 			&:hover {
@@ -112,5 +120,10 @@
 	}
 
 	.btn.btn__func {
+	}
+
+	.btn.btn__memo.btn__memo--full {
+		background: $bg-gradient__op--memo;
+		color: $hover-shadow-color-dark;
 	}
 </style>

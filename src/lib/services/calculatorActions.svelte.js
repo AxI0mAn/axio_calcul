@@ -9,7 +9,7 @@
 */
 import { appState } from '../store/appState.svelte.js';
 import { evaluateExpression, isLastCharOperator } from './mathCore.js';
-import { float_toFixed } from './base';
+import { float_toFixed } from './base.js';
 
 /**
 * Нажатие цифры
@@ -44,36 +44,31 @@ export function addOperator(op) {
 * Нажатие "="
 */
 export function performCalculation() {
+  // Если в выражении пусто — вычислять нечего
   if (appState.expression === '') return;
 
-  // Формируем финальное выражение
-  const finalExpr = appState.expression + appState.display;
+  let finalExpr = '';
+
+  // ПРОВЕРКА: Если мы только что нажали оператор (+, -, *...) 
+  // и НЕ ввели новое число (isNewInput === true)
+  if (appState.isNewInput) {
+    // Отрезаем последний символ-оператор из цепочки (например, "5+" -> "5")
+    finalExpr = appState.expression.slice(0, -1);
+  } else {
+    // Обычный ввод: приклеиваем то, что набрано на табло (например, "5+" + "3")
+    finalExpr = appState.expression + appState.display;
+  }
+
   const result = evaluateExpression(finalExpr);
   const toHistory = `${finalExpr}=${result}`;
 
-
-  // Добавляем в историю (например "2+2*2=6")
+  // Добавляем в историю
   appState.historySession.push(toHistory);
-
-  // console.log('История обновлена, текущая длина:', appState.historySession.length);
-  // console.log(`show appState:`)
-  // console.log({
-  //   'display': appState.display,
-  //   'M1 ': appState.M1,
-  //   'M2': appState.M2,
-  //   'M3 ': appState.M3,
-  //   'M4 ': appState.M4,
-  //   'historySession': $state.snapshot(appState.historySession), // ПРИМЕНЯЕМ snapshot Т.К. МУТИРУЕМ МАССИВ  appState.historySession.push(toHistory);
-  //   'isNewInput': appState.isNewInput,
-  //   'expression': appState.expression,
-  //   'numToFix': appState.numToFix,
-  // })
-
 
   // Обновляем дисплей
   appState.display = `${float_toFixed(result)}`;
-  appState.expression = ''; // Очищаем текущую цепочку
-  appState.isNewInput = true; // Следующая цифра начнет новый ввод
+  appState.expression = '';    // Сбрасываем цепочку
+  appState.isNewInput = true;  // Результат — это теперь "новое число" для следующего ввода
 }
 
 
@@ -83,3 +78,18 @@ export function performCalculation() {
 export function clear() {
   appState.reset();
 }
+
+
+// console.log('История обновлена, текущая длина:', appState.historySession.length);
+// console.log(`show appState:`)
+// console.log({
+//   'display': appState.display,
+//   'M1 ': appState.M1,
+//   'M2': appState.M2,
+//   'M3 ': appState.M3,
+//   'M4 ': appState.M4,
+//   'historySession': $state.snapshot(appState.historySession), // ПРИМЕНЯЕМ snapshot Т.К. МУТИРУЕМ МАССИВ  appState.historySession.push(toHistory);
+//   'isNewInput': appState.isNewInput,
+//   'expression': appState.expression,
+//   'numToFix': appState.numToFix,
+// })
