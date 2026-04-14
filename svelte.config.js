@@ -27,12 +27,10 @@ const config = {
 		},
 
 		prerender: { // Для статического сайта на GitHub Pages эта настройка обязательна, чтобы SvelteKit обнаружил и сгенерировал все страницы вашего приложения.
-			entries: ['*'],
+			entries: ['*', '/en/'],
 			handleHttpError: ({ path, referrer, message }) => {
-				// Игнорируем ошибку, если она вызвана редиректом на /en/
-				if (path === '/en' || path === '/en/') return;
-
-				// В остальных случаях выбрасываем ошибку
+				// Если ошибка связана с корнем или /en/ - пропускаем
+				if (path === '/' || path === '/en' || path === '/en/') return;
 				throw new Error(message);
 			}
 		}
