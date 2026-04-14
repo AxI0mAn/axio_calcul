@@ -11,6 +11,9 @@
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
 
 	let { children } = $props();
+
+	export const prerender = true;
+export const trailingSlash = 'always';
 </script>
 
 <svelte:head>

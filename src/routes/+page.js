@@ -5,5 +5,5 @@ import { base } from '$app/paths';
 
 export function load() {
   // Автоматически перенаправляем с /axio_calcul/ на /axio_calcul/en/
-  throw redirect(307, `${base}/en`);
+  throw redirect(307, `${base}/en/`);
 }
