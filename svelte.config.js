@@ -23,7 +23,7 @@ const config = {
 		paths: {
 			base: process.env.VITE_BASE_PATH || '', // Имя репозитория возьмёт GH Pages при сборке с помощью Actions
 
-			//base: process.env.NODE_ENV === 'production' ? '/axio_calcul' : '', // Если мы на GitHub Pages (production), добавляем имя репозитория
+			// base: process.env.NODE_ENV === 'production' ? '/axio_calcul' : '', // Если мы на GitHub Pages (production), добавляем имя репозитория
 		},
 
 		prerender: { // Для статического сайта на GitHub Pages эта настройка обязательна, чтобы SvelteKit обнаружил и сгенерировал все страницы вашего приложения.
