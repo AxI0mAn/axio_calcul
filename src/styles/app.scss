@@ -1,0 +1,33 @@
+// src/styles/app.scss  
+// импортируется в src/routes/+layout.svelte
+
+@use '_reset.scss';
+@use "_typography.scss";
+@use '_layout.scss';
+
+// Устанавливаются глобальные стили 
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #1e1e1e;
+}
+
+a {
+  // .btn__interface - убрать синий прямоугольник (tap highlight) и другие мобильные эффекты при нажатии
+  // 1. Убираем синий прямоугольник на iOS и Android (Chrome/Safari)
+  -webkit-tap-highlight-color: transparent;
+
+  // 2. Убираем рамку фокуса, которая может появляться после клика
+  &:focus,
+  &:active {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  // 3. Отключаем контекстное меню при долгом нажатии (если нужно)
+  // Это предотвратит всплывающее окно "Открыть в новой вкладке" на мобилках
+  -webkit-touch-callout: none;
+}

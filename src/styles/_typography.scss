@@ -1,0 +1,35 @@
+// Подключаем шрифты  
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap');
+
+// Создаем переменные для удобства (они попадут в дочерние компоненты через Vite)
+$font-main: 'Inter', sans-serif;
+$font-digits: 'Rajdhani', sans-serif;
+
+body {
+  font-family: $font-main;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Кнопки и инпуты по умолчанию не наследуют шрифт body, исправляем это:
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+// Специальный класс для всех цифровых блоков
+.font-digits {
+  font-family: $font-digits;
+  font-variant-numeric: tabular-nums; // Важно: цифры будут одной ширины, дисплей не будет "прыгать"
+  letter-spacing: 0.02em;
+}
+
+// Применяем сразу к ключевым зонам, чтобы не писать класс вручную везде
+.main-display,
+.current-expression,
+.btn-digit {
+  // если у твоих кнопок будет такой класс
+  @extend .font-digits;
+}
