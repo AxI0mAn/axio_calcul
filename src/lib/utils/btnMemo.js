@@ -9,16 +9,17 @@ import { appState } from '../store/appState.svelte.js';
  */
 export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
   // --- ПРОВЕРКА НА ERROR ---
-  // Если мы пытаемся сохранить данные из истории
+  // Если мы пытаемся сохранить слово ERROR из истории
   if (sourceData && appState.extractResult(sourceData) === 'ERROR') {
     console.warn('Попытка сохранить ERROR из истории заблокирована');
     return;
   }
-  // Если мы пытаемся сохранить текущий дисплей
+  // Если мы пытаемся сохранить слово ERROR из текущего дисплея
   if (!sourceData && appState.display === 'ERROR' && appState[slot] === null) {
     console.warn('Попытка сохранить ERROR с дисплея заблокирована');
     return;
   }
+
   const currentValueInMemo = appState[slot];
   const currentDisplay = String(appState.display);
   const lastChar = currentDisplay.slice(-1);
@@ -74,9 +75,25 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
     appState.isNewInput = true;
   } else {
     // ВЫДАЧА (ИЗВЛЕЧЕНИЕ)
-    const val = String(currentValueInMemo);
+    let val = String(currentValueInMemo);
     const lastChar = String(appState.display).slice(-1);
+    // const preLastChar = val.slice(-1);
     const isOperator = ['+', '-', '*', '/'].includes(lastChar);
+
+    // избавляемся от -> М* и отрицательное число берём в скобки
+    // Сначала очищаем от пробелов
+    let cleanVal = val.trim();
+    //  Если в конце конструкция с "M", извлекаем само число
+    if (cleanVal.at(-2) === 'M') {
+      // parseFloat сам заберет "-206" или "206" из начала строки
+      cleanVal = String(parseFloat(cleanVal));
+    }
+    // Теперь проверяем на отрицательность (parseFloat преобразует строку в число для сравнения)
+    if (parseFloat(cleanVal) < 0) {
+      val = `(${cleanVal})`;
+    } else {
+      val = cleanVal;
+    }
 
     // ЗОЛОТОЕ ПРАВИЛО:
     // 1. Если на экране оператор (30+) — ПРИКЛЕИВАЕМ (30+1)
