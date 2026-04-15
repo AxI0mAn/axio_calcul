@@ -61,5 +61,13 @@
 			gap: 8px;
 			height: 100%;
 		}
+		@media screen and (max-width: 480px) and (orientation: portrait),
+			screen and (max-height: 480px) and (orientation: landscape),
+			screen and (pointer: coarse) and (max-width: 1024px) {
+			gap: 4px;
+			.col {
+				gap: 4px;
+			}
+		}
 	}
 </style>

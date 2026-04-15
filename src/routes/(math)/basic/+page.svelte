@@ -4,12 +4,8 @@
 	 */
 
 	// ------------- ссылки с учётом локализации в будущем
+	// @ts-ignore
 	import { base } from '$app/paths';
-	import { page } from '$app/stores';
-
-	// Получаем текущий язык из параметров пути (Svelte 5)
-	let lang = $derived($page.params.lang || 'en');
-	// Применяем в ссылках как <a href="{base}/{lang}/путь">
 
 	// -------------
 
@@ -34,7 +30,7 @@
 		</div>
 		<div class="fieldBtn_page">
 			<div class="fieldBtn_basic">
-				<a href="{base}/{lang}/" class="catalog__item">
+				<a href="{base}/" class="catalog__item">
 					<p>catalog</p>
 					<img {src} alt="logo catalog calculators" />
 				</a>

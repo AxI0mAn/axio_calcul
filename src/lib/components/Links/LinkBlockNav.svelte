@@ -73,6 +73,14 @@
 			transform 0.1s,
 			background-color 0.2s;
 
+		@media screen and (max-width: 480px) and (orientation: portrait),
+			screen and (max-height: 480px) and (orientation: landscape),
+			screen and (pointer: coarse) and (max-width: 1024px) {
+			svg {
+				transform: scale(50%);
+			}
+		}
+
 		@media (hover: hover) and (pointer: fine) {
 			&:hover {
 				// background-color: $hover-color-light;
