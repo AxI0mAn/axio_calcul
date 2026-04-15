@@ -27,8 +27,9 @@ const config = {
 		},
 
 		prerender: { // Для статического сайта на GitHub Pages эта настройка обязательна, чтобы SvelteKit обнаружил и сгенерировал все страницы вашего приложения.
-			entries: ['*', '/en/'],
-			handleHttpError: ({ path, referrer, message }) => {
+			entries: ['*', '/en/'], // entries: ['*', '/en/', '/de/', '/es/']. - Когда вы добавите, например, немецкий (de) и испанский (es), вам действительно нужно будет добавить их в список:
+
+			handleHttpError: ({ path, message }) => { // было ({ path, referrer, message }) но referrer определяется Linterом как ошибка . сам referrer — это «откуда пришла ссылка». В вашем конфиге он нужен только для отладки (чтобы знать, где именно вы ошиблись в ссылке).
 				// Если ошибка связана с корнем или /en/ - пропускаем
 				if (path === '/' || path === '/en' || path === '/en/') return;
 				throw new Error(message);
