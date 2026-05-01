@@ -120,6 +120,15 @@
 	}
 
 	.btn.btn__func {
+		font-size: 1.5rem;
+		color: whitesmoke;
+		border: transparent;
+		background: transparent;
+		background-color: transparent;
+	}
+
+	.btn.constanta {
+		color: $main-color;
 	}
 
 	.btn.btn__memo.btn__memo--full {

@@ -6,7 +6,6 @@
 	// ------------- ссылки с учётом локализации в будущем
 	// @ts-ignore
 	import { base } from '$app/paths';
-
 	// -------------
 
 	import { appState } from '$lib/store/appState.svelte';
@@ -14,7 +13,7 @@
 	import BtnBlockDigit from '$lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte';
 	import BtnBlockOp from '$lib/components/Btn/BtnBlockBase/BtnBlockOp.svelte';
 
-	import BtnBlockOpBasic from '$lib/components/Btn/BtnBlockFeatures/BtnBlockOpBasic.svelte';
+	import BtnBlockOpEngineer from '$lib/components/Btn/BtnBlockFeatures/BtnBlockOpEngineer.svelte';
 
 	import DisText from '$lib/components/Display/DisText.svelte';
 
@@ -31,9 +30,9 @@
 		<div class="field_displayPad">
 			<DisText />
 		</div>
-		<div class="fieldBtn_page">
+		<div class="fieldBtn_page withScroll">
 			<div class="fieldBtn_basic">
-				<BtnBlockOpBasic />
+				<BtnBlockOpEngineer />
 			</div>
 		</div>
 		<div class="fieldBtn_memory">
@@ -128,8 +127,9 @@
 			grid-area: 6 / 1 / 9 / 4;
 			display: flex;
 			flex-flow: row nowrap;
-			justify-content: center;
+			justify-content: flex-start;
 			align-items: center;
+			overflow-x: scroll;
 		}
 
 		.fieldBtn_memory {

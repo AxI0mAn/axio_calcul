@@ -1,4 +1,6 @@
 <script>
+	// @ts-ignore
+	import { base } from '$app/paths';
 	import { handleScroll } from '$lib/utils/handleScroll';
 
 	import Catalog from '$lib/assets/svgIcon/catalog.svg?raw';
@@ -8,7 +10,9 @@
 </script>
 
 <div class="rowLinks">
-	<a href="/#catalogAllFeatures" class="btn btn__interface" aria-label="Catalog">{@html Catalog}</a>
+	<a href="{base}/#catalogAllFeatures" class="btn btn__interface" aria-label="Catalog"
+		>{@html Catalog}</a
+	>
 
 	<a
 		href="#instruction"

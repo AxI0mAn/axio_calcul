@@ -2,12 +2,6 @@
 export function longpress(node, threshold = 500) {
   let timer;
 
-  // const handleStart = () => {
-  //   timer = setTimeout(() => {
-  //     node.dispatchEvent(new CustomEvent('longpress'));
-  //   }, threshold);
-  // };
-
   const handleStart = () => {
     timer = setTimeout(() => {
       node.dispatchEvent(new CustomEvent('longpress', {
@@ -15,8 +9,6 @@ export function longpress(node, threshold = 500) {
         detail: { originalEvent: true }
       }));
     }, threshold);
-    // === -📝=TODO=📝- ===
-    console.log("Longpress triggered!")
   };
 
   const handleCancel = () => {
