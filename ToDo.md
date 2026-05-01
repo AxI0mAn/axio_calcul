@@ -1,8 +1,8 @@
 
 
-# 1. Поскольку ты переходишь со страницы на страницу, помни: твой appState — это синглтон. Если ты ввел число на главной, а потом перешел по ссылке /basic, значение appState.display сохранится, так как объект в памяти один и тот же.
-
+#  ❎ Поскольку ты переходишь со страницы на страницу, помни: твой appState — это синглтон. Если ты ввел число на главной, а потом перешел по ссылке /basic, значение appState.display сохранится, так как объект в памяти один и тот же.
 Если ты хочешь, чтобы при переходе в новый режим калькулятор "сбрасывался", тебе стоит вызывать appState.reset() в блоке onMount на целевой странице или прямо в функции клика по ссылке.
+appState — это синглтон для всей математики!!
 
 
 
@@ -13,14 +13,174 @@
     return;
   }
 
-#  Когда начнете добавлять тригонометрию, помните, что стандартный Math.sin() принимает радианы, а пользователи калькуляторов обычно ждут градусы. Вам придется добавить в mathCore.js еще и функцию конвертации: rad = deg (pi/180)
-  
+ ❎ на кнопке корень квадратный через svg?
+
+
+
+
+===================================================================
+===================================================================
+===================================================================
+#  тригонометрия 
+
+Тригонометрия.
+Все функции для тригонометрии должны находиться в файле src/lib/services/math/trigon.js
+
+функции, которые необходимо создать в файле src/lib/services/math/trigon.js
+		sinFunc,
+		sinhFunc,
+		asinFunc,
+		asinhFunc,
+		cosFunc,
+		coshFunc,
+		acosFunc,
+		acoshFunc,
+		tanFunc,
+		tanhFunc,
+		atanFunc,
+		atanhFunc,
+		cotFunc,
+		cothFunc,
+		acotFunc,
+		acothFunc,
+    cornerSwitch
+
+
+стандартный Math.sin() принимает радианы, а пользователи калькуляторов обычно ждут градусы. Поэтому стор в файле appState.svelte.js указано corner, и есть функция cornerSwitch  которая переключает режим обработки тригонометрии. 
+
+class AppState {
+ corner = $state('deg'); // Флаг в каких еденицах измерения работаем с тригонометрией. По умолчанию градусы - 'deg', возможные варианты 'deg', 'rad' - радианы, 'grad' - грады.  
+}
+Продумай наличие функции конвертации: rad = deg (pi/180)
+
+Переключение для аppState.corner осуществляется кнопками с классом btn__trig, та кнопка текст в которой равен тексту в аppState.corner - имеет дополнительный класс active. 
+
+Компонент с кнопками для тригонометрических функций в файле src/lib/components/Btn/BtnBlockFeatures/BtnBlockOpTrigon.svelte
+<script>
+	/**
+* BtnBlockOpTrigon.svelte
+
+*/
+	import BtnText from '../BtnText.svelte';
+	import {
+		sinFunc,
+		sinhFunc,
+		asinFunc,
+		asinhFunc,
+		cosFunc,
+		coshFunc,
+		acosFunc,
+		acoshFunc,
+		tanFunc,
+		tanhFunc,
+		atanFunc,
+		atanhFunc,
+		cotFunc,
+		cothFunc,
+		acotFunc,
+		acothFunc
+	} from '$lib/services/math/trigon.js';
+</script>
+
+<div class="digBlock">
+	<div class="row">
+		<BtnText customClass="op btn__trig active" onclick={() => trigCheck()} buttonText="deg" />
+		<BtnText customClass="op btn__trig" onclick={() => trigCheck()} buttonText="rad" />
+		<BtnText customClass="op btn__trig" onclick={() => trigCheck()} buttonText="grad" />
+	</div>
+	<div class="row">
+		<BtnText customClass="op btn__func" onclick={() => sinFunc()} buttonText="sin" />
+		<BtnText customClass="op btn__func" onclick={() => sinhFunc()} buttonText="sinh" />
+		<BtnText customClass="op btn__func" onclick={() => asinFunc()} buttonText="asin" />
+		<BtnText customClass="op btn__func" onclick={() => asinhFunc()} buttonText="asinh" />
+	</div>
+	<div class="row">
+		<BtnText customClass="op btn__func" onclick={() => cosFunc()} buttonText="cos" />
+		<BtnText customClass="op btn__func" onclick={() => coshFunc()} buttonText="cosh" />
+		<BtnText customClass="op btn__func" onclick={() => acosFunc()} buttonText="acos" />
+		<BtnText customClass="op btn__func" onclick={() => acoshFunc()} buttonText="acosh" />
+	</div>
+	<div class="row">
+		<BtnText customClass="op btn__func" onclick={() => tanFunc()} buttonText="tan" />
+		<BtnText customClass="op btn__func" onclick={() => tanhFunc()} buttonText="tanh" />
+		<BtnText customClass="op btn__func" onclick={() => atanFunc()} buttonText="atan" />
+		<BtnText customClass="op btn__func" onclick={() => atanhFunc()} buttonText="atanh" />
+	</div>
+	<div class="row">
+		<BtnText customClass="op btn__func" onclick={() => cotFunc()} buttonText="cot" />
+		<BtnText customClass="op btn__func" onclick={() => cothFunc()} buttonText="coth" />
+		<BtnText customClass="op btn__func" onclick={() => acotFunc()} buttonText="acot" />
+		<BtnText customClass="op btn__func" onclick={() => acothFunc()} buttonText="acoth" />
+	</div>
+</div>
+
+
+===================================================================
+=================================================================== 
+
+# Конвертер углов (Deg / Rad / Grad): Возможность переключаться между градусами и радианами. Для инженеров радианы — стандарт, для школьников — градусы.
+
+
+
+
+===================================================================
+=================================================================== 
+
+# Исправить!
+447=3*149 
+divs:447=3*149:58 
+
+NaN - на дисплее должно быть ERROR вместо NaN
+
+
+# Исправить! 
+есть число на дисплее как результат предыдущего действия, но не 0 и нажимаем √х - то не заменяем число, а извлекаем корень из этого числа
+# Исправить! 
+Если  нажат √х, то извлечение из памяти не добавляет цифру, а заменяет символ корня!
+
+# ИСПРАВИТЬ 
+если из памяти извлекли число, то к нему приклеиваются нажимаемые цифры, а должны заменять извлечённое число!
+
+ ❎  если на дисплее ERROR, то Backspace - очищает не по символьно, а сразу всё слово
+
+
+
+
+
+
+===================================================================
+=================================================================== 
+ 
+
+ ❎  Инженерная нотация (EE или Exp): Возможность вводить числа типа 5*10^12. 5 на 10 в 12 степени
+ *10^y
+ 
+
+
+
+
+# Обратные тригонометрические функции: Не только sin, но и asin (arcsin), acos, atan.
+
+ ❎  1. Математические константы
+\pi (Пи): Math.PI (~3.14159). Основа всей тригонометрии.
+e (Число Эйлера): Math.E (~2.71828). Основа натуральных логарифмов и роста.
+\phi (Золотое сечение): (1 + Math.sqrt(5)) / 2 (~1.618). Полезно для дизайнеров и архитекторов.
+\sqrt{2}: Math.SQRT2 (~1.414). Часто встречается в геометрии и электротехнике.
+
+# 2. Физические константы (для настоящего инженерного уровня)
+Символ,Название,Значение,Применение
+c,Скорость света,299792458 м/с,"Физика, оптика"
+G,Гравитационная постоянная,6.674×10−11,Астрономия
+g,Ускорение свободного падения,9.80665 м/с²,"Механика, расчет веса"
+h,Постоянная Планка,6.626×10−34,Квантовая физика
+R,Газовая постоянная,8.314 Дж/(моль·К),Термодинамика
+
+
+ ❎   ИСПРАВИТЬ если нажать пи а следом е, то они склеются на экране, а должна произойти замена!! 
 
  ❎ двойной клик на ячейке памяти: ПЕРВЫЙ КЛИК - вывОДИТ число из памяти на экран, А ВТОРОЙ сохранЯЕт в ячейке
 
-
  ❎ почему, когда я делаю цепочку [M1]+[M2]+[M3]+[M4], то  М1 извлекается дважды
-
 
  ❎  ERROR → M1 запись ОШИБКИ в ячейку памяти???
 
@@ -29,14 +189,30 @@
 
   ❎  не работает скролл в 	.history-section 
 
-# сменить название и вместо https://axi0man.github.io/axio_calcul/ должно быть axioCL
+
+
+# строки appState.display и appState.expression - можно корректировать установив курсор и используя backspase цифры и знаки 
+
+
+
+
+# сменить название и вместо https://axi0man.github.io/axio_calcul/ должно быть mymoca  - my mobile calculator
+# SEO наименование страниц вместе с chatGPT
+
+
 
 
 # запустить скрипт для оптимизации картинок
 
 # Подготовить иконки для калькуляторов jpeg webp 256 и 64px оптимизировать их
 
-# Cделать компонент picture принимает url для jpeg, url webp, alt, customClass. использовать лучшие практики типа lazyLoad 
+# из a.catalog__item  для src/routes/(math)/basic/+page.svelte сделать автоматический слайдер из разных режимов
+
+
+
+
+
+❎  Cделать компонент picture принимает url для jpeg, url webp, alt, customClass. использовать лучшие практики типа lazyLoad 
 
 ❎  исправить, чтоб в истории вместо -- были скобки вокруг числа 
 -4--4=0 
@@ -46,9 +222,9 @@
 
 # поддержка цифр и enter на desktope
 
-# select  в правом верхнем углу - как быстрый переход к другому калькулятору
+# select  в правом верхнем углу - как быстрый переход к другому калькулятору внутри группы (math/basic math/engin math/trigon или geom/triang geom/circle geom/square и т.п.)
 
-# заменить svg для info и остальных кнопок на актуальное из коллекции part44
+❎  заменить svg для info и остальных кнопок на актуальное из коллекции part44
 
 
 ❎  адаптив layout для basic/
@@ -56,8 +232,8 @@
 добавить padding снизу, чтоб экран не обрезал кнопки
 
 
+❎   Добавить полосу снизу для рекламной строки - банера
 
-# SEO наименование страниц
 
 ❌ 5 языков - это ИЗБЫТОЧНО ДЛЯ ЭТОГО ПЕТ-ПРОЕКТА,  правильно для SEO через отдельные ветки routes/en/...all folders и так для каждого языка routes/es/...all folders 
 

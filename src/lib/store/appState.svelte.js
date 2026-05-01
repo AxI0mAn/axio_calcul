@@ -8,6 +8,7 @@ class AppState {
   expression = $state('');// Текущая строящаяся цепочка (например "37+3")
   isNewInput = $state(true);// Флаг= $state() нужно ли заменить display при вводе цифры
 
+  corner = $state('deg'); // Флаг как работаем с тригонометрией
   numToFix = $state(6); //Количество знаков после запятой для результата вычисления
   now_mode = $state('arithmetic'); // Режим калькулятора - отображается в окне div class="now_mode"
 

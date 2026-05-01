@@ -9,7 +9,8 @@
 
 	// -------------
 
-	import src from '$lib/assets/basic.png';
+	import src1 from '$lib/assets/basic.png';
+	import src2 from '$lib/assets/catalog.png';
 </script>
 
 <div class="app-wrapper">
@@ -18,7 +19,11 @@
 		<p>текстовая навигация с бысрым переходом на страницу калькулятора</p>
 		<a href="{base}/basic" class="catalog__item">
 			<p>arithmetic</p>
-			<img {src} alt="logo basic calculator" />
+			<img src={src1} alt="logo basic calculator" />
+		</a>
+		<a href="{base}/engineer" class="catalog__item">
+			<p>engineer</p>
+			<img src={src2} alt="logo engineer calculator" />
 		</a>
 	</main>
 	<article class="instruction" id="instruction">

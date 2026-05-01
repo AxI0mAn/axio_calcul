@@ -88,6 +88,7 @@
       ". right ."
       ". revi .";
     justify-content: center;
+    row-gap: 4px;
 
     .field_calculator {
       grid-area: calc;
@@ -144,5 +145,39 @@
       width: 100%;
     }
 
+  }
+}
+
+.withScroll {
+  // --- Стандарт для Firefox ---
+  scrollbar-width: thin; // тонкий скроллбар
+  scrollbar-color: #86edf2 rgba(2, 17, 85, 0.3); // [цвет ползунка] [цвет дорожки]
+
+  // --- WebKit (Chrome, Safari, Edge, Opera) ---
+  &::-webkit-scrollbar {
+    width: 6px; // Ширина вертикального скролла
+    height: 6px; // Высота горизонтального (если появится)
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(2, 17, 85, 0.5); // Дорожка (фон)
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #86edf2; // Цвет ползунка
+    border-radius: 10px;
+    // Добавляем эффект свечения
+    box-shadow: 0 0 5px rgba(134, 237, 242, 0.5);
+    border: 1px solid rgba(2, 17, 85, 0.2);
+
+    &:hover {
+      background: rgba(134, 237, 242, .8); // Светлее при наведении
+      box-shadow: 0 0 10px rgba(134, 237, 242, 0.8);
+    }
+
+    &:active {
+      background: #4ade80; // Меняет цвет на зеленый при нажатии (как ваш main-display)
+    }
   }
 }

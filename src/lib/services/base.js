@@ -13,8 +13,9 @@ import { appState } from "$lib/store/appState.svelte";
 // Удаление последнего символа (Backspace)
 export function backspace() {
   let currentValue = appState.display;
-  // console.log('function backspace'); 
-  if (currentValue === '' || currentValue === '0' || currentValue.length <= 1) {
+
+  // если на дисплее ERROR, то Backspace - очищает не по символьно, а сразу всё слово
+  if (currentValue === '' || currentValue === '0' || currentValue.length <= 1 || currentValue === 'ERROR') {
     appState.display = '0';
   } else {
     appState.display = currentValue.slice(0, -1);
@@ -22,7 +23,9 @@ export function backspace() {
   // 2. Если мы удаляем цифры и точкa остаётся последним символом
   if (currentValue.endsWith('.')) {
     appState.display = currentValue.slice(0, -1);
-  }
+  };
+
+
 }
 
 // Переключение знака (+/-)
@@ -66,9 +69,36 @@ export function addDecimal() {
 }
 
 /**
- * ограничение знаков результата после запятой
+ * Ограничение знаков и автоматическое сокращение нулей в e+
  */
 export function float_toFixed(num) {
-  return parseFloat(num.toFixed(appState.numToFix));
+  const strNum = String(num);
+
+  // 1. Если это уже экспонента (e+), NaN или ERROR — не трогаем
+  if (isNaN(num) || strNum.includes('e') || strNum === 'ERROR') {
+    return strNum;
+  }
+
+  // 2. Логика превращения нулей в e+
+  // Ищем в конце числа 6 и более нулей
+  const zeroMatch = strNum.match(/^(.*[^0])(0{6,})$/);
+  if (zeroMatch) {
+    const significantPart = zeroMatch[1]; // Часть без нулей в конце (например, 100001)
+    const exponent = zeroMatch[2].length; // Количество нулей (например, 6)
+    return `${significantPart}e+${exponent}`;
+  }
+
+  // 3. Стандартное форматирование для обычных чисел
+  let result = parseFloat(num).toFixed(appState.numToFix);
+
+  // Убирает нули после точки, а если останется точка в конце — убирает и её
+  return result.replace(/(\.0+|(\.[0-9]*[1-9])0+)$/, '$2');
 }
 
+
+/**
+* Очистка (клавиша С)
+*/
+export function clear() {
+  appState.reset();
+}
