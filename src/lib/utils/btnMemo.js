@@ -23,22 +23,34 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
   const currentValueInMemo = appState[slot];
   const currentDisplay = String(appState.display);
   const lastChar = currentDisplay.slice(-1);
-
+  const sqrtSym = String.fromCharCode(8730); //  Определяем символ корня √
+  const endsWithSqrt = appState.display.endsWith(sqrtSym) || appState.display.endsWith(sqrtSym + '('); // Проверяем, заканчивается ли дисплей оператором или корнем 
   // Проверяем, является ли последний символ оператором
   const isOperator = ['+', '-', '*', '/'].includes(lastChar);
 
   // --- СЦЕНАРИЙ 1: Двойной клик (Извлечение копии без удаления) ---
   if (isDoubleClick && slot && !sourceData) {
     if (currentValueInMemo !== null) {
-      const val = String(currentValueInMemo);
-
+      let val = String(currentValueInMemo);
+      // Сначала очищаем от пробелов
+      let cleanVal = val.trim();
+      // Если в конце конструкция с "M", извлекаем само число
+      if (cleanVal.at(-2) === 'M') {
+        cleanVal = String(parseFloat(cleanVal));
+      }
+      // Проверяем на отрицательность и берем в скобки
+      if (parseFloat(cleanVal) < 0) {
+        val = `(${cleanVal})`;
+      } else {
+        val = cleanVal;
+      }
       if (isOperator) {
         appState.display = currentDisplay + val;
       } else {
         appState.display = val;
       }
 
-      appState.isNewInput = true; // Блокируем склейку для следующего ввода
+      appState.isNewInput = false; // Блокируем склейку для следующего ввода
     }
     return;
   }
@@ -99,8 +111,10 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
     // 1. Если на экране оператор (30+) — ПРИКЛЕИВАЕМ (30+1)
     // 2. Если на экране 0 или флаг нового ввода (после "=" или записи) — ЗАМЕНЯЕМ
     // 3. Если на экране просто другое число (121) БЕЗ оператора — ЗАМЕНЯЕМ (предотвращаем конкатенацию)
-    if (isOperator) {
-      appState.display += val;
+    // 4. Если строка на экране заканчивается как  String.fromCharCode(8730) или "√(" ,то не заменить а добавить цифры из памяти
+
+    if (isOperator || endsWithSqrt) {
+      appState.display = currentDisplay + val;
     } else {
       appState.display = val;
     }
@@ -114,4 +128,4 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
       appState.memoryUpdate(slot, null);
     }
   }
-}
+} 

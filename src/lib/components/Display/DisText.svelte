@@ -61,7 +61,7 @@
 <style lang="scss">
 	.display-box {
 		min-height: 100%; // 180px;
-		max-height: 48vh;
+		max-height: 40vh;
 		width: 100%;
 
 		overflow: hidden;

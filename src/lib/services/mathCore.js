@@ -158,29 +158,56 @@ export function evaluateExpression(cleanExpression) {
 
 
     // * Общие делители для X и Y  function allDivisors()
-    const divsRegExp = /divs:([\d.]+):([\d.]+)/g;
+    /*
+   const divsRegExp = /divs:([\d.]+):([\d.]+)/g;
 
+       if (expr.includes('divs:')) {
+         const finalStr = expr.replace(divsRegExp, (match, x, y) => {
+           const num1 = Math.abs(parseInt(x));
+           const num2 = Math.abs(parseInt(y));
+           const commonDivisors = [];
+           const limit = Math.min(num1, num2);
+   
+           for (let i = 2; i <= limit; i++) {
+             if (num1 % i === 0 && num2 % i === 0) {
+               commonDivisors.push(i);
+             }
+           }
+   
+           // НОВЫЙ ФОРМАТ: "24 ∩ 48 : [2, 4...]"
+           // Символ ∩ (\u2229) означает пересечение множеств делителей
+           return `${num1} \u2229 ${num2} : [${commonDivisors.join(', ')}]`;
+         });
+   
+         return finalStr; // ВАЖНО: выходим из функции здесь, не доходя до new Function!
+       }
+   */
     if (expr.includes('divs:')) {
-      const finalStr = expr.replace(divsRegExp, (match, x, y) => {
-        const num1 = Math.abs(parseInt(x));
-        const num2 = Math.abs(parseInt(y));
-        const commonDivisors = [];
-        const limit = Math.min(num1, num2);
+      // Регулярное выражение ищет: 
+      // 1. Начало divs:
+      // 2. Группу (\d+), которая состоит ТОЛЬКО из цифр
+      // 3. Разделитель : и вторую группу (\d+) ТОЛЬКО из цифр
+      const divsRegExp = /^divs:(\d+):(\d+)$/;
+      const match = expr.match(divsRegExp);
 
-        for (let i = 2; i <= limit; i++) {
-          if (num1 % i === 0 && num2 % i === 0) {
-            commonDivisors.push(i);
-          }
+      // Если строка не соответствует строгому формату divs:ЧИСЛО:ЧИСЛО
+      if (!match) {
+        return "ERROR";
+      }
+
+      const num1 = parseInt(match[1]);
+      const num2 = parseInt(match[2]);
+
+      // Дальнейшая логика вычисления делителей...
+      let commonDivisors = [];
+      let limit = Math.min(num1, num2);
+      for (let i = 2; i <= limit; i++) {
+        if (num1 % i === 0 && num2 % i === 0) {
+          commonDivisors.push(i);
         }
-
-        // НОВЫЙ ФОРМАТ: "24 ∩ 48 : [2, 4...]"
-        // Символ ∩ (\u2229) означает пересечение множеств делителей
-        return `${num1} \u2229 ${num2} : [${commonDivisors.join(', ')}]`;
-      });
-
-      return finalStr; // ВАЖНО: выходим из функции здесь, не доходя до new Function!
+      }
+      return `${num1} \u2229 ${num2} : [${commonDivisors.join(', ')}]`;
     }
-
 
 
     // 4. ВЫЧИСЛЕНИЕ

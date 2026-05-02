@@ -12,12 +12,14 @@
 		percentage,
 		toPower,
 		toPower2,
-		toPower3,
 		tenPowerX,
-		ePowerX,
 		roundUp,
 		addE,
-		addPi,
+		addPi
+	} from '$lib/services/math/basic.js';
+	import {
+		toPower3,
+		ePowerX,
 		addGold,
 		addSqrt2,
 		addLN10,
@@ -29,7 +31,7 @@
 		funcRandom,
 		multipliers,
 		allDivisors
-	} from '$lib/services/math/basic.js';
+	} from '$lib/services/math/engineer.js';
 	import { addSqrtY } from '$lib/services/math/basic.js';
 	import { addOperator } from '$lib/services/calculatorActions.svelte.js';
 </script>
