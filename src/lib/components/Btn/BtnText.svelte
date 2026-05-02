@@ -135,4 +135,14 @@
 		background: $bg-gradient__op--memo;
 		color: $hover-shadow-color-dark;
 	}
+
+	@media screen and (max-width: 480px) and (orientation: portrait),
+		screen and (max-height: 480px) and (orientation: landscape),
+		screen and (pointer: coarse) and (max-width: 1024px) {
+		.btn.btn__func,
+		.btn.btn__memo {
+			font-size: 1.25rem;
+			padding: 1vh 2vw; // 4px 6px;
+		}
+	}
 </style>
