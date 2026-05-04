@@ -60,7 +60,7 @@
 	.btn__interface {
 		// Сброс стилей ссылки
 		text-decoration: none;
-		color: $hover-color-dark;
+		color: whitesmoke;
 
 		// Центрирование контента
 		display: flex;

@@ -22,6 +22,8 @@
 	import LinkBlockNav from '$lib/components/Links/LinkBlockNav.svelte';
 
 	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
+
+	appState.now_mode = 'engineering';
 </script>
 
 <div class="app-wrapper">
@@ -187,11 +189,15 @@
 			}
 
 			.fieldBtn_page {
-				grid-area: 1 / 7 / 5 / 10;
+				grid-area: 1 / 7 / 4 / 10;
 				display: flex;
 				flex-flow: column nowrap;
-				justify-content: space-around;
-				align-items: center;
+				justify-content: space-evenly;
+				align-items: flex-start;
+			}
+
+			.fieldBtn_memory {
+				grid-area: 4 / 7 / 5 / 10;
 			}
 
 			.fieldBtn_digitPad {

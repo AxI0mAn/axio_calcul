@@ -1,7 +1,7 @@
 <!--    Применение
    <script>
-  import Picture from './Picture.svelte';
-</script>
+			import Picture from './Picture.svelte';
+		</script>
 
 <Picture 
   src={{ 

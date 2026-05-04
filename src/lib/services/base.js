@@ -72,14 +72,19 @@ export function addDecimal() {
  * Ограничение знаков и автоматическое сокращение нулей в e+
  */
 export function float_toFixed(num) {
-  const strNum = String(num);
 
-  // 1. Если это уже экспонента (e+), NaN или ERROR — не трогаем
+  // 1. Убираем ошибку точности JS (например, 4.999...999 -> 5)
+  // toPrecision(15) округляет до 15 значащих цифр. 
+  // parseFloat затем уберет лишние нули: 5.000000000 -> 5
+  const correctedNum = parseFloat(Number(num).toPrecision(15));
+  const strNum = String(correctedNum);
+
+  // 2. Если это уже экспонента (e+), NaN или ERROR — не трогаем
   if (isNaN(num) || strNum.includes('e') || strNum === 'ERROR') {
-    return strNum;
+    return strNum.replace(/\.?0+e/, 'e');
   }
 
-  // 2. Логика превращения нулей в e+
+  // 3. Логика превращения нулей в e+
   // Ищем в конце числа 6 и более нулей
   const zeroMatch = strNum.match(/^(.*[^0])(0{6,})$/);
   if (zeroMatch) {
@@ -88,8 +93,8 @@ export function float_toFixed(num) {
     return `${significantPart}e+${exponent}`;
   }
 
-  // 3. Стандартное форматирование для обычных чисел
-  let result = parseFloat(num).toFixed(appState.numToFix);
+  // 4. Стандартное форматирование для обычных чисел
+  let result = correctedNum.toFixed(appState.numToFix);
 
   // Убирает нули после точки, а если останется точка в конце — убирает и её
   return result.replace(/(\.0+|(\.[0-9]*[1-9])0+)$/, '$2');
