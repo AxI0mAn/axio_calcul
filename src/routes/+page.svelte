@@ -18,7 +18,7 @@
 	<main class="field_calculator catalog">
 		<p>текстовая навигация с бысрым переходом на страницу калькулятора</p>
 		<a href="{base}/basic" class="catalog__item">
-			<p>arithmetic</p>
+			<p>basic</p>
 			<img src={src1} alt="logo basic calculator" />
 		</a>
 		<a href="{base}/engineer" class="catalog__item">
