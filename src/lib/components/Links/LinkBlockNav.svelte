@@ -60,7 +60,7 @@
 	.btn__interface {
 		// Сброс стилей ссылки
 		text-decoration: none;
-		color: whitesmoke;
+		color: $hover-color-light;
 
 		// Центрирование контента
 		display: flex;
@@ -76,14 +76,6 @@
 		transition:
 			transform 0.1s,
 			background-color 0.2s;
-
-		@media screen and (max-width: 480px) and (orientation: portrait),
-			screen and (max-height: 480px) and (orientation: landscape),
-			screen and (pointer: coarse) and (max-width: 1024px) {
-			svg {
-				transform: scale(50%);
-			}
-		}
 
 		@media (hover: hover) and (pointer: fine) {
 			&:hover {
@@ -107,6 +99,13 @@
 			box-shadow:
 				0 0 2px $active-shadow-color-light,
 				0 0 8px $active-shadow-color-dark;
+		}
+	}
+
+	@media screen and (max-width: 500px) and (orientation: portrait),
+		screen and (max-height: 500px) and (orientation: landscape) {
+		.btn__interface :global(svg) {
+			transform: scale(0.8); // Уменьшаем до 80%
 		}
 	}
 </style>

@@ -16,6 +16,12 @@
 		initAccordion();
 	});
 
+	// Double Tap Issue - перехватывает первый клик на мобильном устройстве
+	import { initTouchHover } from '$lib/utils/initTouchCards';
+	$effect(() => {
+		initTouchHover('.catalog__card');
+	});
+
 	// ------------- логотипы для ссылок на страницы калькуляторов
 
 	import Picture from '$lib/components/Picture/Picture.svelte';
@@ -43,7 +49,7 @@
 		<div class="groupCalcAll">
 			<details class="groupCalc" name="my-accordion">
 				<summary>
-					<h2 class="groupCalc__title catalog__card--title">mathematics calculators</h2>
+					<h2 class="groupCalc__title">mathematics calculators</h2>
 				</summary>
 				<section class="group__catalog">
 					<div class="catalog__post">
@@ -104,7 +110,7 @@
 			</details>
 			<details class="groupCalc" name="my-accordion">
 				<summary>
-					<h2 class="groupCalc__title catalog__card--title">geometry calculators</h2>
+					<h2 class="groupCalc__title">geometry calculators</h2>
 				</summary>
 				<section class="group__catalog">
 					<div class="catalog__post">
@@ -213,11 +219,6 @@
 		content: '';
 	}
 
-	.groupCalc__title.catalog__card--title {
-		width: 90%;
-		font-size: 1.5rem;
-		cursor: pointer;
-	}
 	.group__catalog {
 		/*  Catalog: 
   1. все карточки одинакового размера. 
@@ -260,10 +261,6 @@
 		padding: 0px;
 
 		border-radius: 12px;
-		-webkit-border-radius: 12px;
-		-moz-border-radius: 12px;
-		-ms-border-radius: 12px;
-		-o-border-radius: 12px;
 
 		box-shadow: 2px 2px 2px 2px rgb(var(--shadow));
 
@@ -272,10 +269,11 @@
 		grid-template-rows: 1fr;
 
 		transition: all 0.35s;
-		-webkit-transition: all 0.35s;
-		-moz-transition: all 0.35s;
-		-ms-transition: all 0.35s;
-		-o-transition: all 0.35s;
+
+		-webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при нажатии в Safari */
+		-webkit-touch-callout: none; /* Убирает системное меню при долгом нажатии */
+		user-select: none; /* Предотвращает выделение текста внутри */
+		touch-action: manipulation; /* Оптимизирует задержку клика */
 	}
 
 	.catalog__card--content {
@@ -289,12 +287,8 @@
 		object-fit: fill;
 
 		border-radius: 12px;
-		-webkit-border-radius: 12px;
-		-moz-border-radius: 12px;
-		-ms-border-radius: 12px;
-		-o-border-radius: 12px;
 	}
-
+	.groupCalc__title,
 	.catalog__card--title {
 		width: 100%;
 		min-height: 2rem;
@@ -323,81 +317,72 @@
 		border-top: 1px solid rgb(var(--mainColorR), 0.2);
 		border-bottom: 1px solid rgb(var(--mainColorR), 0.2);
 		transition: all 0.35s;
-		-webkit-transition: all 0.35s;
-		-moz-transition: all 0.35s;
-		-ms-transition: all 0.35s;
-		-o-transition: all 0.35s;
 	}
 
-	.catalog__card:hover {
-		box-shadow: -4px 4px 2px 2px rgb(var(--shadow), 0.9);
-		outline: 4px solid green;
-
-		transition: all 0.5s;
-		-webkit-transition: all 0.5s;
-		-moz-transition: all 0.5s;
-		-ms-transition: all 0.5s;
-		-o-transition: all 0.5s;
-
-		transform: rotate3d(1, 1, 0, 20deg);
-		-webkit-transform: rotate3d(1, 1, 0, 20deg);
-		-moz-transform: rotate3d(1, 1, 0, 20deg);
-		-ms-transform: rotate3d(1, 1, 0, 20deg);
-		-o-transform: rotate3d(1, 1, 0, 20deg);
-		transform-style: preserve-3d;
+	.groupCalc__title {
+		width: 90%;
+		font-size: 1.5rem;
+		cursor: pointer;
 	}
 
-	.catalog__card:hover .catalog__card--title {
-		box-shadow: 0px 0px 30px rgb(var(--mainColorL), 0.9);
-		border-top: 1px solid rgb(var(--mainColorL), 0.2);
-		border-bottom: 1px solid rgb(var(--mainColorL), 0.2);
-		color: rgb(var(--shadow), 1);
-		width: fit-content;
-		min-height: 4rem;
-		font-size: 2rem;
-
-		padding: 2px 4px;
-		text-shadow: -2px 2px 2px rgb(var(--mainColorL), 0.9);
-
-		transition: all 0.35s;
-
-		transform: translateZ(50px);
-		-webkit-transform: translateZ(50px);
-		-moz-transform: translateZ(50px);
-		-ms-transform: translateZ(50px);
-		-o-transform: translateZ(50px);
+	.catalog__card--title {
+		transform: scale(0.01);
 	}
 
-	.catalog__card:hover::before {
-		position: absolute;
-		bottom: -2px;
-		content: '';
-		background: transparent;
-		width: 0%;
-		height: 0px;
-		transition: all 0.5s;
-		-webkit-transition: all 0.5s;
-		-moz-transition: all 0.5s;
-		-ms-transition: all 0.5s;
-		-o-transition: all 0.5s;
+	/* Состояние Hover для устройств с мышью */
+	@media (hover: hover) {
+		.catalog__card:hover {
+			box-shadow: -4px 4px 2px 2px rgba(255, 127, 80, 0.5); //rgb(var(--shadow), 0.9);
+			outline: 4px solid coral;
+
+			transition: box-shadow 0.05s;
+			transition: all 0.5s;
+
+			transform: rotate3d(1, 1, 0, 20deg);
+			transform-style: preserve-3d;
+		}
+
+		.catalog__card:hover .catalog__card--title {
+			box-shadow: 0px 0px 30px rgb(var(--mainColorL), 0.9);
+			border-top: 1px solid rgb(var(--mainColorL), 0.2);
+			border-bottom: 1px solid rgb(var(--mainColorL), 0.2);
+			color: coral; //rgb(var(--shadow), 1);
+			min-width: 100%;
+			width: fit-content;
+			min-height: 4rem;
+			font-size: 2rem;
+
+			padding: 2px 4px;
+			text-shadow: -2px 2px 2px rgb(var(--mainColorL), 0.9);
+
+			transition: all 0.35s;
+
+			transform: translateZ(50px) scale(1);
+		}
+
+		.catalog__card:hover::before {
+			position: absolute;
+			bottom: -2px;
+			content: '';
+			background: transparent;
+			width: 0%;
+			height: 0px;
+			transition: all 0.5s;
+		}
 	}
 
-	.catalog__card:active {
+	.catalog__card:active:not(.is-hovered) {
+		box-shadow: -4px 4px 2px 2px rgb(var(--shadow), 0.3);
+		outline: none;
 		box-shadow: none;
-		transition: all 0.35s;
-		-webkit-transition: all 0.35s;
-		-moz-transition: all 0.35s;
-		-ms-transition: all 0.35s;
-		-o-transition: all 0.35s;
+		text-decoration: none;
+
+		transition: all 0.1s;
 		transform: rotate3d(0, 0, 0, 20deg);
-		-webkit-transform: rotate3d(0, 0, 0, 20deg);
-		-moz-transform: rotate3d(0, 0, 0, 20deg);
-		-ms-transform: rotate3d(0, 0, 0, 20deg);
-		-o-transform: rotate3d(0, 0, 0, 20deg);
 		transform-style: preserve-3d;
 	}
 
-	.catalog__card:active .catalog__card--title {
+	.catalog__card:active:not(.is-hovered) .catalog__card--title {
 		backdrop-filter: blur(0px);
 		box-shadow: none;
 		border-top: none;
@@ -407,14 +392,47 @@
 		padding-bottom: 2px;
 		text-shadow: none;
 		transition: all 0.35s;
-		-webkit-transition: all 0.35s;
-		-moz-transition: all 0.35s;
-		-ms-transition: all 0.35s;
-		-o-transition: all 0.35s;
+
 		transform: translateZ(0px);
-		-webkit-transform: translateZ(0px);
-		-moz-transform: translateZ(0px);
-		-ms-transform: translateZ(0px);
-		-o-transform: translateZ(0px);
+	}
+
+	/* Состояние "Первого клика" для мобильных (через класс .is-hovered ) */
+	.catalog__card.is-hovered {
+		box-shadow: -4px 4px 2px 2px rgba(255, 127, 80, 0.5); //rgb(var(--shadow), 0.9);
+		outline: 4px solid coral;
+
+		transition: box-shadow 0.05s;
+		transition: all 0.5s;
+
+		transform: rotate3d(1, 1, 0, 20deg);
+		transform-style: preserve-3d;
+	}
+
+	.catalog__card.is-hovered .catalog__card--title {
+		box-shadow: 0px 0px 30px rgb(var(--mainColorL), 0.9);
+		border-top: 1px solid rgb(var(--mainColorL), 0.2);
+		border-bottom: 1px solid rgb(var(--mainColorL), 0.2);
+		color: coral; //rgb(var(--shadow), 1);
+		min-width: 100%;
+		width: fit-content;
+		min-height: 4rem;
+		font-size: 2rem;
+
+		padding: 2px 4px;
+		text-shadow: -2px 2px 2px rgb(var(--mainColorL), 0.9);
+
+		transition: all 0.05s;
+
+		transform: translateZ(50px) scale(1);
+	}
+
+	.catalog__card.is-hovered::before {
+		position: absolute;
+		bottom: -2px;
+		content: '';
+		background: transparent;
+		width: 0%;
+		height: 0px;
+		transition: all 0.5s;
 	}
 </style>

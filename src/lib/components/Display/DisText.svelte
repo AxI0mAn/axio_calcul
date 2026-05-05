@@ -124,6 +124,12 @@
 		p:first-child {
 			margin-top: auto;
 		}
+		p {
+			-webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при нажатии в Safari */
+			-webkit-touch-callout: none; /* Убирает системное меню при долгом нажатии */
+			user-select: none; /* Предотвращает выделение текста внутри */
+			touch-action: manipulation; /* Оптимизирует задержку клика */
+		}
 	}
 	// Стилизация для скроллбара в history-section
 

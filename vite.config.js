@@ -23,6 +23,8 @@ export default defineConfig({
 
 	css: {
 		// PostCSS для Autoprefixer
+		// Пример для более широкой поддержки	для древних браузеров 
+		// overrideBrowserslist: ['> 0.5%', 'last 4 versions', 'Firefox ESR']
 		postcss: {
 			plugins: [
 				autoprefixer({

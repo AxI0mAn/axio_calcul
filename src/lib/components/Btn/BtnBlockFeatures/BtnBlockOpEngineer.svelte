@@ -136,8 +136,7 @@
 		}
 
 		@media screen and (max-width: 480px) and (orientation: portrait),
-			screen and (max-height: 480px) and (orientation: landscape),
-			screen and (pointer: coarse) and (max-width: 1024px) {
+			screen and (max-height: 480px) and (orientation: landscape) {
 			gap: 4px;
 			.row {
 				gap: 4px;

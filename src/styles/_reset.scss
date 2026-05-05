@@ -16,11 +16,6 @@
   outline: none;
 }
 
-a:focus,
-a:active {
-  outline: none;
-}
-
 nav,
 footer,
 header,
@@ -59,13 +54,27 @@ button::-moz-focus-inner {
   border: 0;
 }
 
-a,
-a:visited {
+a {
+  // 1. Убираем стандартное подчеркивание
   text-decoration: none;
-}
 
-a:hover {
-  text-decoration: none;
+  // 2. Наследуем цвет от родителя, чтобы ссылки не были синими по умолчанию
+  color: inherit;
+
+  // 3. Убираем мобильный серый/красный "блик" при нажатии (iOS/Android)
+  -webkit-tap-highlight-color: transparent;
+
+  // 4. Убираем контур при фокусе (но важно оставить его для клавиатуры!)
+  &:focus,
+  &:active {
+    outline: none;
+  }
+
+  // 5. Для доступности: возвращаем контур только при навигации кнопкой TAB
+  &:focus-visible {
+    outline: 2px solid var(--mainColorL, currentColor);
+    outline-offset: 2px;
+  }
 }
 
 ul li {
