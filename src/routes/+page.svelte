@@ -17,7 +17,7 @@
 	});
 
 	// Double Tap Issue - перехватывает первый клик на мобильном устройстве
-	import { initTouchHover } from '$lib/utils/initTouchCards';
+	import { initTouchHover } from '$lib/utils/initTouchHover';
 	$effect(() => {
 		initTouchHover('.catalog__card');
 	});
@@ -371,7 +371,7 @@
 		}
 	}
 
-	.catalog__card:active:not(.is-hovered) {
+	.catalog__card:active:not(.isHovered) {
 		box-shadow: -4px 4px 2px 2px rgb(var(--shadow), 0.3);
 		outline: none;
 		box-shadow: none;
@@ -382,7 +382,7 @@
 		transform-style: preserve-3d;
 	}
 
-	.catalog__card:active:not(.is-hovered) .catalog__card--title {
+	.catalog__card:active:not(.isHovered) .catalog__card--title {
 		backdrop-filter: blur(0px);
 		box-shadow: none;
 		border-top: none;
@@ -396,8 +396,8 @@
 		transform: translateZ(0px);
 	}
 
-	/* Состояние "Первого клика" для мобильных (через класс .is-hovered ) */
-	.catalog__card.is-hovered {
+	/* Состояние "Первого клика" для мобильных (через класс .isHovered ) */
+	:global(.catalog__card.isHovered) {
 		box-shadow: -4px 4px 2px 2px rgba(255, 127, 80, 0.5); //rgb(var(--shadow), 0.9);
 		outline: 4px solid coral;
 
@@ -408,7 +408,7 @@
 		transform-style: preserve-3d;
 	}
 
-	.catalog__card.is-hovered .catalog__card--title {
+	:global(.catalog__card.isHovered .catalog__card--title) {
 		box-shadow: 0px 0px 30px rgb(var(--mainColorL), 0.9);
 		border-top: 1px solid rgb(var(--mainColorL), 0.2);
 		border-bottom: 1px solid rgb(var(--mainColorL), 0.2);
@@ -426,7 +426,7 @@
 		transform: translateZ(50px) scale(1);
 	}
 
-	.catalog__card.is-hovered::before {
+	:global(.catalog__card.isHovered::before) {
 		position: absolute;
 		bottom: -2px;
 		content: '';
