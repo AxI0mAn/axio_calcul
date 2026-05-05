@@ -137,8 +137,7 @@
 	}
 
 	@media screen and (max-width: 480px) and (orientation: portrait),
-		screen and (max-height: 480px) and (orientation: landscape),
-		screen and (pointer: coarse) and (max-width: 1024px) {
+		screen and (max-height: 480px) and (orientation: landscape) {
 		.btn.btn__func,
 		.btn.btn__memo {
 			font-size: 1.25rem;
