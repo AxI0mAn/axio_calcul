@@ -22,6 +22,9 @@
 		initTouchHover('.catalog__card');
 	});
 
+	//
+	import HomeHeader from '$lib/components/aBlock/homeHeader/homeHeader.svelte';
+
 	// ------------- логотипы для ссылок на страницы калькуляторов
 
 	import Picture from '$lib/components/Picture/Picture.svelte';
@@ -40,12 +43,11 @@
 <div class="app-wrapper">
 	<aside class="field_left"></aside>
 	<main class="field_calculator catalog">
-		<header class="home__header">
-			<nav>BURGER</nav>
-			<p class="appNameInHeader font-digits">axio mobile calculator</p>
-			<a href="{base}/settings">Settings</a>
-		</header>
-		<h1 class="slogan">28 function in 2 calculators</h1>
+		<div class="headerWrapper"><HomeHeader /></div>
+		<h1 class="slogan font-digits">
+			<span class="allFunc">28 functions</span> <span>in</span>
+			<span class="allCalc">2 calculators</span>
+		</h1>
 		<div class="groupCalcAll">
 			<details class="groupCalc" name="my-accordion">
 				<summary>
@@ -168,23 +170,28 @@
 		justify-content: space-between;
 		align-items: center;
 		gap: 24px;
-	}
 
-	.home__header {
-		background-color: coral;
+		position: relative;
+	}
+	.headerWrapper {
 		width: 100%;
-		padding: 24px 12px;
-		display: flex;
-		flex-flow: row nowrap;
-		justify-content: space-between;
-		align-items: center;
-		.appNameInHeader {
-			font-size: 1.5rem;
-			font-weight: 777;
-		}
+		z-index: 999;
 	}
 	.slogan {
+		display: flex;
+		flex-flow: column wrap;
+		justify-content: center;
+		align-items: center;
+
+		margin-bottom: 2rem;
+
+		font-size: 2.4rem;
+		text-align: center;
 		color: coral;
+		.allCalc {
+			color: #86edf2;
+			font-weight: 777;
+		}
 	}
 	// =============================================================
 	.groupCalcAll {
@@ -320,9 +327,19 @@
 	}
 
 	.groupCalc__title {
+		min-height: 3rem;
 		width: 90%;
 		font-size: 1.5rem;
 		cursor: pointer;
+		border-top: none;
+		border-bottom: none;
+		&:hover {
+			border-top: 1px solid rgb(var(--mainColorR), 0.2);
+			border-right: 8px groove coral;
+			border-bottom: 1px solid rgb(var(--mainColorR), 0.2);
+			border-left: 8px groove coral;
+			transition: all 0.35s;
+		}
 	}
 
 	.catalog__card--title {

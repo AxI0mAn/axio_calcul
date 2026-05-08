@@ -136,6 +136,15 @@
 		color: $hover-shadow-color-dark;
 	}
 
+	.btn.btn__install {
+		padding: 2rem;
+		color: coral;
+	}
+	.btn.btn__install--mini {
+		padding: 0.25rem;
+		color: coral;
+	}
+
 	@media screen and (max-width: 480px) and (orientation: portrait),
 		screen and (max-height: 480px) and (orientation: landscape) {
 		.btn.btn__func,

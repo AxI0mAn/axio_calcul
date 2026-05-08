@@ -3,9 +3,10 @@
 	import '../styles/app.scss';
 	import '../styles/_modal.scss';
 
-	import { fade } from 'svelte/transition'; // Для плавного появления модалки с ячейками памяти
-
 	import favicon from '$lib/assets/favicon.png';
+
+	// Для плавного появления модалки с ячейками памяти
+	import { fade } from 'svelte/transition';
 
 	import { appState } from '$lib/store/appState.svelte';
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
@@ -13,7 +14,20 @@
 	let { children } = $props();
 
 	export const prerender = true;
-export const trailingSlash = 'always';
+	export const trailingSlash = 'always';
+
+	// установка приложения
+	import { appStore } from '$lib/store/appStore.svelte';
+	import { initPwaLogic } from '$lib/utils/initPwaLogic';
+
+	// Этот код сработает ОДИН РАЗ при инициализации приложения
+	$effect(() => {
+		// Нам не нужно вешать слушатели на каждой странице. т.к. Окно (window) у нас одно на весь сеанс.
+		if (!appStore.installed) {
+			console.log('Проверяем возможность установки приложения src/routes/+layout.svelte');
+			initPwaLogic();
+		}
+	});
 </script>
 
 <svelte:head>

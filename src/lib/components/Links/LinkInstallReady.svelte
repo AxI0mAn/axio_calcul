@@ -1,37 +1,37 @@
 <script>
-	// @ts-ignore
 	import { base } from '$app/paths';
-	import { handleScroll } from '$lib/utils/handleScroll';
+	import { appStore } from '$lib/store/appStore.svelte';
+	import { installPwaAction } from '$lib/utils/initPwaLogic';
+	import Install from '$lib/assets/svgIcon/download.svg?raw';
 
-	import Catalog from '$lib/assets/svgIcon/catalog.svg?raw';
-	import History from '$lib/assets/svgIcon/history.svg?raw';
-	import Info from '$lib/assets/svgIcon/info.svg?raw';
-	// import Settings from '$lib/assets/svgIcon/settings.svg?raw';
-
-	import InstallReady from '$lib/components/Links/LinkInstallReady.svelte';
+	let { customClass = '' } = $props();
 </script>
 
-<div class="rowLinks">
-	<a href="{base}/#catalogAllFeatures" class="btn btn__interface" aria-label="Catalog"
-		>{@html Catalog}</a
-	>
-
+{#if appStore.canInstall && !appStore.installed}
 	<a
-		href="#instruction"
-		onclick={(e) => handleScroll(e, '.instruction')}
-		class="btn btn__interface"
-		aria-label="Info"
+		href="{base}/install"
+		onclick={(e) => {
+			e.preventDefault(); // ЗАПРЕЩАЕМ переход по ссылке, так как вызываем системное окно
+			installPwaAction();
+		}}
+		class="btn btn__interface installLink {customClass}"
+		aria-label="Install"
 	>
-		{@html Info}
-	</a>
-
-	<a href="{base}/history" class="btn btn__interface" aria-label="History">{@html History}</a>
-	<InstallReady />
-	<!-- <a href="{base}/settings" class="btn btn__interface" aria-label="Settings">{@html Settings}</a> -->
-</div>
+		{@html Install}</a
+	>
+{:else if !appStore.installed}
+	<a
+		href="{base}/install"
+		class="btn btn__interface installLink {customClass}"
+		aria-label="Install"
+	>
+		{@html Install}</a
+	>
+{/if}
 
 <style lang="scss">
 	// --- SCSS Переменные ---
+	$accent: coral;
 	$main-color: rgb(1, 217, 195); // Цвет текста
 	$bg-color: rgb(15, 23, 42); // Фоновый цвет
 	$bg-gradient: linear-gradient(45deg, #02427e 0%, #000d37 50%, #02273e 100%);
@@ -52,13 +52,26 @@
 	$active-shadow-color-light: rgba(100, 170, 255, 0.7);
 	$active-shadow-color-dark: $main-color;
 
-	.rowLinks {
-		padding: 8px;
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 4px;
+	.btn.btn__interface.installLink {
+		color: $accent;
+		&:hover {
+			color: $main-color;
+		}
+		&:active {
+			background-color: transparent;
+		}
 	}
-
+	.btn.btn__interface.mainHeaderInstallLink {
+		color: #fff;
+		border: transparent;
+		box-shadow: none;
+		&:hover {
+			color: $bg-color;
+		}
+		&:active {
+			background-color: transparent;
+		}
+	}
 	.btn__interface {
 		// Сброс стилей ссылки
 		text-decoration: none;
