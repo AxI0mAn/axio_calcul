@@ -28,7 +28,7 @@
 
 <div class="app-wrapper">
 	<aside class="field_left"></aside>
-	<main class="field_calculator basic">
+	<main class="field_main basic">
 		<div class="field_displayPad">
 			<DisText />
 		</div>
@@ -112,7 +112,7 @@
 			border-radius: 16px;
 		}
 	}
-	.field_calculator.basic {
+	.field_main.basic {
 		// По умолчанию вертикальный (12 строк, 6 колонок)
 		display: grid;
 		grid-template-columns: repeat(6, calc(50vh / 6));
@@ -161,7 +161,7 @@
 	}
 	// --- РЕЖИМ:  TABLET PORTRAIT ---
 	@media (max-width: 1023px) and (orientation: portrait), (max-width: 767px) {
-		.field_calculator.basic {
+		.field_main.basic {
 			grid-template-columns: repeat(6, minmax(1fr, calc(100vw / 6)));
 			grid-template-rows: repeat(12, calc(100vh / 12));
 			margin: 0 auto;
@@ -170,7 +170,7 @@
 
 	// --- РЕЖИМ: MOBILE  PORTRAIT ---
 	@media (orientation: portrait) and (max-width: 432px) {
-		.field_calculator.basic {
+		.field_main.basic {
 			grid-template-columns: repeat(6, calc(100vw / 6));
 			grid-template-rows: repeat(12, calc(100vh / 12));
 			margin: 0 auto;
@@ -179,7 +179,7 @@
 
 	// --- МОБИЛЬНЫЙ LANDSCAPE (6 строк, 12 колонок) ---
 	@media (max-height: 500px) and (orientation: landscape) {
-		.field_calculator.basic {
+		.field_main.basic {
 			grid-template-columns: repeat(12, calc(100vw / 12));
 			grid-template-rows: repeat(6, calc(100vh / 6));
 			width: 100%;

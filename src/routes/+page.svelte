@@ -42,7 +42,7 @@
 
 <div class="app-wrapper">
 	<aside class="field_left"></aside>
-	<main class="field_calculator catalog">
+	<main class="field_main catalog">
 		<div class="headerWrapper"><HomeHeader /></div>
 		<h1 class="slogan font-digits">
 			<span class="allFunc">28 functions</span> <span>in</span>
@@ -159,7 +159,7 @@
 </div>
 
 <style lang="scss">
-	.field_calculator.catalog {
+	.field_main.catalog {
 		width: 100%;
 		// background: #1e293b;
 		padding: 0.4rem;

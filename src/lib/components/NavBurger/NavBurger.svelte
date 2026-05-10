@@ -32,9 +32,11 @@
 						{ label: 'headers', href: '/widget/headers' }
 					]
 				},
-				{ label: 'Progress', href: '/shared/progress' }
+				{ label: 'old history', href: `${base}/history` }
 			]
-		}
+		},
+		{ label: 'old history', href: `${base}/history` },
+		{ label: 'settings', href: `${base}/settings` }
 	]);
 
 	if (!appStore.installed) {

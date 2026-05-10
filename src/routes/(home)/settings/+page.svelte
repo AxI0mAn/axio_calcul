@@ -1,8 +1,175 @@
-<h1>settings</h1>
+<script>
+	import { appStore } from '$lib/store/appStore.svelte';
+
+	// Константы для выбора
+	const languages = ['RU', 'EN', 'UA', 'PT', 'ES'];
+	const fontSizes = [
+		{ label: 'Mini', value: 14 },
+		{ label: 'Norm', value: 16 },
+		{ label: 'Max', value: 18 }
+	];
+</script>
+
+<h1 class="header">settings</h1>
+<div class="settings-page">
+	<section class="setting-group">
+		<span class="label">Цветовая тема</span>
+		<div class="radio-group">
+			<label class="radio-item">
+				<input type="radio" bind:group={appStore.theme} value="light" />
+				<span class="btn-check">Light</span>
+			</label>
+			<label class="radio-item">
+				<input type="radio" bind:group={appStore.theme} value="dark" />
+				<span class="btn-check">Dark</span>
+			</label>
+		</div>
+	</section>
+
+	<section class="setting-group">
+		<span class="label">Язык интерфейса</span>
+		<select bind:value={appStore.lang} class="custom-select">
+			{#each languages as l}
+				<option value={l}>{l}</option>
+			{/each}
+		</select>
+	</section>
+
+	<section class="setting-group">
+		<span class="label">Размер текста</span>
+		<div class="radio-group">
+			{#each fontSizes as fs}
+				<label class="radio-item">
+					<input type="radio" bind:group={appStore.fontSize} value={fs.value} />
+					<span class="btn-check">{fs.label}</span>
+				</label>
+			{/each}
+		</div>
+	</section>
+
+	<section class="setting-group">
+		<div class="label-row">
+			<span class="label">Точность знаков</span>
+			<span class="value-badge">{appStore.toFix}</span>
+		</div>
+		<input type="range" min="0" max="12" bind:value={appStore.toFix} class="custom-range" />
+	</section>
+
+	<section class="setting-group">
+		<div class="label-row">
+			<span class="label">Лимит истории</span>
+			<span class="value-badge">{appStore.historyLocal}</span>
+		</div>
+		<input type="range" min="1" max="20" bind:value={appStore.historyLocal} class="custom-range" />
+	</section>
+</div>
 
 <style>
-	h1 {
+	.settings-page {
+		color: #00d1ff; /* Неоновый голубой */
+		padding: 20px;
+		font-family: sans-serif;
+		min-height: 100vh;
+	}
+
+	.header {
 		color: coral;
-		font-size: 80px;
+		font-size: 5rem;
+		display: inline-block;
+		padding: 1rem 2rem;
+		margin-bottom: 2rem;
+	}
+
+	.setting-group {
+		margin: 0 auto;
+		max-width: 100vmin;
+		margin-bottom: 25px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.label {
+		color: #aaa;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+	}
+
+	.label-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.value-badge {
+		color: #fff;
+		background: #1a202c;
+		padding: 2px 10px;
+		border: 1px solid #00d1ff;
+		border-radius: 4px;
+		box-shadow: 0 0 10px rgba(0, 209, 255, 0.3);
+	}
+
+	/* Стилизация Radio как кнопок на скриншоте */
+	.radio-group {
+		display: flex;
+		gap: 10px;
+	}
+
+	.radio-item input {
+		display: none;
+	}
+
+	.btn-check {
+		display: block;
+		padding: 10px 20px;
+		background: linear-gradient(180deg, #2c3440 0%, #1a202c 100%);
+		border: 1px solid #3d4655;
+		border-radius: 6px;
+		color: #fff;
+		cursor: pointer;
+		text-align: center;
+		min-width: 70px;
+		transition: 0.2s;
+	}
+
+	.radio-item input:checked + .btn-check {
+		border-color: #00d1ff;
+		box-shadow: inset 0 0 10px rgba(0, 209, 255, 0.5);
+		color: #00d1ff;
+	}
+
+	/* Стилизация Range (Ползунок) */
+	.custom-range {
+		-webkit-appearance: none;
+		width: 100%;
+		height: 6px;
+		background: #2c3440;
+		border-radius: 3px;
+		outline: none;
+	}
+
+	.custom-range::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: 20px;
+		height: 20px;
+		background: #00d1ff;
+		border-radius: 50%;
+		cursor: pointer;
+		box-shadow: 0 0 10px #00d1ff;
+	}
+
+	/* Стилизация Select */
+	.custom-select {
+		background: #2c3440;
+		color: #fff;
+		border: 1px solid #3d4655;
+		padding: 10px;
+		border-radius: 6px;
+		outline: none;
+	}
+
+	.custom-select:focus {
+		border-color: #00d1ff;
 	}
 </style>

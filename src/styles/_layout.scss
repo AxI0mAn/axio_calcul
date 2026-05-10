@@ -44,7 +44,7 @@
       grid-area: right;
     }
 
-    .field_calculator {
+    .field_main {
       top: 0;
       grid-area: calc;
       width: 50vh;
@@ -94,7 +94,7 @@
     justify-content: center;
     row-gap: 4px;
 
-    .field_calculator {
+    .field_main {
       grid-area: calc;
     }
 

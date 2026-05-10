@@ -5,7 +5,7 @@
 
 	import favicon from '$lib/assets/favicon.png';
 
-	// Для плавного появления модалки с ячейками памяти
+	// ===========  Для плавного появления модалки с ячейками памяти
 	import { fade } from 'svelte/transition';
 
 	import { appState } from '$lib/store/appState.svelte';
@@ -16,7 +16,7 @@
 	export const prerender = true;
 	export const trailingSlash = 'always';
 
-	// установка приложения
+	// ===========  установка приложения
 	import { appStore } from '$lib/store/appStore.svelte';
 	import { initPwaLogic } from '$lib/utils/initPwaLogic';
 
@@ -27,6 +27,29 @@
 			console.log('Проверяем возможность установки приложения src/routes/+layout.svelte');
 			initPwaLogic();
 		}
+	});
+
+	// =========== настраиваем глобальный «слушатель» для мобильных устройств. Применяется для работы historyStore
+	import { onMount } from 'svelte';
+	/**
+	 * Настраиваем отслеживание состояния видимости страницы.
+	 * Это самый надежный способ сохранить данные на мобильных устройствах.
+	 */
+	onMount(() => {
+		const handleVisibilityChange = () => {
+			// Когда пользователь сворачивает браузер, переключает вкладку
+			// или закрывает приложение — состояние становится 'hidden'.
+			if (document.visibilityState === 'hidden') {
+				appState.saveAllActiveSessions();
+			}
+		};
+
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+
+		// Чистим за собой при уничтожении макета
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+		};
 	});
 </script>
 

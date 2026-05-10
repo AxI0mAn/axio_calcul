@@ -4,9 +4,8 @@
 	import BtnText from '$lib/components/Btn/BtnText.svelte';
 </script>
 
-<div class="page">
-	<h1>install</h1>
-
+<h1 class="header">install</h1>
+<div class="install-page">
 	<h3>страница install: краткое объяснение что установится как и зачем</h3>
 	<ol>
 		<li>
@@ -21,9 +20,8 @@
 		</li>
 	</ol>
 
-	<h2>Если Ваш браузер поддерживает установку приложения, то</h2>
-
 	{#if appStore.canInstall && !appStore.installed}
+		<h2>Если Ваш браузер поддерживает установку приложения, то</h2>
 		<BtnText
 			customClass="btn__install"
 			onclick={() => {
@@ -41,19 +39,25 @@
 </div>
 
 <style>
-	.page {
+	.install-page {
 		padding: 2rem;
 		min-height: 100vw;
+		color: #fff;
+		line-height: 1.4rem;
+
+		margin: 0 auto;
+		max-width: 100vmin;
+		margin-bottom: 25px;
 		display: flex;
 		flex-direction: column;
-		flex-wrap: wrap;
-		justify-content: flex-start;
-		align-items: flex-start;
-		gap: 2rem;
-		color: #fff;
+		gap: 10px;
 	}
-	h1 {
+
+	.header {
 		color: coral;
-		font-size: 80px;
+		font-size: 5rem;
+		display: inline-block;
+		padding: 1rem 2rem;
+		margin-bottom: 2rem;
 	}
 </style>
