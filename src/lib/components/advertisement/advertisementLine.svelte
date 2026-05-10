@@ -24,7 +24,7 @@
 	});
 </script>
 
-<a href="/basic" class="catalog__item">
+<a href="https://axi0man.github.io/axI0_Puzzle/" target="_blank" class="catalog__items">
 	{#key currentIndex}
 		<img src={images[currentIndex]} alt="puzzle advertisement" class="slide-img" />
 	{/key}

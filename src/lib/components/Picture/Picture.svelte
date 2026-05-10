@@ -67,12 +67,12 @@
 	{/if}
 </div>
 
-<style>
+<style lang="scss">
 	.picture-wrapper {
 		position: relative;
 		display: block; /* Изменено с inline-block для лучшего контроля размеров */
 		overflow: hidden;
-		background-color: #f3f4f6;
+		background-color: transparent; //#f3f4f6;
 		border-radius: 8px;
 		width: 100%;
 	}
@@ -93,7 +93,7 @@
 	.loader-placeholder {
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background: linear-gradient(90deg, #f0f0f0 5%, #e0e0e0 10%, #f0f0f0 7%);
 		background-size: 200% 100%;
 		animation: skeleton-loading 1.5s infinite;
 		z-index: 1;

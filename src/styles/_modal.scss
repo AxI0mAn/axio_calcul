@@ -47,12 +47,12 @@
     gap: 10px;
 
     .btn__clear-all {
-      background-color: #f76025; // Твой акцентный оранжевый
+      background-color: coral; // Твой акцентный оранжевый
       color: white;
 
       &:hover {
         background-color: white;
-        color: #f76025;
+        color: coral;
       }
     }
 

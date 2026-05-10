@@ -1,6 +1,6 @@
 {
-  "short_name": "axio_calcul",
-  "name": "MegaCalculator PWA",
+  "short_name": "amoca",
+  "name": "axio mobile calculator",
   "icons": [
     {
       "src": "icon-192.png",
@@ -16,7 +16,7 @@
   "start_url": "/axio_calcul/",
   "scope": "/axio_calcul/",
   "display": "standalone",
-  "background_color": "#1e293b",
+  "background_color": "#1f1f1f",
   "theme_color": "#1e293b",
-  "description": "Fast MegaCalculator."
+  "description": "Fast Mobile MegaCalculator"
 }
