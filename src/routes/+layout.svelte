@@ -51,6 +51,12 @@
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
 		};
 	});
+
+	//======================== смена цветовой темы приложения
+	// Руна $effect будет следить за изменением appStore.theme
+	$effect(() => {
+		document.documentElement.setAttribute('data-theme', appStore.theme);
+	});
 </script>
 
 <svelte:head>

@@ -1,11 +1,12 @@
 //  src/styles/_layout.scss
 
+@use "_variables.scss" as *;
+
 .app-wrapper {
   display: grid;
   width: 100%;
   height: fit-content;
   overflow-y: auto;
-  // background-color: #1a2a3a; // Фон как на скриншоте
 
   // --- РЕЖИМ: DESKTOP & TABLET LANDSCAPE ---
   @media (min-width: 1024px),
@@ -27,51 +28,41 @@
     }
 
     .field_left {
-      // === -📝=TODO=📝- ===
-      background-color: rgba(127, 255, 212, .25);
-
-      box-shadow:
-        -8px 0px 16px 8px rgba(0, 0, 0, 0.75);
-
+      background: linear-gradient(to right, $clr-black 0%, rgba($clr-bg-darker, 0.4) 100%);
+      box-shadow: -8px 0px 16px 8px rgba($clr-black, 0.75);
       left: 0;
       grid-area: left;
     }
 
     .field_right {
-      // === -📝=TODO=📝- ===
-      background-color: rgba(219, 127, 255, 0.25);
+      background: linear-gradient(to left, $clr-black 0%, rgba($clr-bg-darker, 0.4) 100%);
       right: 0;
       grid-area: right;
     }
 
     .field_main {
+      background: $grad-btn-main;
+      box-shadow: 0px 0px 8px 4px rgba($clr-mint, 0.75);
       top: 0;
       grid-area: calc;
       width: 50vh;
-      // min-height: 100vh;
       position: relative;
-      box-shadow:
-        0px 0px 8px 4px rgba(1, 217, 195, 0.75);
-      background: linear-gradient(215deg, #02427e 0%, #000d37 50%, #02273e 100%);
     }
 
     .instruction {
-      // === -📝=TODO=📝- ===
-      background-color: rgba(255, 232, 127, 0.25);
+      background: linear-gradient(180deg, rgba($clr-mint, 0.05) 0%, rgba($clr-bg-darker, 0.8) 100%);
+      border-top: 1px solid rgba($clr-mint, 0.2);
       grid-area: instr;
       width: 50vh;
-      // Автоматическая высота по контенту
       min-height: 20vh;
       padding: 2rem 0;
     }
 
     .reviews__old {
-
-      // === -📝=TODO=📝- ===
-      background-color: rgba(255, 0, 21, 0.25);
+      background: linear-gradient(0deg, rgba($clr-coral, 0.05) 0%, rgba($clr-bg-darker, 0.8) 100%);
+      border-bottom: 1px solid rgba($clr-coral, 0.2);
       grid-area: revi;
       width: 50vh;
-      // Автоматическая высота по контенту
       min-height: 20vh;
       padding: 2rem 0;
     }
@@ -100,33 +91,35 @@
 
     .field_left {
       grid-area: left;
-      // === -📝=TODO=📝- ===
       min-height: 4rem;
-      background-color: #02427e;
+      background: linear-gradient(90deg, $clr-bg-darker 0%, $clr-blue-light 100%);
+      border-radius: 8px;
     }
 
     .instruction {
       grid-area: instr;
       padding: 1rem;
-      // === -📝=TODO=📝- ===;
       min-height: 4rem;
-      background-color: #1f7e02;
+      background: $clr-bg-darker;
+      border: 1px solid rgba($clr-mint, 0.3);
+      border-radius: 8px;
     }
 
     .field_right {
       grid-area: right;
       padding: 1rem;
-      // === -📝=TODO=📝- ===;
       min-height: 4rem;
-      background-color: #7e0202;
+      background: $clr-bg-darker;
+      border: 1px solid rgba($clr-coral, 0.3);
+      border-radius: 8px;
     }
 
     .reviews__old {
       grid-area: revi;
       padding: 1rem;
-      // === -📝=TODO=📝- ===
       min-height: 4rem;
-      background-color: #7e5d02;
+      background: linear-gradient(180deg, $clr-bg-darker 0%, $clr-blue-mid 100%);
+      border-radius: 8px;
     }
   }
 
@@ -155,7 +148,7 @@
 .withScroll {
   // --- Стандарт для Firefox ---
   scrollbar-width: thin; // тонкий скроллбар
-  scrollbar-color: #86edf2 rgba(2, 17, 85, 0.3); // [цвет ползунка] [цвет дорожки]
+  scrollbar-color: $clr-mint-soft rgba($clr-blue-deep, 0.3); // [цвет ползунка] [цвет дорожки]
 
   // --- WebKit (Chrome, Safari, Edge, Opera) ---
   &::-webkit-scrollbar {
@@ -164,24 +157,24 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(2, 17, 85, 0.5); // Дорожка (фон)
+    background: rgba($clr-blue-deep, 0.5); // Дорожка (фон)
     border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #86edf2; // Цвет ползунка
+    background: $clr-mint-soft; // Цвет ползунка
     border-radius: 10px;
     // Добавляем эффект свечения
-    box-shadow: 0 0 5px rgba(134, 237, 242, 0.5);
-    border: 1px solid rgba(2, 17, 85, 0.2);
+    box-shadow: 0 0 5px rgba($clr-mint-soft, 0.5);
+    // border: 1px solid rgba(2, 17, 85, 0.2);
 
     &:hover {
-      background: rgba(134, 237, 242, .8); // Светлее при наведении
-      box-shadow: 0 0 10px rgba(134, 237, 242, 0.8);
+      background: $clr-mint;
+      box-shadow: 0 0 10px rgba($clr-mint, 0.8);
     }
 
     &:active {
-      background: #4ade80; // Меняет цвет на зеленый при нажатии (как ваш main-display)
+      background: $clr-mint; // Меняет цвет на зеленый при нажатии (как ваш main-display)
     }
   }
 }

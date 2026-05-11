@@ -93,7 +93,16 @@
 	.loader-placeholder {
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(90deg, #f0f0f0 5%, #e0e0e0 10%, #f0f0f0 7%);
+
+		// БЫЛО: Серый градиент (#f0f0f0)
+		// СТАЛО: Темно-синий фон с неоновым бликом (Mint или Coral на выбор)
+		background: linear-gradient(
+			90deg,
+			rgba($clr-bg-darker, 0.9) 25%,
+			rgba($clr-mint, 0.2) 50%,
+			rgba($clr-bg-darker, 0.9) 75%
+		);
+
 		background-size: 200% 100%;
 		animation: skeleton-loading 1.5s infinite;
 		z-index: 1;

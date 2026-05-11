@@ -1,4 +1,5 @@
 <script>
+	// @ts-ignore
 	import { base } from '$app/paths';
 	import Catalog from '$lib/assets/svgIcon/catalog.svg?raw';
 	import { historyStore } from '$lib/store/historyStore.svelte';
@@ -31,44 +32,68 @@
 	.history-container {
 		margin: 0 auto;
 		max-width: 100vmin;
-		color: #00d1ff; /* Неоновый голубой */
+		color: $clr-sky;
 		padding: 20px;
 		font-family: sans-serif;
 		min-height: 100vh;
 	}
 
 	.header {
-		color: coral;
+		color: $clr-coral;
 		font-size: 5rem;
 		display: inline-block;
 		padding: 1rem 2rem;
 		margin-bottom: 2rem;
 	}
+
 	.history-item {
-		border: 1px solid #ccc;
+		background-color: $clr-bg-card;
+		border: 1px solid rgba($clr-mint, 0.3);
 		margin-bottom: 1rem;
 		padding: 10px;
 		border-radius: 8px;
+		box-shadow: $shadow-neon-mint;
 	}
+
 	.type-badge {
 		font-weight: bold;
 		text-transform: uppercase;
-		border: 1px solid #ccc;
+		// БЫЛО: #ccc
+		border: 1px solid $clr-slate;
+		color: $clr-mint;
 		padding: 2px 6px;
 		font-size: 0.8rem;
+		border-radius: 4px;
 	}
+
 	.date {
-		color: #00d1ff; /* Неоновый голубой */
+		// БЫЛО: #00d1ff
+		color: $clr-sky;
 		font-size: 0.8rem;
 		float: right;
 	}
+
 	ul {
-		color: #fff;
+		// БЫЛО: #fff
+		color: $clr-text-main;
 		margin-top: 10px;
 		list-style: none;
 		padding-left: 0;
 	}
+
 	ul li {
 		line-height: 1.5rem;
+		// Можно добавить разделитель между строками истории
+		border-bottom: 1px solid rgba($clr-slate, 0.1);
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	@media (max-height: 500px) and (orientation: landscape),
+		(max-width: 500px) and (orientation: portrait) {
+		.header {
+			font-size: 2rem;
+		}
 	}
 </style>

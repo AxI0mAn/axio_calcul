@@ -1,11 +1,16 @@
 // src/lib/actions/longpress.js
 /**
  * Svelte Action для определения долгого нажатия.
- * Генерирует событие 'longpress' при удержании элемента.
- * * @param {HTMLElement} node - Элемент, к которому привязывается действие
+ * Генерирует событие 'longpress' при удержании элемента. 
+ * @param {HTMLElement} node - Элемент, к которому привязывается действие
  * @param {number} [threshold=500] - Время удержания в мс (по умолчанию 500)
- * @returns {{destroy: Function}}
+ * @returns {{ 
+ * destroy: () => void, 
+ * $$_attributes?: { onlongpress?: (e: CustomEvent) => void } 
+ * }}
  */
+
+
 export function longpress(node, threshold = 500) {
   let timer;
 
@@ -27,7 +32,7 @@ export function longpress(node, threshold = 500) {
   node.addEventListener('mouseleave', handleCancel);
   node.addEventListener('touchstart', handleStart, { passive: true });
   node.addEventListener('touchend', handleCancel);
-  node.addEventListener('touchcancel', handleCancel); // Добавили для мобилок
+  node.addEventListener('touchcancel', handleCancel);
 
   return {
     destroy() {
@@ -37,6 +42,7 @@ export function longpress(node, threshold = 500) {
       node.removeEventListener('touchstart', handleStart);
       node.removeEventListener('touchend', handleCancel);
       node.removeEventListener('touchcancel', handleCancel);
+      clearTimeout(timer);
     }
   };
 }

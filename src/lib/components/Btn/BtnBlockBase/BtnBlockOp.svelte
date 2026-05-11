@@ -52,7 +52,7 @@
 		grid-template-rows: 1fr;
 		padding: 8px;
 		border: 1px solid transparent;
-		background: #86edf2;
+		background: $clr-mint-soft;
 		gap: 8px;
 		.col {
 			display: grid;

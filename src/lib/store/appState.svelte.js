@@ -2,7 +2,7 @@
  * текущее состояние калькулятора appState.svelte.js
  */
 
-import { appStore } from "./appStore.svelte";
+// import { appStore } from "./appStore.svelte";
 import { historyStore } from "./historyStore.svelte";
 
 class AppState {
@@ -15,7 +15,7 @@ class AppState {
   /** @type {string} */
   corner = $state('deg'); // Флаг как работаем с тригонометрией
   /** @type {number} */
-  numToFix = $state(appStore.toFix); //Количество знаков после запятой для результата вычисления
+  // numToFix = $state(appStore.toFix); //Количество знаков после запятой для результата вычисления
   /** @type {string} */
   now_mode = $state('amoca'); // Режим калькулятора - отображается в окне div class="now_mode"
 

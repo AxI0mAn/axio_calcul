@@ -250,5 +250,5 @@ function autoCloseBrackets(str) {
 //   'historySession': $state.snapshot(appState.historySession), // ПРИМЕНЯЕМ snapshot Т.К. МУТИРУЕМ МАССИВ  appState.historySession.push(toHistory);
 //   'isNewInput': appState.isNewInput,
 //   'expression': appState.expression,
-//   'numToFix': appState.numToFix,
+//   'numToFix': appStore.toFix,
 // })
