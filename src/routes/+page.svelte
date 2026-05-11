@@ -22,6 +22,15 @@
 		initTouchHover('.catalog__card');
 	});
 
+	// кнопка ВВЕРХ
+	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
+
+	onMount(() => {
+		// В качестве якоря передаем ID элемента в самом верху страницы
+		// (например, логотип или пустой div в начале body)
+		createScrollTopButton('top-anchor');
+	});
+
 	//
 	import HomeHeader from '$lib/components/aBlock/homeHeader/homeHeader.svelte';
 
@@ -43,7 +52,7 @@
 <div class="app-wrapper">
 	<aside class="field_left"></aside>
 	<main class="field_main catalog">
-		<div class="headerWrapper"><HomeHeader /></div>
+		<div class="headerWrapper" id="top-anchor"><HomeHeader /></div>
 		<h1 class="slogan font-digits">
 			<span class="allFunc">28 functions</span> <span>in</span>
 			<span class="allCalc">2 calculators</span>
