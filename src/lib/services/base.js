@@ -24,8 +24,6 @@ export function backspace() {
   if (currentValue.endsWith('.')) {
     appState.display = currentValue.slice(0, -1);
   };
-
-
 }
 
 // Переключение знака (+/-)

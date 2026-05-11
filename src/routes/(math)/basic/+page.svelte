@@ -25,6 +25,40 @@
 	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
 
 	appState.now_mode = 'basic';
+
+	// обрабатываем ввод с клавиатуры ПК - только для desktop
+
+	import { onMount } from 'svelte';
+	import { handleCalculatorKey } from '$lib/utils/keyboardHandler.js';
+	import {
+		addDigit,
+		addOperator,
+		performCalculation
+	} from '$lib/services/calculatorActions.svelte';
+	import { addDecimal, backspace, clear } from '$lib/services/base';
+	import { percentage, toPower, bigFactorial } from '$lib/services/math/basic';
+
+	onMount(() => {
+		// 1. Проверка на десктоп
+		if (window.matchMedia('(pointer: coarse)').matches) return;
+
+		// 2. Создаем замыкание обработчика
+		const onKeyDown = (e) =>
+			handleCalculatorKey(e, {
+				addDigit,
+				addOperator,
+				addDecimal,
+				backspace,
+				clear,
+				performCalculation,
+				percentage,
+				toPower,
+				bigFactorial
+			});
+
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	});
 </script>
 
 <div class="app-wrapper">
