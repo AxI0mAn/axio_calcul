@@ -13,7 +13,7 @@
 
 	onMount(() => {
 		// Код внутри onMount никогда не запустится на сервере
-		initAccordion();
+		initAccordion(); // аккордеон из нескольких <details> для домашнего каталога
 	});
 
 	// Double Tap Issue - перехватывает первый клик на мобильном устройстве
@@ -25,10 +25,14 @@
 	// кнопка ВВЕРХ
 	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
 
-	onMount(() => {
-		// В качестве якоря передаем ID элемента в самом верху страницы
-		// (например, логотип или пустой div в начале body)
-		createScrollTopButton('top-anchor');
+	$effect(() => {
+		// Запускаем создание и сохраняем функцию удаления
+		const destroyButton = createScrollTopButton('top-anchor');
+
+		// Эта часть сработает, когда пользователь уйдет с этой страницы
+		return () => {
+			destroyButton();
+		};
 	});
 
 	//

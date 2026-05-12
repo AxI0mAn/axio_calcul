@@ -18,12 +18,14 @@ export function handleCalculatorKey(e, actions) {
     backspace?.();
     return;
   }
-  if (key === 'Escape') {
+
+  if (key === 'Escape' || key === 'Delete') {
     e.preventDefault();
     clear?.();
     return;
   }
-  if (key === 'Enter' || key === '=') {
+
+  if (key === 'Enter' || key === '=' || key === ' ') {
     e.preventDefault();
     performCalculation?.();
     return;

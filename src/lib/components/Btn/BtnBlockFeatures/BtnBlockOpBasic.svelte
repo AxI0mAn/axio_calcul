@@ -38,7 +38,7 @@
 		<BtnText customClass="op btn__func" onclick={() => tenPowerX()} buttonText=" *10^y" />
 	</div>
 	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => addSqrtY()} buttonText="y&Sqrt;x" />
+		<BtnText customClass="op btn__func" onclick={() => addSqrtY()} buttonText="ʸ&Sqrt;x" />
 		<BtnText customClass="op btn__func" onclick={() => addSqrt()} buttonText="&Sqrt;x" />
 		<BtnText customClass="op btn__func" onclick={() => denominator()} buttonText="1/x" />
 	</div>

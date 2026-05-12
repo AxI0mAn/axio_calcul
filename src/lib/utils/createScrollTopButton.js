@@ -40,7 +40,7 @@ export function createScrollTopButton(anchorId) {
     right: '20px',
     width: '40px',
     height: '40px',
-    backgroundColor: '#ff7f50',
+    backgroundColor: '#0284c7',
     border: 'none',
     borderRadius: '50%', // Идеальный круг
     cursor: 'pointer',
@@ -51,7 +51,7 @@ export function createScrollTopButton(anchorId) {
     opacity: '0',
     visibility: 'hidden',
     zIndex: '1000',
-    boxShadow: '0 4px 12px rgba(255, 127, 80, 0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+    boxShadow: '0 4px 12px rgba(100, 116, 139, 0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
     transform: 'scale(0.05)',
     outline: 'none'
   });
@@ -74,23 +74,23 @@ export function createScrollTopButton(anchorId) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // ЛОГИКА НАБЛЮДЕНИЯ
+  const anchor = document.getElementById(anchorId);
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      // Если якорь ушел из вида — показываем, если вернулся — скрываем
-      if (!entry.isIntersecting) {
-        showBtn();
-      } else {
-        hideBtn();
-      }
+      // Если якорь виден — скрываем, если нет — показываем
+      entry.isIntersecting ? hideBtn() : showBtn();
     });
-  }, {
-    threshold: 0,
-    rootMargin: '0px 0px -100% 0px' // Улучшает точность срабатывания
-  });
+  }, { threshold: 0 });
 
-  const anchor = document.getElementById(anchorId);
   if (anchor) observer.observe(anchor);
-
   document.body.appendChild(btn);
+
+  // ВОЗВРАЩАЕМ ФУНКЦИЮ ОЧИСТКИ
+  return () => {
+    observer.disconnect(); // Останавливаем слежку
+    if (btn.parentNode) {
+      btn.parentNode.removeChild(btn); // Удаляем кнопку из HTML
+    }
+  };
 }
