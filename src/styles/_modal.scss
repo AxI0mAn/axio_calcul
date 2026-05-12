@@ -6,29 +6,36 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8); // Затемнение фона
-  backdrop-filter: blur(4px); // Легкое размытие (очень современно)
+  // Используем чистый черный с прозрачностью для максимального фокуса на окне
+  background-color: rgba($clr-black, 0.85);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; // Поверх всего
+  z-index: 9999;
   padding: 20px;
 }
 
 .modal-content {
-  background-color: #1a1a1a; // Темный фон в стиле калькулятора
-  border: 1px solid #333;
+  // Вместо #1a1a1a используем наш глубокий синий фон
+  background-color: $clr-bg-card;
+
+  // Добавляем мятную рамку для связи с дизайном калькулятора
+  border: 1px solid rgba($clr-mint, 0.3);
   border-radius: 16px;
   padding: 24px;
   max-width: 400px;
   width: 100%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+  // Используем готовую глубокую тень
+  box-shadow: $shadow-deep;
   text-align: center;
 
   h3 {
     margin-bottom: 20px;
     font-size: 1.1rem;
-    color: #f8fafc;
+    // Используем чистый белый для заголовков
+    color: $clr-text-main;
     font-weight: 400;
   }
 
@@ -47,24 +54,36 @@
     gap: 10px;
 
     .btn__clear-all {
-      background-color: coral; // Твой акцентный оранжевый
-      color: white;
+      // Опасное действие — используем коралловый акцент
+      background-color: $clr-coral;
+      color: $clr-text-main;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
 
       &:hover {
-        background-color: white;
-        color: coral;
+        // Инверсия при наведении
+        background-color: $clr-text-main;
+        color: $clr-coral;
+        box-shadow: $shadow-neon-coral;
       }
     }
 
     .btn__cancel {
       background: transparent;
-      border: 1px solid #444;
-      color: #999;
+      // Вместо #444 используем синий оттенок из палитры
+      border: 1px solid $clr-blue-light;
+      color: $clr-slate;
       margin-top: 5px;
+      padding: 10px;
+      border-radius: 8px;
+      transition: all 0.2s;
 
       &:hover {
-        color: #fff;
-        border-color: #666;
+        color: $clr-text-main;
+        border-color: $clr-mint;
+        background-color: rgba($clr-mint, 0.1);
       }
     }
   }

@@ -23,7 +23,42 @@
 
 	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
 
-	appState.now_mode = 'engineering';
+	appState.now_mode = 'ENGINEER';
+
+	// обрабатываем ввод с клавиатуры ПК - только для desktop
+
+	import { onMount } from 'svelte';
+	import { handleCalculatorKey } from '$lib/utils/keyboardHandler.js';
+	import {
+		addDigit,
+		addOperator,
+		performCalculation
+	} from '$lib/services/calculatorActions.svelte';
+	import { addDecimal, backspace, clear } from '$lib/services/base';
+	import { percentage, toPower, bigFactorial } from '$lib/services/math/basic';
+
+	// поддержка ввода с клавиатуры на ПК
+	onMount(() => {
+		// 1. Проверка на десктоп
+		if (window.matchMedia('(pointer: coarse)').matches) return;
+
+		// 2. Создаем замыкание обработчика
+		const onKeyDown = (e) =>
+			handleCalculatorKey(e, {
+				addDigit,
+				addOperator,
+				addDecimal,
+				backspace,
+				clear,
+				performCalculation,
+				percentage,
+				toPower,
+				bigFactorial
+			});
+
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	});
 </script>
 
 <div class="app-wrapper">
@@ -69,49 +104,7 @@
 		flex: 1 1 0;
 		min-width: 0;
 	}
-	// === -📝=TODO=📝- ===
-	// это стили копия от a.catalog__item из src/routes/+page.svelte
-	a.catalog__item {
-		padding: 24px;
-		padding-top: 12px;
-		border: 1px solid white;
-		border-radius: 24px;
-		background: transparent;
-		color: grey;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 12px;
-		transition: all 0.5s;
 
-		&:hover {
-			background: #0f172a;
-			color: #94a3b8;
-			transition: all 0.35s;
-			p {
-				text-transform: uppercase;
-				font-weight: 800;
-				color: #4ade80;
-			}
-			img {
-				transform: scale(1.2);
-				transition: all 0.75s;
-			}
-		}
-		&:active {
-			color: #0f172a;
-			filter: blur(0.2px);
-			transform: scaleY(96%);
-			transition: all 0.05s;
-		}
-		img {
-			width: 10vmin;
-			aspect-ratio: 1/1;
-			border: 1px solid transparent;
-			border-radius: 16px;
-		}
-	}
 	.field_main.basic {
 		// По умолчанию вертикальный (12 строк, 6 колонок)
 		display: grid;

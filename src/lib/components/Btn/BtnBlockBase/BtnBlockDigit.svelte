@@ -104,7 +104,7 @@
 		padding: 8px;
 		border: 1px solid transparent;
 		border-top-left-radius: 8px;
-		background-color: #86edf2;
+		background-color: $clr-mint-soft;
 		height: 100%;
 		display: grid;
 		grid-template-columns: 1fr;

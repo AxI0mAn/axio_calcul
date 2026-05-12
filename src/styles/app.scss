@@ -3,6 +3,7 @@
 
 @use '_reset.scss';
 @use "_typography.scss";
+@use "_variables.scss";
 @use '_layout.scss';
 
 // Устанавливаются глобальные стили 
@@ -12,7 +13,7 @@ html {
 }
 
 body {
-  background: #1f1f1f;
+  background: $clr-bg;
 }
 
 a {

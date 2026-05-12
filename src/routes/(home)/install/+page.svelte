@@ -38,11 +38,11 @@
 	{/if}
 </div>
 
-<style>
+<style lang="scss">
 	.install-page {
 		padding: 2rem;
 		min-height: 100vw;
-		color: #fff;
+		color: $clr-text-main;
 		line-height: 1.4rem;
 
 		margin: 0 auto;
@@ -54,10 +54,16 @@
 	}
 
 	.header {
-		color: coral;
+		color: $clr-coral;
 		font-size: 5rem;
 		display: inline-block;
 		padding: 1rem 2rem;
 		margin-bottom: 2rem;
+	}
+	@media (max-height: 500px) and (orientation: landscape),
+		(max-width: 500px) and (orientation: portrait) {
+		.header {
+			font-size: 2rem;
+		}
 	}
 </style>

@@ -11,7 +11,7 @@ class AppStore {
 
   /** цветовая тема приложения
    * @type {'light' | 'dark'} */
-  #theme = $state('light');
+  #theme = $state('dark');
 
   /** выбор языка для интерфейсов и текстов
    * @type {'RU' | 'EN' | 'UA' | 'PT' | 'ES'} */

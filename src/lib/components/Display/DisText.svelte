@@ -9,7 +9,27 @@
 
 	import { tick } from 'svelte';
 
+	// history
+	let historyContain = $state(); // В Svelte 5 ссылки на элементы тоже можно инициализировать через $state
+
+	$effect(() => {
+		// Явно указываем зависимость. Эффект сработает при каждом изменении длины.
+		const historyLength = appState.historySession.length;
+
+		// Если истории нет или элемент еще не привязан, ничего не делаем
+		if (!historyContain || historyLength === 0) return;
+
+		// Svelte 5 запускает эффекты после обновления DOM,
+		// поэтому scrollHeight уже будет актуальным.
+		historyContain.scrollTo({
+			top: historyContain.scrollHeight,
+			behavior: 'smooth'
+		});
+	});
+
+	/* 	// old version
 	let historyContain; // Ссылка на div с историей
+
 	$effect(() => {
 		appState.historySession.length; // следим за добавлением новой строки в историю
 
@@ -23,15 +43,38 @@
 				});
 			}
 		};
-
 		scrollToBottom();
 	});
+*/
+
+	// QuickMenu
+	// @ts-ignore
+	import { page } from '$app/stores';
+	import { menuMaps } from '$lib/config/menuMaps.js';
+	import QuickMenu from '$lib/components/aBlock/QuickMenu.svelte';
+
+	// Реактивная переменная: проверяем, есть ли для текущего пути карта меню
+	let currentMap = $derived(
+		// Ищем в группе math
+		menuMaps.math.some((item) => item.href === $page.url.pathname)
+			? menuMaps.math
+			: // Если не нашли, ищем в группе geometry
+				menuMaps.geometry.some((item) => item.href === $page.url.pathname)
+				? menuMaps.geometry
+				: null
+	);
 </script>
 
 <div class="display-box">
-	<div class="now_mode">
-		<p>{appState.now_mode}</p>
-	</div>
+	{#if currentMap}
+		<div class="quick-nav-container">
+			<QuickMenu items={currentMap} />
+		</div>
+	{:else}
+		<div class="now_mode">
+			<p>{appState.now_mode}</p>
+		</div>
+	{/if}
 	<!-- Блок истории вычислений -->
 	<div bind:this={historyContain} class="history-section">
 		<!-- {#each appState.historySession as entry}
@@ -60,7 +103,7 @@
 
 <style lang="scss">
 	.display-box {
-		min-height: 100%; // 180px;
+		min-height: 100%;
 		max-height: 40vh;
 		width: 100%;
 
@@ -72,22 +115,30 @@
 		flex-direction: column;
 		justify-content: space-between;
 
-		position: relative;
+		position: relative; // Контейнер для позиционирования меню
 		bottom: 0;
 
-		background: rgba(2, 17, 85, 0.3);
-		box-shadow:
-			inset 4px 4px 8px 4px rgba(1, 217, 195, 0.33),
-			inset -4px -4px 8px 4px rgba(1, 217, 195, 0.33),
-			0px 0px 2px 4px rgba(0, 0, 0, 0.5);
+		// Используем темно-синюю базу с прозрачностью
+		background: rgba($clr-bg-darker, 0.3);
 
-		// border-radius: 0.75rem;
-		// margin-bottom: 1.5rem;
-		border: 1px solid #99c3fd;
+		box-shadow:
+			$shadow-inset,
+			// Наш готовый мятный инсет
+			0px 0px 2px 4px rgba($clr-black, 0.5);
+
+		// Цвет рамки дисплея (был #99c3fd - это светлый серо-голубой)
+		border: 1px solid $clr-slate;
 
 		font-size: 2.5rem;
 		text-align: left;
-		color: rgba(220, 224, 230, 0.8);
+		color: rgba($clr-white, 0.8);
+	}
+
+	.quick-nav-container {
+		position: absolute;
+		top: 1px;
+		right: 1px;
+		z-index: 50;
 	}
 
 	.now_mode {
@@ -98,9 +149,11 @@
 		font-size: 1rem;
 		font-weight: 800;
 		letter-spacing: 0.2rem;
-		color: #86edf2;
+
+		// Мятный акцент для режима
+		color: $clr-mint-soft;
 		text-transform: uppercase;
-		border: 1px solid #86edf2;
+		border: 1px solid $clr-mint-soft;
 		border-bottom-left-radius: 0.5rem;
 	}
 
@@ -112,62 +165,65 @@
 
 		font-size: 1.25rem;
 		line-height: 1.75rem;
-		color: #94a3b8;
+
+		// Второстепенный текст истории
+		color: $clr-slate;
 
 		margin-bottom: 0.5rem;
 		padding-left: 5px;
 
 		display: flex;
 		flex-direction: column;
-		// justify-content: flex-end; // это ломает скролл
 
 		p:first-child {
 			margin-top: auto;
 		}
 		p {
-			-webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при нажатии в Safari */
-			-webkit-touch-callout: none; /* Убирает системное меню при долгом нажатии */
-			user-select: none; /* Предотвращает выделение текста внутри */
-			touch-action: manipulation; /* Оптимизирует задержку клика */
+			-webkit-tap-highlight-color: transparent;
+			-webkit-touch-callout: none;
+			user-select: none;
+			touch-action: manipulation;
 		}
 	}
-	// Стилизация для скроллбара в history-section
 
+	// Стилизация скроллбара
 	.history-section::-webkit-scrollbar {
 		width: 4px;
 	}
 	.history-section::-webkit-scrollbar-thumb {
-		background: #334155;
+		// Темная деталь скролла
+		background: $clr-blue-mid;
 		border-radius: 10px;
 	}
 
 	.current-expression {
-		flex-shrink: 0; // ГАРАНТИРУЕТ, что эти блоки не будут сжиматься или уезжать
+		flex-shrink: 0;
 		padding: 0.25rem;
 		font-size: 2rem;
-		color: #94a3b8;
+		color: $clr-slate;
 		margin: 0;
 		min-height: 2.5rem;
-		border-top: 1px solid #94a3b8;
-		// border-bottom: 1px solid #94a3b8;
+		border-top: 1px solid $clr-slate;
 	}
 
 	.main-display {
-		flex-shrink: 0; // ГАРАНТИРУЕТ, что эти блоки не будут сжиматься или уезжать
+		flex-shrink: 0;
 		font-size: 3rem;
 		margin: 0;
-		color: #4ade80;
+
+		// Основной результат (зеленоватый неон)
+		color: $clr-mint;
 		font-weight: bold;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		transition: font-size 0.2s ease; /* Плавное уменьшение если текст длинный*/
+		transition: font-size 0.2s ease;
 	}
 
 	.long-text {
-		font-size: 2.5rem; /* Уменьшаем шрифт для чисел > 10 знаков */
+		font-size: 2.5rem;
 	}
 
 	.extra-long-text {
-		font-size: 1.75rem; /* Еще меньше для очень длинных чисел */
+		font-size: 1.75rem;
 	}
 </style>

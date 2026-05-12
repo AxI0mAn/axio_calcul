@@ -13,13 +13,26 @@
 
 	onMount(() => {
 		// Код внутри onMount никогда не запустится на сервере
-		initAccordion();
+		initAccordion(); // аккордеон из нескольких <details> для домашнего каталога
 	});
 
 	// Double Tap Issue - перехватывает первый клик на мобильном устройстве
 	import { initTouchHover } from '$lib/utils/initTouchHover';
 	$effect(() => {
 		initTouchHover('.catalog__card');
+	});
+
+	// кнопка ВВЕРХ
+	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
+
+	$effect(() => {
+		// Запускаем создание и сохраняем функцию удаления
+		const destroyButton = createScrollTopButton('top-anchor');
+
+		// Эта часть сработает, когда пользователь уйдет с этой страницы
+		return () => {
+			destroyButton();
+		};
 	});
 
 	//
@@ -43,7 +56,7 @@
 <div class="app-wrapper">
 	<aside class="field_left"></aside>
 	<main class="field_main catalog">
-		<div class="headerWrapper"><HomeHeader /></div>
+		<div class="headerWrapper" id="top-anchor"><HomeHeader /></div>
 		<h1 class="slogan font-digits">
 			<span class="allFunc">28 functions</span> <span>in</span>
 			<span class="allCalc">2 calculators</span>
@@ -161,9 +174,9 @@
 <style lang="scss">
 	.field_main.catalog {
 		width: 100%;
-		// background: #1e293b;
+		background: $clr-bg-card;
 		padding: 0.4rem;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+		box-shadow: $shadow-deep;
 
 		display: flex;
 		flex-flow: column nowrap;
@@ -187,9 +200,9 @@
 
 		font-size: 2.4rem;
 		text-align: center;
-		color: coral;
+		color: $clr-coral;
 		.allCalc {
-			color: #86edf2;
+			color: $clr-mint-soft;
 			font-weight: 777;
 		}
 	}
@@ -227,12 +240,6 @@
 	}
 
 	.group__catalog {
-		/*  Catalog: 
-  1. все карточки одинакового размера. 
-  2. вёрстка - Flex-box
-  3. наполняемость каталога - вручную 
-  4. объем контента - фиксированный
-  */
 		margin: 0 auto;
 		width: 96%;
 		overflow: hidden;
@@ -242,20 +249,17 @@
 		justify-content: space-evenly;
 		row-gap: 1rem;
 		column-gap: clamp(0.5rem, 0.8929rem + 1.7857vw, 2.5rem);
-		/* column-gap: от 8 до 40рх - отступ между колонками */
 
 		padding: 1rem;
 
-		background: rgba(2, 17, 85, 0.1);
+		background: rgba($clr-bg-darker, 0.1);
 		box-shadow:
-			0px 0px 30px rgb(var(--mainColorR), 0.4),
-			inset 4px 4px 8px 4px rgba(1, 217, 195, 0.33),
-			inset -4px -4px 8px 4px rgba(1, 217, 195, 0.33);
+			0px 0px 30px rgba($clr-coral, 0.4),
+			$shadow-inset;
 	}
 
 	.catalog__post {
-		// min-width: 280px;
-		width: 40%; //440px;
+		width: 40%;
 		height: fit-content;
 		margin: 0px;
 		padding: 0px;
@@ -269,7 +273,7 @@
 
 		border-radius: 12px;
 
-		box-shadow: 2px 2px 2px 2px rgb(var(--shadow));
+		box-shadow: $shadow-card;
 
 		display: grid;
 		grid-template-columns: 1fr;
@@ -277,10 +281,10 @@
 
 		transition: all 0.35s;
 
-		-webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при нажатии в Safari */
-		-webkit-touch-callout: none; /* Убирает системное меню при долгом нажатии */
-		user-select: none; /* Предотвращает выделение текста внутри */
-		touch-action: manipulation; /* Оптимизирует задержку клика */
+		-webkit-tap-highlight-color: transparent;
+		-webkit-touch-callout: none;
+		user-select: none;
+		touch-action: manipulation;
 	}
 
 	.catalog__card--content {
@@ -311,18 +315,17 @@
 
 		font-size: 1.2rem;
 		font-weight: 800;
-		color: #86edf2;
+		color: $clr-mint-soft;
 		text-align: center;
 
 		backdrop-filter: blur(10px);
-		background: rgba(2, 17, 85, 0.3);
+		background: rgba($clr-bg-darker, 0.3);
 		box-shadow:
-			0px 0px 30px rgb(var(--mainColorR), 0.4),
-			inset 4px 4px 8px 4px rgba(1, 217, 195, 0.33),
-			inset -4px -4px 8px 4px rgba(1, 217, 195, 0.33);
+			0px 0px 16px rgba($clr-mint-soft, 0.4),
+			$shadow-inset;
 
-		border-top: 1px solid rgb(var(--mainColorR), 0.2);
-		border-bottom: 1px solid rgb(var(--mainColorR), 0.2);
+		border-top: 1px solid rgba($clr-coral, 0.2);
+		border-bottom: 1px solid rgba($clr-coral, 0.2);
 		transition: all 0.35s;
 	}
 
@@ -331,14 +334,24 @@
 		width: 90%;
 		font-size: 1.5rem;
 		cursor: pointer;
-		border-top: none;
-		border-bottom: none;
+
+		border: 1px solid $clr-mint-soft;
+		box-shadow: inset 0px 0px 12px $clr-mint-soft;
+
 		&:hover {
-			border-top: 1px solid rgb(var(--mainColorR), 0.2);
-			border-right: 8px groove coral;
-			border-bottom: 1px solid rgb(var(--mainColorR), 0.2);
-			border-left: 8px groove coral;
+			box-shadow:
+				0px 0px 12px rgba($clr-coral, 0.4),
+				$shadow-inset;
+			border-top: none;
+			border-right: 8px groove $clr-coral;
+			border-bottom: none;
+			border-left: 8px groove $clr-coral;
 			transition: all 0.35s;
+
+			outline: 2px solid $clr-blue-light;
+			box-shadow:
+				0 0 4px $clr-mint-soft,
+				0 0 8px $clr-bg-card;
 		}
 	}
 
@@ -349,8 +362,8 @@
 	/* Состояние Hover для устройств с мышью */
 	@media (hover: hover) {
 		.catalog__card:hover {
-			box-shadow: -4px 4px 2px 2px rgba(255, 127, 80, 0.5); //rgb(var(--shadow), 0.9);
-			outline: 4px solid coral;
+			box-shadow: -4px 4px 2px 2px rgba($clr-coral, 0.5);
+			outline: 4px solid $clr-coral;
 
 			transition: box-shadow 0.05s;
 			transition: all 0.5s;
@@ -360,17 +373,17 @@
 		}
 
 		.catalog__card:hover .catalog__card--title {
-			box-shadow: 0px 0px 30px rgb(var(--mainColorL), 0.9);
-			border-top: 1px solid rgb(var(--mainColorL), 0.2);
-			border-bottom: 1px solid rgb(var(--mainColorL), 0.2);
-			color: coral; //rgb(var(--shadow), 1);
+			box-shadow: 0px 0px 30px rgba($clr-mint, 0.9);
+			border-top: 1px solid rgba($clr-mint, 0.2);
+			border-bottom: 1px solid rgba($clr-mint, 0.2);
+			color: $clr-coral;
 			min-width: 100%;
 			width: fit-content;
 			min-height: 4rem;
 			font-size: 2rem;
 
 			padding: 2px 4px;
-			text-shadow: -2px 2px 2px rgb(var(--mainColorL), 0.9);
+			text-shadow: -2px 2px 2px rgba($clr-mint, 0.9);
 
 			transition: all 0.35s;
 
@@ -389,7 +402,7 @@
 	}
 
 	.catalog__card:active:not(.isHovered) {
-		box-shadow: -4px 4px 2px 2px rgb(var(--shadow), 0.3);
+		box-shadow: -4px 4px 2px 2px rgba($clr-black, 0.3);
 		outline: none;
 		box-shadow: none;
 		text-decoration: none;
@@ -404,7 +417,7 @@
 		box-shadow: none;
 		border-top: none;
 		border-bottom: none;
-		color: rgb(var(--mainColorL), 0.9);
+		color: rgba($clr-mint, 0.9);
 		padding-top: 2px;
 		padding-bottom: 2px;
 		text-shadow: none;
@@ -415,8 +428,8 @@
 
 	/* Состояние "Первого клика" для мобильных (через класс .isHovered ) */
 	:global(.catalog__card.isHovered) {
-		box-shadow: -4px 4px 2px 2px rgba(255, 127, 80, 0.5); //rgb(var(--shadow), 0.9);
-		outline: 4px solid coral;
+		box-shadow: -4px 4px 2px 2px rgba($clr-coral, 0.5);
+		outline: 4px solid $clr-coral;
 
 		transition: box-shadow 0.05s;
 		transition: all 0.5s;
@@ -426,17 +439,17 @@
 	}
 
 	:global(.catalog__card.isHovered .catalog__card--title) {
-		box-shadow: 0px 0px 30px rgb(var(--mainColorL), 0.9);
-		border-top: 1px solid rgb(var(--mainColorL), 0.2);
-		border-bottom: 1px solid rgb(var(--mainColorL), 0.2);
-		color: coral; //rgb(var(--shadow), 1);
+		box-shadow: 0px 0px 30px rgba($clr-mint, 0.9);
+		border-top: 1px solid rgba($clr-mint, 0.2);
+		border-bottom: 1px solid rgba($clr-mint, 0.2);
+		color: $clr-coral;
 		min-width: 100%;
 		width: fit-content;
 		min-height: 4rem;
 		font-size: 2rem;
 
 		padding: 2px 4px;
-		text-shadow: -2px 2px 2px rgb(var(--mainColorL), 0.9);
+		text-shadow: -2px 2px 2px rgba($clr-mint, 0.9);
 
 		transition: all 0.05s;
 

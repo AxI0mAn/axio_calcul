@@ -9,6 +9,7 @@
 import { appState } from '../store/appState.svelte.js';
 import { evaluateExpression } from './mathCore.js';
 import { float_toFixed } from './base.js';
+import { toSuperscript } from '$lib/utils/toSuperscript.js';
 
 /**
 * Проверяет, является ли последний символ строки оператором
@@ -172,7 +173,13 @@ export function performCalculation() {
   if (historyEntry.includes(nSym)) {
     const re = new RegExp(`${nSym}${sqrtSym}([\\d.]+):([\\d.]+)`, 'g');
     // Превращаем "ⁿ√64:3" в красивое "3√64"
-    historyEntry = historyEntry.replace(re, `$2${sqrtSym}$1`);
+    // historyEntry = historyEntry.replace(re, `$2${sqrtSym}$1`);
+    historyEntry = historyEntry.replace(re, (match, base, exponent) => {
+      // Превращаем "3" в "³", "23" в "²³" и т.д.
+      const superExponent = toSuperscript(exponent);
+      // Возвращаем результат: ²³√64
+      return `${superExponent}${sqrtSym}${base}`;
+    });
   }
 
   // 6. logYX логарифм Х по основанию Y
@@ -250,5 +257,5 @@ function autoCloseBrackets(str) {
 //   'historySession': $state.snapshot(appState.historySession), // ПРИМЕНЯЕМ snapshot Т.К. МУТИРУЕМ МАССИВ  appState.historySession.push(toHistory);
 //   'isNewInput': appState.isNewInput,
 //   'expression': appState.expression,
-//   'numToFix': appState.numToFix,
+//   'numToFix': appStore.toFix,
 // })

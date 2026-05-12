@@ -17,7 +17,7 @@
 
 <style lang="scss">
 	.home__header {
-		background-color: coral;
+		background-color: $clr-coral; // Используем наш утвержденный акцент
 		width: 100%;
 		padding: 0.25rem 0.5rem;
 		display: flex;
@@ -25,12 +25,16 @@
 		justify-content: space-between;
 		align-items: center;
 		gap: 1rem;
-		color: #fff;
+
+		// Текст внутри коралловой шапки должен быть темным для контраста
+		color: $clr-bg;
+
 		.appNameInHeader {
 			text-align: center;
 			font-size: 1.5rem;
 			font-weight: 777;
 		}
+
 		.installReadyWrap {
 			min-height: 100%;
 			min-width: 3rem;

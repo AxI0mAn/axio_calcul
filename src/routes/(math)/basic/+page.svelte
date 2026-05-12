@@ -24,7 +24,42 @@
 
 	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
 
-	appState.now_mode = 'basic';
+	appState.now_mode = 'BASIC';
+
+	// обрабатываем ввод с клавиатуры ПК - только для desktop
+
+	import { onMount } from 'svelte';
+	import { handleCalculatorKey } from '$lib/utils/keyboardHandler.js';
+	import {
+		addDigit,
+		addOperator,
+		performCalculation
+	} from '$lib/services/calculatorActions.svelte';
+	import { addDecimal, backspace, clear } from '$lib/services/base';
+	import { percentage, toPower, bigFactorial } from '$lib/services/math/basic';
+
+	// поддержка ввода с клавиатуры на ПК
+	onMount(() => {
+		// 1. Проверка на десктоп
+		if (window.matchMedia('(pointer: coarse)').matches) return;
+
+		// 2. Создаем замыкание обработчика
+		const onKeyDown = (e) =>
+			handleCalculatorKey(e, {
+				addDigit,
+				addOperator,
+				addDecimal,
+				backspace,
+				clear,
+				performCalculation,
+				percentage,
+				toPower,
+				bigFactorial
+			});
+
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	});
 </script>
 
 <div class="app-wrapper">
@@ -70,58 +105,15 @@
 		flex: 1 1 0;
 		min-width: 0;
 	}
-	// === -📝=TODO=📝- ===
-	// это стили копия от a.catalog__item из src/routes/+page.svelte
-	a.catalog__item {
-		padding: 24px;
-		padding-top: 12px;
-		border: 1px solid white;
-		border-radius: 24px;
-		background: transparent;
-		color: grey;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 12px;
-		transition: all 0.5s;
 
-		&:hover {
-			background: #0f172a;
-			color: #94a3b8;
-			transition: all 0.35s;
-			p {
-				text-transform: uppercase;
-				font-weight: 800;
-				color: #4ade80;
-			}
-			img {
-				transform: scale(1.2);
-				transition: all 0.75s;
-			}
-		}
-		&:active {
-			color: #0f172a;
-			filter: blur(0.2px);
-			transform: scaleY(96%);
-			transition: all 0.05s;
-		}
-		img {
-			width: 10vmin;
-			aspect-ratio: 1/1;
-			border: 1px solid transparent;
-			border-radius: 16px;
-		}
-	}
 	.field_main.basic {
-		// По умолчанию вертикальный (12 строк, 6 колонок)
 		display: grid;
+		// Используем $clr-black для теней или прозрачных областей если нужно
 		grid-template-columns: repeat(6, calc(50vh / 6));
 		grid-template-rows: repeat(12, calc(100vh / 12));
 		grid-column-gap: 0px;
 		grid-row-gap: 0px;
 
-		// Распределение областей (Grid Areas)
 		.field_displayPad {
 			grid-area: 1 / 1 / 6 / 7;
 		}
@@ -154,12 +146,12 @@
 
 		.advertisementLine {
 			grid-area: 12 / 1 / 13 / 7;
-
 			overflow: hidden;
-			position: relative; // База для абсолютных потомков
+			position: relative;
 		}
 	}
-	// --- РЕЖИМ:  TABLET PORTRAIT ---
+
+	// --- МЕДИА-ЗАПРОСЫ (Цвета тут не меняются, только сетка) ---
 	@media (max-width: 1023px) and (orientation: portrait), (max-width: 767px) {
 		.field_main.basic {
 			grid-template-columns: repeat(6, minmax(1fr, calc(100vw / 6)));
@@ -168,7 +160,6 @@
 		}
 	}
 
-	// --- РЕЖИМ: MOBILE  PORTRAIT ---
 	@media (orientation: portrait) and (max-width: 432px) {
 		.field_main.basic {
 			grid-template-columns: repeat(6, calc(100vw / 6));
@@ -177,17 +168,15 @@
 		}
 	}
 
-	// --- МОБИЛЬНЫЙ LANDSCAPE (6 строк, 12 колонок) ---
 	@media (max-height: 500px) and (orientation: landscape) {
 		.field_main.basic {
 			grid-template-columns: repeat(12, calc(100vw / 12));
 			grid-template-rows: repeat(6, calc(100vh / 6));
 			width: 100%;
-			// Распределение областей (Grid Areas)
+
 			.field_displayPad {
 				grid-area: 1 / 1 / 7 / 7;
 			}
-
 			.fieldBtn_page {
 				grid-area: 1 / 7 / 4 / 10;
 				display: flex;
@@ -195,19 +184,15 @@
 				justify-content: space-around;
 				align-items: center;
 			}
-
 			.fieldBtn_memory {
 				grid-area: 4 / 7 / 5 / 10;
 			}
-
 			.fieldBtn_digitPad {
 				grid-area: 1 / 10 / 6 / 13;
 			}
-
 			.fieldBtn_basicOperators {
 				grid-area: 5 / 7 / 7 / 10;
 			}
-
 			.fieldBtn_nav {
 				grid-area: 6 / 10 / 7 / 13;
 				align-self: center;

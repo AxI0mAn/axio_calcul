@@ -1,4 +1,5 @@
 <script>
+	// @ts-ignore
 	import { base } from '$app/paths';
 	import { clickOutside } from '$lib/utils/clickOutside';
 	import { appStore } from '$lib/store/appStore.svelte';
@@ -222,22 +223,6 @@
 
 <style lang="scss">
 	/* -------------------------------------- */
-	/* SCSS ПЕРЕМЕННЫЕ */
-	/* -------------------------------------- */
-	$burger-color: #fff;
-	$burger-color-close: #fff;
-	$menu-bg-color: #fff;
-	$menu-bg-blur: rgba(255, 255, 255, 0.5);
-	$link-color: #333;
-	$hover-bg-color: #f0f0f0;
-	$active-bg-color: #e0e0e0;
-	$sub-menu-border: #ccc;
-	$transition-speed: 0.3s;
-
-	$accent: coral;
-	$main-color: rgb(1, 217, 195); // Цвет текста
-	$bg-color: rgb(15, 23, 42); // Фоновый цвет
-	/* -------------------------------------- */
 	/* ОБЩИЕ СТИЛИ */
 	/* -------------------------------------- */
 	.burger-menu {
@@ -251,7 +236,6 @@
 		filter: none;
 		position: relative;
 
-		/* Стиль при открытом меню */
 		&.is-open {
 			background-color: transparent;
 		}
@@ -278,16 +262,18 @@
 		touch-action: manipulation;
 
 		.line {
-			fill: $burger-color;
+			// Был $burger-color (#1e1e1e)
+			fill: $clr-bg-darker;
 			transition:
-				transform $transition-speed ease-in-out,
-				opacity $transition-speed ease-in-out;
+				transform 0.3s ease-in-out,
+				opacity 0.3s ease-in-out;
 			transform-origin: 0;
 		}
 
 		&:hover {
 			.line {
-				fill: $bg-color;
+				// При наведении иконка становится белой
+				fill: $clr-white;
 			}
 		}
 
@@ -295,7 +281,7 @@
 		&.is-active {
 			.top {
 				transform: translate(0, -17.5px) rotate(45deg);
-				fill: $burger-color-close;
+				fill: $clr-white; // Белый крестик при закрытии
 			}
 
 			.middle {
@@ -305,7 +291,7 @@
 
 			.bottom {
 				transform: translate(0, 17.5px) rotate(-45deg);
-				fill: $burger-color-close;
+				fill: $clr-white;
 			}
 		}
 	}
@@ -320,42 +306,46 @@
 		max-width: 90vw;
 		z-index: 999;
 		padding: 10px 0;
-		border: 1px solid #eee;
-		/* Фон для самого меню */
-		background-color: coral;
+
+		// Вместо #eee
+		border: 1px solid $clr-blue-light;
+
+		// Вместо coral используем переменную (шапка меню)
+		background-color: $clr-coral;
+
+		// Добавим тень, чтобы меню "всплывало" над калькулятором
+		box-shadow: $shadow-deep;
 	}
 
-	/* Интерактивный WRAPPER для элементов с вложениями */
+	/* Интерактивный WRAPPER */
 	.menu-button-wrapper {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		width: 100%;
-
-		/* Сбрасываем дефолтные стили кнопки */
 		background: none;
 		border: none;
 		padding: 10px 15px;
 		text-align: left;
 		cursor: pointer;
 
-		/* Стили фокуса/активации для кнопки */
 		&:focus-visible {
-			outline: 2px solid $burger-color;
+			outline: 2px solid $clr-mint;
 			outline-offset: -2px;
-			background-color: $hover-bg-color;
+			background-color: rgba($clr-white, 0.1);
 		}
 		&:active {
-			background-color: $active-bg-color;
+			background-color: rgba($clr-black, 0.1);
 		}
 	}
 
 	.menu-label {
 		flex-grow: 1;
-		color: $link-color;
+		// Текст на коралловом фоне делаем темным, как в шапке
+		color: $clr-bg-darker;
 	}
 
-	/* Обертка для листовых элементов, неинтерактивна */
+	/* Обертка для листовых элементов */
 	.menu-link-wrapper {
 		display: flex;
 		justify-content: space-between;
@@ -367,35 +357,27 @@
 		flex-grow: 1;
 		padding: 10px 15px;
 		text-decoration: none;
-		color: $link-color;
+		color: $clr-bg-darker;
 		transition: background-color 0.15s ease;
 		-webkit-tap-highlight-color: transparent;
 		touch-action: manipulation;
 
 		&:focus-visible {
-			outline: 2px solid $burger-color;
+			outline: 2px solid $clr-mint;
 			outline-offset: -2px;
-			background-color: $hover-bg-color;
+			background-color: rgba($clr-white, 0.1);
 		}
 
 		&:active {
-			background-color: $active-bg-color;
+			background-color: rgba($clr-black, 0.1);
 		}
 	}
 
-	/* Стили при наведении (только для устройств с точным указателем) */
+	/* Стили при наведении */
 	@media (hover: hover) and (pointer: fine) {
-		/* Наведение на кнопку-враппер */
-		.menu-button-wrapper:hover {
-			background-color: $hover-bg-color;
-		}
-
-		/* Наведение на обычную ссылку */
-		.menu-item:not(.has-children) .menu-link-wrapper:hover {
-			background-color: $hover-bg-color;
-			.menu-link {
-				background-color: $hover-bg-color;
-			}
+		.menu-button-wrapper:hover,
+		.menu-link:hover {
+			background-color: rgba($clr-white, 0.2);
 		}
 	}
 
@@ -407,42 +389,24 @@
 
 		&.level-1 {
 			padding-left: 20px;
-			border-left: 2px solid $sub-menu-border;
+			// Вместо #ccc
+			border-left: 2px solid rgba($clr-bg-darker, 0.3);
 		}
 
 		&.level-2 {
 			padding-left: 15px;
-			border-left: 1px solid $sub-menu-border;
-		}
-
-		.menu-link {
-			padding: 8px 10px;
+			border-left: 1px solid rgba($clr-bg-darker, 0.2);
 		}
 	}
 
-	/* Контейнер треугольника - ИСКЛЮЧИТЕЛЬНО ИНФОРМАТИВНЫЙ */
-	.triangle-container {
-		padding-left: 10px;
-		padding-right: 5px;
-		cursor: default;
-
-		/* Убедимся, что фон применяется на всю область для hover */
-		@media (hover: hover) and (pointer: fine) {
-			.menu-button-wrapper:hover & {
-				background-color: $hover-bg-color;
-			}
-		}
-	}
-
+	/* Треугольник */
 	.triangle {
 		width: 10px;
 		height: 10px;
-		fill: $link-color;
+		fill: $clr-bg-darker;
 		transition: transform 0.2s ease-in-out;
 		transform-origin: 50% 50%;
-		transform: rotate(0deg);
 
-		/* Поворот треугольника при открытом вложенном меню */
 		&.rotated {
 			transform: rotate(90deg);
 		}

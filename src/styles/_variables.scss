@@ -1,10 +1,118 @@
-	:root {
-	  --mainColorL: 41, 229, 205;
-	  --mainColorR: 255, 208, 252;
-	  /* --shadow: #586466; */
-	  --shadow: 88, 100, 102;
+// src/styles/_variables.scss
 
-	  --linGrad90: linear-gradient(90deg,
-	      rgba(var(--mainColorL), 0.75),
-	      rgba(var(--mainColorR), 0.75) 100%);
+// =============================================================================
+// 1. ДИНАМИЧЕСКИЕ ЦВЕТА (Меняются в зависимости от темы)
+// =============================================================================
+
+:root {
+
+	// --- DARK THEME (Default) ---
+	&,
+	&[data-theme='dark'] {
+		--clr-bg: #1f1f1f;
+		--clr-bg-darker: #000d37;
+		--clr-bg-card: #0f172a;
+		--clr-text-main: #ffffff;
+		--clr-slate: #64748b;
+
+		--clr-mint: #01d9c3;
+		--clr-mint-soft: #86edf2;
+		--clr-sky: #00d1ff;
+		--clr-coral: #ff7f50;
+
+		--clr-blue-light: #02427e;
+		--clr-blue-mid: #02273e;
+		--clr-blue-hover: #344e66;
+		--clr-blue-deep: #00051a;
+
+		// Свечение (RGBA значения для динамики)
+		--shd-mint-glow: rgba(1, 217, 195, 0.5);
+		--shd-coral-glow: rgba(255, 127, 80, 0.5);
+		--shd-blue-glow: rgba(100, 170, 255, 0.7);
+		--shadow-card-val: 2px 2px 2px 2px #586466;
 	}
+
+	&[data-theme='light'] {
+		// Базовые фоны - уходим в "стерильный" чистый интерфейс
+		--clr-bg: #f1f5f9; // Светлый серо-голубой (Slate 100)
+		--clr-bg-darker: #e2e8f0; // Slate 200
+		--clr-bg-card: #c2e0fc; // Чистый белый
+		--clr-text-main: #1e293b; // Глубокий Slate 800 (лучше чем чистый черный)
+		--clr-slate: #353e4b;
+
+		// Акценты - делаем их более насыщенными, т.к. нет свечения
+		--clr-mint: #0a7770; // Teal 600
+		--clr-mint-soft: #0e463e; // Teal 400
+		--clr-sky: #0284c7; // Sky 600
+
+		// ЗАМЕНА КОРАЛЛОВОГО: Переходим к Indigo, чтобы сочетаться с PNG иконками
+		--clr-coral: #726beb; // Indigo 600 (теперь это наш Primary Accent)
+
+		// Синяя палитра (инвертированная, для мягких подложек)
+		--clr-blue-light: #f8fafc;
+		--clr-blue-mid: #cbd5e1;
+		--clr-blue-hover: #e2e8f0;
+		--clr-blue-deep: #dee2e6;
+
+		// Тени - вместо свечения используем объем
+		--shd-mint-glow: rgba(13, 148, 136, 0.15);
+		--shd-coral-glow: rgba(79, 70, 229, 0.15);
+		--shd-blue-glow: rgba(2, 132, 199, 0.1);
+
+		// Карточки должны "лежать" на поверхности
+		--shadow-card-val: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+		// Инсет для светлой темы делаем серым/мягким
+		--shadow-inset-val: inset 2px 2px 5px rgba(0, 0, 0, 0.05);
+	}
+}
+
+// =============================================================================
+// 2. СТАТИЧЕСКИЕ ЦВЕТА (Не меняются никогда)
+// =============================================================================
+$clr-black: #000000;
+$clr-white: #ffffff;
+
+// =============================================================================
+// 3. SASS-ПЕРЕМЕННЫЕ (Связки с CSS-переменными)
+// =============================================================================
+
+$clr-bg: var(--clr-bg);
+$clr-bg-darker: var(--clr-bg-darker);
+$clr-bg-card: var(--clr-bg-card);
+$clr-text-main: var(--clr-text-main);
+$clr-slate: var(--clr-slate);
+
+$clr-mint: var(--clr-mint);
+$clr-mint-soft: var(--clr-mint-soft);
+$clr-sky: var(--clr-sky);
+$clr-coral: var(--clr-coral);
+
+$clr-blue-light: var(--clr-blue-light);
+$clr-blue-mid: var(--clr-blue-mid);
+$clr-blue-hover: var(--clr-blue-hover);
+$clr-blue-deep: var(--clr-blue-deep);
+
+// =============================================================================
+// 4. КОМПЛЕКСНЫЕ СТИЛИ (Градиенты и Тени)
+// Используем интерполяцию #{}, чтобы Sass корректно передал var() в CSS
+// =============================================================================
+
+// Градиенты
+$grad-btn-main: linear-gradient(215deg, #{$clr-blue-light} 0%, #{$clr-bg-darker} 50%, #{$clr-blue-mid} 100%);
+$grad-op: linear-gradient(45deg, #{$clr-slate} 0%, #252c35 50%, #4b5768 100%);
+$grad-memo: linear-gradient(45deg, #{$clr-slate} 0%, #{$clr-mint} 50%, #4b5768 100%);
+
+// Тени и Неон
+$shadow-neon-mint: 0 0 8px var(--shd-mint-glow);
+$shadow-neon-coral: 0 0 8px var(--shd-coral-glow);
+$shadow-neon-blue: 0 0 8px var(--shd-blue-glow);
+$shd-blue-glow: var(--shd-blue-glow);
+
+$shadow-card: var(--shadow-card-val);
+$shadow-deep: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+// Внутреннее неоновое свечение (Используем статический Mint для примера, 
+// либо переведи в var() если оно должно тускнеть в светлой теме)
+$shadow-inset: inset 4px 4px 8px rgba(1, 217, 195, 0.33),
+	inset -4px -4px 8px rgba(1, 217, 195, 0.33);
