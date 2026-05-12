@@ -2,6 +2,8 @@
 	/**
 	 *  src/lib/components/Display/DisText.svelte
 	 */
+	// @ts-ignore
+	import { base } from '$app/paths';
 
 	import { appState } from '$lib/store/appState.svelte.js';
 	import { longpress } from '$lib/actions/longpress';
@@ -55,13 +57,13 @@
 
 	// Реактивная переменная: проверяем, есть ли для текущего пути карта меню
 	let currentMap = $derived(
-		// Ищем в группе math
-		menuMaps.math.some((item) => item.href === $page.url.pathname)
-			? menuMaps.math
-			: // Если не нашли, ищем в группе geometry
-				menuMaps.geometry.some((item) => item.href === $page.url.pathname)
-				? menuMaps.geometry
-				: null
+		Object.values(menuMaps)
+			.flat()
+			.some((item) => $page.url.pathname.endsWith(item.href))
+			? Object.values(menuMaps).find((group) =>
+					group.some((item) => $page.url.pathname.endsWith(item.href))
+				)
+			: null
 	);
 </script>
 

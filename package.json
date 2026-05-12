@@ -5,12 +5,12 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"serv": "npm run dev -- --open",
+		"serv": "npm run dev -- --open --port 5175",
 		"prod": "npm run clean && VITE_BASE_PATH='/axio_calcul' vite build",
 		"clean": "rimraf build",
 		"build": "vite build",
 		"deploy": "npm run build",
-		"preview": "vite preview",
+		"preview": "vite preview --port 8080",
 		"prepare": "svelte-kit sync || echo ''",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."
@@ -23,6 +23,7 @@
 		"@sveltejs/kit": "^2.50.2",
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
 		"@types/node": "^22",
+		"@vite-pwa/sveltekit": "^1.1.0",
 		"autoprefixer": "^10.4.27",
 		"eslint": "^9.39.2",
 		"eslint-config-prettier": "^10.1.8",
