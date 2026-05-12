@@ -5,12 +5,12 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"serv": "npm run dev -- --open",
+		"serv": "npm run dev -- --open --port 5175",
 		"prod": "npm run clean && VITE_BASE_PATH='/axio_calcul' vite build",
 		"clean": "rimraf build",
 		"build": "vite build",
 		"deploy": "npm run build",
-		"preview": "vite preview",
+		"preview": "vite preview --port 8080",
 		"prepare": "svelte-kit sync || echo ''",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."

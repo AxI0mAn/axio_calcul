@@ -83,6 +83,7 @@
 	}
 
 	.btn.btn__func {
+		padding: 2px 8px;
 		font-size: 1.5rem;
 		color: $clr-text-main;
 		border: transparent;

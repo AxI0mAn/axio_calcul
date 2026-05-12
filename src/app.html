@@ -5,15 +5,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	%sveltekit.head%
-
-	<script>
-		if ('serviceWorker' in navigator) {
-			window.addEventListener('load', () => {
-				// Регистрируем sw.js относительно базового пути
-				navigator.serviceWorker.register('./sw.js');
-			});
-		}
-	</script>
+	<link rel="manifest" href="%sveltekit.assets%/manifest.json">
 </head>
 
 <body data-sveltekit-preload-data="hover">

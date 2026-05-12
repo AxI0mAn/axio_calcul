@@ -20,8 +20,11 @@ export default defineConfig({
 				navigateFallback: './index.html',
 			},
 			devOptions: {
-				enabled: true // Позволяет тестировать PWA в dev-режиме
-			}
+				enabled: true,
+				type: 'module', // Важно для Svelte 5
+				suppressWarnings: true,
+				navigateFallbackAllowlist: [/^\/$/], // Позволяет корректно работать на главной
+			},
 		})
 	],
 
