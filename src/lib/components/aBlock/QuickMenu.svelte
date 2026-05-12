@@ -4,7 +4,9 @@
 	import { appState } from '$lib/store/appState.svelte';
 	import Picture from '$lib/components/Picture/Picture.svelte';
 
-	let { items = [] } = $props();
+	// @ts-ignore
+	import { base } from '$app/paths';
+	let { items } = $props();
 
 	// Ищем текущий объект. Если не нашли, берем первый.
 	let activeItem = $derived(items.find((i) => i.name === appState.now_mode) || items[0]);
@@ -32,7 +34,7 @@
 		<nav class="dropdown">
 			{#each items as item}
 				{#if item.name !== appState.now_mode}
-					<a href={item.href} onclick={close} class="item">
+					<a href="{base}{item.href}" onclick={close} class="item">
 						<Picture src={item.img} alt={item.name} loading="lazy" />
 						<span class="name-tag">{item.name}</span>
 					</a>
