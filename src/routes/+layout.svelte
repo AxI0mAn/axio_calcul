@@ -8,6 +8,25 @@
 	// @ts-ignore
 	import { page } from '$app/stores';
 
+	// =========== для работы плагина SvelteKitPWA
+	import { onMount } from 'svelte';
+	import { pwaInfo } from 'virtual:pwa-info'; // Информация о манифесте
+
+	onMount(async () => {
+		// Регистрируем Service Worker автоматически
+		if (pwaInfo) {
+			const { registerSW } = await import('virtual:pwa-register');
+			registerSW({
+				immediate: true, // Проверять обновление сразу
+				onRegistered(r) {
+					console.log('PWA: Service Worker зарегистрирован');
+				},
+				onRegisterError(error) {
+					console.error('PWA: Ошибка регистрации:', error);
+				}
+			});
+		}
+	});
 	//============ встроенные эффекты Svelte5
 	import { fade } from 'svelte/transition';
 	import { blur } from 'svelte/transition';
@@ -71,7 +90,6 @@
 	});
 
 	// =========== настраиваем глобальный «слушатель» для мобильных устройств. Применяется для работы historyStore - сохранение истории в localStorage при выходе из приложения
-	import { onMount } from 'svelte';
 	/**
 	 * Настраиваем отслеживание состояния видимости страницы.
 	 * Это самый надежный способ сохранить данные на мобильных устройствах.
@@ -98,6 +116,8 @@
 	<link rel="icon" href={favicon} />
 	<title>amoca</title>
 </svelte:head>
+
+{@html pwaInfo?.webManifest.linkTag}
 
 {#key $page.url.pathname}
 	<div

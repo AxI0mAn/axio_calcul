@@ -2,9 +2,28 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
+import { SvelteKitPWA } from '@vite-pwa/sveltekit'; // 1. Импортируем плагин
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [
+		sveltekit(),
+		// 2. Настройка PWA
+		SvelteKitPWA({
+			registerType: 'autoUpdate', // Автоматическое обновление без перезагрузки вручную
+			manifest: false,            // Используем твой manifest.json из static
+			workbox: {
+				// Кэшируем все важные файлы
+				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json}'],
+				// Чистим старый кэш автоматически
+				cleanupOutdatedCaches: true,
+				// Настройка для GitHub Pages (чтобы не было проблем с путями)
+				navigateFallback: './index.html',
+			},
+			devOptions: {
+				enabled: true // Позволяет тестировать PWA в dev-режиме
+			}
+		})
+	],
 
 	resolve: {
 		alias: {
@@ -12,9 +31,6 @@ export default defineConfig({
 		},
 	},
 
-	// ДЛЯ УСКОРЕНИЯ горячей перезагрузки модулей (HMR - Hot Module Replacement), 
-	// вызванный проблемами с файловым наблюдателем (File Watcher) 
-	// или недостаточной производительностью компиляции.
 	server: {
 		watch: {
 			ignored: ['**/node_modules/**']
@@ -22,32 +38,23 @@ export default defineConfig({
 	},
 
 	css: {
-		// PostCSS для Autoprefixer
-		// Пример для более широкой поддержки	для древних браузеров 
-		// overrideBrowserslist: ['> 0.5%', 'last 4 versions', 'Firefox ESR']
 		postcss: {
 			plugins: [
 				autoprefixer({
 					overrideBrowserslist: ['last 2 versions', 'not dead']
-				})],
+				})
+			],
 		},
 
-		// Настройка SCSS препроцессора
 		preprocessorOptions: {
 			scss: {
-				// Глобальные переменные SCSS
-				// Этот файл будет автоматически импортирован во все Svelte-компоненты
-				// БЕЗ необходимости писать @import ... в каждом файле.
-				// НО если ты поместишь _reset.scss или _layout.scss СЮДА, ТО вес твоего CSS вырастет в десятки раз.
-				// ДЛЯ _reset.scss и _layout.scss ИМПОРТИРУЙ В src/styles/app.scss, КОТОРЫЙ ИМПОРТИРУЕТСЯ В src/routes/+layout.svelte
 				additionalData: `
-    @use "${path.resolve('src/styles/variables').replace(/\\/g, '/')}" as *;
-    @use "${path.resolve('src/styles/mixins').replace(/\\/g, '/')}" as *;
-  `
+          @use "${path.resolve('src/styles/variables').replace(/\\/g, '/')}" as *;
+          @use "${path.resolve('src/styles/mixins').replace(/\\/g, '/')}" as *;
+        `
 			}
 		},
 
-		// 3. Настройка CSS Modules (опционально)
 		modules: {
 			localsConvention: 'camelCase',
 			generateScopedName: '[name]__[local]--[hash:base64:5]',

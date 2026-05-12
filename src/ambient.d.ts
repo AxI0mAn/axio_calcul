@@ -40,3 +40,23 @@ declare module '*.json' {
   export default value;
 }
 // Добавьте сюда любые другие форматы, которые вы планируете импортировать (например, .mp4, .json)
+
+declare module 'virtual:pwa-info' {
+  export const pwaInfo: {
+    webManifest: {
+      linkTag: string;
+    };
+  } | undefined;
+}
+
+declare module 'virtual:pwa-register' {
+  export type RegisterSWOptions = {
+    immediate?: boolean;
+    onRegistered?: (registration: ServiceWorkerRegistration | undefined) => void;
+    onRegisterError?: (error: any) => void;
+    onNeedRefresh?: () => void;
+    onOfflineReady?: () => void;
+  };
+
+  export function registerSW(options?: RegisterSWOptions): (reloadPage?: boolean) => Promise<void>;
+}
