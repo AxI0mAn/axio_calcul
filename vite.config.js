@@ -12,12 +12,12 @@ export default defineConfig({
 			registerType: 'autoUpdate', // Автоматическое обновление без перезагрузки вручную
 			manifest: false,            // Используем твой manifest.json из static
 			workbox: {
-				// Кэшируем все важные файлы
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json}'],
-				// Чистим старый кэш автоматически
 				cleanupOutdatedCaches: true,
-				// Настройка для GitHub Pages (чтобы не было проблем с путями)
-				navigateFallback: './index.html',
+				// Для GitHub Pages fallback должен указывать на index.html внутри папки
+				navigateFallback: 'index.html',
+				// Это позволит сервис-воркеру не ломать маршруты SvelteKit
+				navigateFallbackAllowlist: [/^(?!\/__).*/]
 			},
 			devOptions: {
 				enabled: true,
