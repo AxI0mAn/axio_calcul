@@ -9,7 +9,27 @@
 
 	import { tick } from 'svelte';
 
+	// history
+	let historyContain = $state(); // В Svelte 5 ссылки на элементы тоже можно инициализировать через $state
+
+	$effect(() => {
+		// Явно указываем зависимость. Эффект сработает при каждом изменении длины.
+		const historyLength = appState.historySession.length;
+
+		// Если истории нет или элемент еще не привязан, ничего не делаем
+		if (!historyContain || historyLength === 0) return;
+
+		// Svelte 5 запускает эффекты после обновления DOM,
+		// поэтому scrollHeight уже будет актуальным.
+		historyContain.scrollTo({
+			top: historyContain.scrollHeight,
+			behavior: 'smooth'
+		});
+	});
+
+	/* 	// old version
 	let historyContain; // Ссылка на div с историей
+
 	$effect(() => {
 		appState.historySession.length; // следим за добавлением новой строки в историю
 
@@ -23,15 +43,38 @@
 				});
 			}
 		};
-
 		scrollToBottom();
 	});
+*/
+
+	// QuickMenu
+	// @ts-ignore
+	import { page } from '$app/stores';
+	import { menuMaps } from '$lib/config/menuMaps.js';
+	import QuickMenu from '$lib/components/aBlock/QuickMenu.svelte';
+
+	// Реактивная переменная: проверяем, есть ли для текущего пути карта меню
+	let currentMap = $derived(
+		// Ищем в группе math
+		menuMaps.math.some((item) => item.href === $page.url.pathname)
+			? menuMaps.math
+			: // Если не нашли, ищем в группе geometry
+				menuMaps.geometry.some((item) => item.href === $page.url.pathname)
+				? menuMaps.geometry
+				: null
+	);
 </script>
 
 <div class="display-box">
-	<div class="now_mode">
-		<p>{appState.now_mode}</p>
-	</div>
+	{#if currentMap}
+		<div class="quick-nav-container">
+			<QuickMenu items={currentMap} />
+		</div>
+	{:else}
+		<div class="now_mode">
+			<p>{appState.now_mode}</p>
+		</div>
+	{/if}
 	<!-- Блок истории вычислений -->
 	<div bind:this={historyContain} class="history-section">
 		<!-- {#each appState.historySession as entry}
@@ -72,7 +115,7 @@
 		flex-direction: column;
 		justify-content: space-between;
 
-		position: relative;
+		position: relative; // Контейнер для позиционирования меню
 		bottom: 0;
 
 		// Используем темно-синюю базу с прозрачностью
@@ -89,6 +132,13 @@
 		font-size: 2.5rem;
 		text-align: left;
 		color: rgba($clr-white, 0.8);
+	}
+
+	.quick-nav-container {
+		position: absolute;
+		top: 1px;
+		right: 1px;
+		z-index: 50;
 	}
 
 	.now_mode {

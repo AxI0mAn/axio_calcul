@@ -23,7 +23,7 @@
 
 	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
 
-	appState.now_mode = 'engineering';
+	appState.now_mode = 'ENGINEER';
 
 	// обрабатываем ввод с клавиатуры ПК - только для desktop
 
@@ -37,6 +37,7 @@
 	import { addDecimal, backspace, clear } from '$lib/services/base';
 	import { percentage, toPower, bigFactorial } from '$lib/services/math/basic';
 
+	// поддержка ввода с клавиатуры на ПК
 	onMount(() => {
 		// 1. Проверка на десктоп
 		if (window.matchMedia('(pointer: coarse)').matches) return;
