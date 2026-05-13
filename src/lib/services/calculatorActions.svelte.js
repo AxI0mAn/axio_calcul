@@ -152,6 +152,21 @@ export function performCalculation() {
     finalExpr = appState.expression + appState.display;
   }
 
+
+  // 10. Тригонометрия в истории
+  // Если пользователь ввел sin(30) и нажал =, добавим юнит, если его нет 
+  // Если строка начинается на функцию и нет закрывающей скобки — добавляем её
+  // и добавляем текущий юнит для истории
+  if (/^(sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|asinh|acosh|atanh|cot|coth|acot|acoth)\(/.test(finalExpr)) {
+    if (!finalExpr.includes(')')) {
+      // Если пользователь не ввел юнит, добавим его перед закрытием
+      if (!/(deg|rad|grad)$/.test(finalExpr)) {
+        finalExpr += appState.corner;
+      }
+      finalExpr += ')';
+    }
+  }
+
   // 3. Вычисляем результат
   const result = evaluateExpression(finalExpr);
 
@@ -204,6 +219,8 @@ export function performCalculation() {
     // X. Убедитесь, что ПОСЛЕ этого блока if/else в коде больше нет вызовов appState.historySession.push.
     appState.historySession.push(`${historyEntry} = ${result}`);
   }
+
+
 
   // Y. Обновляем состояние экрана
   // Используем float_toFixed, чтобы избежать проблем с точностью JS (например, 0.1 + 0.2)

@@ -6,6 +6,7 @@
 */
 
 import { float_toFixed } from "./base.js";
+import { appState } from "$lib/store/appState.svelte.js";
 
 
 /**
@@ -29,8 +30,11 @@ function isValidMathExpression(expression) {
   const foundWords = expression.match(/[a-zA-Z]+/g) || [];
   const allowedWords = [
     'divs', 'log2', 'ln', 'log10', 'log', 'Math', 'pow',
-    'sqrt', 'sin', 'cos', 'tan', 'PI', 'E', 'e', 'rand'
-  ];
+    'sqrt', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan',
+    'sinh', 'cosh', 'tanh', 'asinh', 'acosh', 'atanh',
+    'cot', 'coth', 'acot', 'acoth', // добавили всё новое
+    'PI', 'E', 'e', 'rand', 'deg', 'rad', 'grad'
+  ]
 
   // Если хотя бы одно найденное слово не входит в список разрешенных — это JS-инъекция
   return foundWords.every(word => allowedWords.includes(word));
@@ -208,6 +212,43 @@ export function evaluateExpression(cleanExpression) {
       }
       return `${num1} \u2229 ${num2} : [${commonDivisors.join(', ')}]`;
     }
+
+    // === ТРИГОНОМЕТРИЯ ===
+    // 1. Коэффициенты пересчета
+    const TO_RAD = { deg: Math.PI / 180, rad: 1, grad: Math.PI / 200 };
+    const currentUnit = appState.corner;
+
+    // 2. Регулярное выражение для поиска всех тригонометрических конструкций
+    const trigNames = "sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|asinh|acosh|atanh|cot|coth|acot|acoth";
+    const pattern = new RegExp(`(${trigNames})\\(([^)]+)\\)?`, "g");
+
+    expr = expr.replace(pattern, (match, func, content) => {
+      // Очищаем содержимое скобок
+      let inner = content.trim();
+
+      // Если внутри только число (нет deg/rad/grad), добавляем текущий юнит из настроек
+      if (!/[a-z]/.test(inner)) {
+        inner += currentUnit;
+      }
+
+      // Определяем юнит и числовое значение
+      const unitFound = inner.match(/(deg|rad|grad)/)[0];
+      const numValue = parseFloat(inner);
+      const rad = numValue * TO_RAD[unitFound];
+
+      // Вычисляем значение в зависимости от типа функции
+      if (func.startsWith('acot')) return (Math.atan(1 / numValue) / TO_RAD[unitFound]);
+      if (func.startsWith('cot')) return (1 / Math.tan(rad));
+
+      // Для гиперболических (sinh, cosh...) и обычных (sin, cos...)
+      if (func.startsWith('a')) {
+        // Обратные (asin, acos...) возвращают радианы -> переводим в градусы/грады
+        return (Math[func](numValue) / TO_RAD[unitFound]);
+      } else {
+        // Прямые (sin, sinh...) принимают радианы
+        return Math[func](rad);
+      }
+    });
 
 
     // 4. ВЫЧИСЛЕНИЕ

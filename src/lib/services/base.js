@@ -99,7 +99,7 @@ export function float_toFixed(num) {
 }
 
 
-/**
+/** 
 * Очистка (клавиша С)
 */
 export function clear() {
