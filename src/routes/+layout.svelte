@@ -124,13 +124,13 @@
 		class="page-wrapper"
 		class:animating={isGroupPage}
 		in:blurFade={{
-			duration: isGroupPage ? 300 : 0,
-			delay: isGroupPage ? 250 : 0,
+			duration: isGroupPage ? 200 : 0,
+			delay: isGroupPage ? 100 : 0,
 			amount: 6
 		}}
 		out:blurFade={{
-			duration: isGroupPage ? 200 : 0,
-			amount: 6
+			duration: isGroupPage ? 50 : 0,
+			amount: 12
 		}}
 	>
 		{@render children()}

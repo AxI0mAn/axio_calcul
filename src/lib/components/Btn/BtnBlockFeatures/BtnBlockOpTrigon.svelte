@@ -4,6 +4,7 @@
 
 */
 	import BtnText from '../BtnText.svelte';
+	import CornerSwitch from './CornerSwitch.svelte';
 	import {
 		sinFunc,
 		sinhFunc,
@@ -24,12 +25,7 @@
 	} from '$lib/services/math/trigon.js';
 </script>
 
-<div class="digBlock">
-	<div class="row">
-		<BtnText customClass="op btn__trig active" onclick={() => trigCheck()} buttonText="deg" />
-		<BtnText customClass="op btn__trig" onclick={() => trigCheck()} buttonText="rad" />
-		<BtnText customClass="op btn__trig" onclick={() => trigCheck()} buttonText="grad" />
-	</div>
+<div class="digBlockT">
 	<div class="row">
 		<BtnText customClass="op btn__func" onclick={() => sinFunc()} buttonText="sin" />
 		<BtnText customClass="op btn__func" onclick={() => sinhFunc()} buttonText="sinh" />
@@ -57,12 +53,23 @@
 </div>
 
 <style lang="scss">
-	.digBlock {
-		padding: 8px;
+	.digBlockT {
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+		min-width: 0;
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: flex-start;
+		align-items: flex-start;
+		gap: 0px;
+	}
+	.opBlock {
+		padding: 4px;
 		border: 1px solid transparent;
 		border-top-left-radius: 8px;
 		background-color: transparent;
 		// height: 100%;
+		min-width: 40%;
 		display: grid;
 		grid-template-columns: 1fr;
 		grid-template-rows: repeat(auto, 1fr);
@@ -70,6 +77,8 @@
 		.row {
 			display: flex;
 			flex-flow: row wrap;
+			justify-content: center;
+			align-items: center;
 			width: 100%;
 			height: 100%;
 			gap: 4px;

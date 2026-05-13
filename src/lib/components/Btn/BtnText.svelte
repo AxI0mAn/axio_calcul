@@ -108,4 +108,30 @@
 		padding: 0.25rem;
 		color: $clr-coral;
 	}
+
+	.btn.trigMode {
+		padding: 2px 8px;
+		font-size: 1.5rem;
+		color: $clr-text-main;
+		border: transparent;
+		background: transparent;
+		box-shadow:
+			0 0 4px $clr-mint-soft,
+			0 0 8px $clr-coral;
+
+		@media (hover: hover) and (pointer: fine) {
+			&:hover {
+				// Рамка (Берем синий из палитры)
+				outline: 2px solid $clr-blue-light;
+				background-color: #344e66; // Темно-синий акцент при наведении
+				box-shadow:
+					0 0 4px $clr-mint-soft,
+					0 0 8px $clr-bg-card;
+				transform: translateY(-0.5px);
+			}
+		}
+	}
+	.btn.trigMode.action {
+		color: $clr-coral;
+	}
 </style>
