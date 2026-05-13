@@ -49,7 +49,10 @@
 			padding: 8px;
 			font-size: 1.5rem;
 		}
-
+		@media (orientation: portrait) and (max-height: 670px) {
+			padding: 4px;
+			font-size: 1.2rem;
+		}
 		// --- Hover ---
 		@media (hover: hover) and (pointer: fine) {
 			&:hover {
@@ -84,10 +87,14 @@
 
 	.btn.btn__func {
 		padding: 2px 8px;
-		font-size: 1.5rem;
+		font-size: 1.25rem;
 		color: $clr-text-main;
 		border: transparent;
 		background: transparent;
+		@media (orientation: portrait) and (max-height: 670px) {
+			padding: 1px 4px;
+			font-size: calc(1vh + 1rem);
+		}
 	}
 
 	.btn.constanta {
@@ -109,9 +116,16 @@
 		color: $clr-coral;
 	}
 
+	.btn.op.btn__func.trigonom {
+		@media (orientation: portrait) and (max-height: 670px) {
+			padding: 1px 4px;
+			font-size: calc(1vh + 0.6rem);
+		}
+	}
+
 	.btn.trigMode {
 		padding: 2px 8px;
-		font-size: 1.5rem;
+		font-size: 1.2rem;
 		color: $clr-text-main;
 		border: transparent;
 		background: transparent;
@@ -129,6 +143,10 @@
 					0 0 8px $clr-bg-card;
 				transform: translateY(-0.5px);
 			}
+		}
+		@media (orientation: portrait) and (max-height: 670px) {
+			padding: calc(0.01rem + 1vh) 4px;
+			font-size: 1rem;
 		}
 	}
 	.btn.trigMode.action {

@@ -27,28 +27,28 @@
 
 <div class="digBlockT">
 	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => sinFunc()} buttonText="sin" />
-		<BtnText customClass="op btn__func" onclick={() => sinhFunc()} buttonText="sinh" />
-		<BtnText customClass="op btn__func" onclick={() => asinFunc()} buttonText="asin" />
-		<BtnText customClass="op btn__func" onclick={() => asinhFunc()} buttonText="asinh" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => sinFunc()} buttonText="sin" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => sinhFunc()} buttonText="sinh" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => asinFunc()} buttonText="asin" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => asinhFunc()} buttonText="asinh" />
 	</div>
 	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => cosFunc()} buttonText="cos" />
-		<BtnText customClass="op btn__func" onclick={() => coshFunc()} buttonText="cosh" />
-		<BtnText customClass="op btn__func" onclick={() => acosFunc()} buttonText="acos" />
-		<BtnText customClass="op btn__func" onclick={() => acoshFunc()} buttonText="acosh" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => cosFunc()} buttonText="cos" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => coshFunc()} buttonText="cosh" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => acosFunc()} buttonText="acos" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => acoshFunc()} buttonText="acosh" />
 	</div>
 	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => tanFunc()} buttonText="tan" />
-		<BtnText customClass="op btn__func" onclick={() => tanhFunc()} buttonText="tanh" />
-		<BtnText customClass="op btn__func" onclick={() => atanFunc()} buttonText="atan" />
-		<BtnText customClass="op btn__func" onclick={() => atanhFunc()} buttonText="atanh" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => tanFunc()} buttonText="tan" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => tanhFunc()} buttonText="tanh" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => atanFunc()} buttonText="atan" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => atanhFunc()} buttonText="atanh" />
 	</div>
 	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => cotFunc()} buttonText="cot" />
-		<BtnText customClass="op btn__func" onclick={() => cothFunc()} buttonText="coth" />
-		<BtnText customClass="op btn__func" onclick={() => acotFunc()} buttonText="acot" />
-		<BtnText customClass="op btn__func" onclick={() => acothFunc()} buttonText="acoth" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => cotFunc()} buttonText="cot" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => cothFunc()} buttonText="coth" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => acotFunc()} buttonText="acot" />
+		<BtnText customClass="op btn__func trigonom" onclick={() => acothFunc()} buttonText="acoth" />
 	</div>
 </div>
 

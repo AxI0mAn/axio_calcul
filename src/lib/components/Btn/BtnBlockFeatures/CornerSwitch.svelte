@@ -28,7 +28,7 @@
 	<BtnText customClass="op btn__func trigMode" onclick={() => denominator()} buttonText="1/x" />
 </div>
 
-<style>
+<style lang="scss">
 	.corner-switch {
 		padding: 0.25rem;
 		padding-left: 0.75rem;
@@ -38,5 +38,9 @@
 		justify-content: flex-start;
 		align-items: center;
 		gap: 8px;
+		@media (orientation: portrait) and (max-height: 638px) {
+			gap: 4px;
+			padding-bottom: 0;
+		}
 	}
 </style>
