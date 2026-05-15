@@ -51,15 +51,17 @@
 	import srcEngineer_webp from '$lib/assets/iconPng/512/png_math_engineer.webp';
 	import srcTrigonom_jpeg from '$lib/assets/iconPng/512/png_math_trigonometry.jpeg';
 	import srcTrigonom_webp from '$lib/assets/iconPng/512/png_math_trigonometry.webp';
+	import srcFraction_jpeg from '$lib/assets/iconPng/512/png_Fraction.jpeg';
+	import srcFraction_webp from '$lib/assets/iconPng/512/png_Fraction.webp';
 </script>
 
 <div class="app-wrapper">
 	<aside class="field_left"></aside>
-	<main class="field_main catalog">
+	<main class="field_main catalog" id="catalogAllFeatures">
 		<div class="headerWrapper" id="top-anchor"><HomeHeader /></div>
 		<h1 class="slogan font-digits">
-			<span class="allFunc">28 functions</span> <span>in</span>
-			<span class="allCalc">2 calculators</span>
+			<span class="allFunc">44 functions</span> <span>in</span>
+			<span class="allCalc">3 calculators</span>
 		</h1>
 		<div class="groupCalcAll">
 			<details class="groupCalc" name="my-accordion">
@@ -119,6 +121,24 @@
 								// height={512}
 							/>
 							<h3 class="catalog__card--title"><span>trigonometry</span></h3>
+						</a>
+					</div>
+					<div class="catalog__post">
+						<a href="{base}/fraction" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcFraction_jpeg}`,
+									jpeg: `${srcFraction_webp}`
+								}}
+								alt="Фон тригонометрического калькулятора"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>fraction</span></h3>
 						</a>
 					</div>
 				</section>

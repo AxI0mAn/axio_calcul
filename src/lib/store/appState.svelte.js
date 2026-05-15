@@ -19,6 +19,11 @@ class AppState {
   /** @type {string} */
   now_mode = $state('amoca'); // Режим калькулятора - отображается в окне div class="now_mode"
 
+  // ========= дроби 
+
+  // ========= дроби 
+
+  // ========= ячейки памяти
   /** @type {number} */
   M1 = $state(null); // значение сохранённое в ячейке памяти калькулятора М1
   /** @type {number} */
@@ -31,7 +36,7 @@ class AppState {
   isMemoModalOpen = $state(false); // флаг для открытия модалки, если все ячейки памяти заняты
   /** @type {number} */
   pendingMemoryValue = $state(null); // Сюда положим число из истории, пока юзер выбирает слот
-
+  // ========= ячейки памяти
 
   /** @type {Array} */
   historySession = $state([]); // Массив строк завершенных вычислений в этой сессии для математики. 
@@ -49,6 +54,12 @@ class AppState {
     this.display = '0';
     this.expression = '';
     this.isNewInput = true;
+  }
+
+  // Метод для переключения режима 
+  setMode(mode) {
+    this.now_mode = mode;
+    this.isFractionMode = (mode === 'fractions');
   }
 
   //============== всё что касается работы с ячейками памяти в режиме математики

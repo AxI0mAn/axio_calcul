@@ -87,7 +87,7 @@
 
 	.btn.btn__func {
 		padding: 2px 8px;
-		font-size: 1.25rem;
+		font-size: calc(1vh + 1rem); //1.25rem;
 		color: $clr-text-main;
 		border: transparent;
 		background: transparent;

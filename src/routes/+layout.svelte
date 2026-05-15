@@ -7,26 +7,25 @@
 	let { children } = $props();
 	// @ts-ignore
 	import { page } from '$app/stores';
+	// @ts-ignore
+	import { base } from '$app/paths';
 
 	// =========== для работы плагина SvelteKitPWA
 	import { onMount } from 'svelte';
+
 	import { pwaInfo } from 'virtual:pwa-info'; // Информация о манифесте
 
-	onMount(async () => {
-		// Регистрируем Service Worker автоматически
-		if (pwaInfo) {
-			const { registerSW } = await import('virtual:pwa-register');
-			registerSW({
-				immediate: true, // Проверять обновление сразу
-				onRegistered(r) {
-					console.log('PWA: Service Worker зарегистрирован');
-				},
-				onRegisterError(error) {
-					console.error('PWA: Ошибка регистрации:', error);
-				}
-			});
+	onMount(() => {
+		// Регистрируем Service Worker только в production
+		// @ts-ignore
+		if (typeof window !== 'undefined' && 'serviceWorker' in navigator && import.meta.env.PROD) {
+			navigator.serviceWorker
+				.register(`${base}/sw.js`, { scope: `${base}/` })
+				.then(() => console.log('PWA: Service Worker зарегистрирован'))
+				.catch((err) => console.error('PWA: Ошибка:', err));
 		}
 	});
+
 	//============ встроенные эффекты Svelte5
 	import { fade } from 'svelte/transition';
 	import { blur } from 'svelte/transition';
@@ -36,9 +35,8 @@
 
 	import { appState } from '$lib/store/appState.svelte';
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
-
-	export const prerender = true;
-	export const trailingSlash = 'always';
+	// export const prerender = true;
+	// export const trailingSlash = 'always';
 
 	// ============ плавные переходы для работы QuickMenu.svelte
 	import { menuMaps } from '$lib/config/menuMaps';
@@ -71,7 +69,7 @@
 
 	// ===========  установка приложения
 	import { appStore } from '$lib/store/appStore.svelte';
-	import { initPwaLogic } from '$lib/utils/initPwaLogic';
+	import { initPwaLogic } from '$lib/utils/initPwaLogic.js';
 
 	//===================== Проверяем возможность установки приложения
 	// Этот код сработает ОДИН РАЗ при инициализации приложения

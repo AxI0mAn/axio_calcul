@@ -146,9 +146,10 @@
 }
 
 .withScroll {
+  overflow: auto;
   // --- Стандарт для Firefox ---
   scrollbar-width: thin; // тонкий скроллбар
-  scrollbar-color: $clr-mint-soft rgba($clr-blue-deep, 0.3); // [цвет ползунка] [цвет дорожки]
+  scrollbar-color: $clr-blue-mid $clr-mint-soft !important; // [цвет ползунка] [цвет дорожки]
 
   // --- WebKit (Chrome, Safari, Edge, Opera) ---
   &::-webkit-scrollbar {
@@ -157,19 +158,19 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba($clr-blue-deep, 0.5); // Дорожка (фон)
+    background-color: $clr-mint-soft !important; // Дорожка (фон)
     border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: $clr-mint-soft; // Цвет ползунка
+    background: $clr-blue-mid !important; // Цвет ползунка
     border-radius: 10px;
     // Добавляем эффект свечения
     box-shadow: 0 0 5px rgba($clr-mint-soft, 0.5);
     // border: 1px solid rgba(2, 17, 85, 0.2);
 
     &:hover {
-      background: $clr-mint;
+      background: $clr-bg !important;
       box-shadow: 0 0 10px rgba($clr-mint, 0.8);
     }
 

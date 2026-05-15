@@ -29,26 +29,6 @@
 		});
 	});
 
-	/* 	// old version
-	let historyContain; // Ссылка на div с историей
-
-	$effect(() => {
-		appState.historySession.length; // следим за добавлением новой строки в историю
-
-		// Используем async, чтобы дождаться tick
-		const scrollToBottom = async () => {
-			await tick(); // Ждем, пока новый <div> добавится в DOM и высота обновится
-			if (historyContain) {
-				historyContain.scrollTo({
-					top: historyContain.scrollHeight,
-					behavior: 'smooth'
-				});
-			}
-		};
-		scrollToBottom();
-	});
-*/
-
 	// QuickMenu
 	// @ts-ignore
 	import { page } from '$app/stores';
@@ -92,7 +72,9 @@
 		<!-- Текущее выражение -->
 		<p class="current-expression">{appState.expression}</p>
 
-		<!-- Текущий ввод/результат -->
+		<!-- Текущий ввод/результат
+		 -->
+
 		<p
 			class="main-display"
 			class:long-text={appState.display.length > 15}
@@ -228,4 +210,6 @@
 	.extra-long-text {
 		font-size: 1.75rem;
 	}
+
+	// дроби
 </style>
