@@ -1,8 +1,10 @@
 <script>
+	// src/lib/components/aBlock/QuickMenu.svelte
 	// * инструкция в /home/daxio/Desktop/Link to Projects/svelte5doc/assets/CODING/Система динамических меню и анимаций.docx
 
 	import { appState } from '$lib/store/appState.svelte';
 	import Picture from '$lib/components/Picture/Picture.svelte';
+	import { clickOutside } from '$lib/utils/clickOutside';
 
 	// @ts-ignore
 	import { base } from '$app/paths';
@@ -15,7 +17,7 @@
 	const close = () => detailsEl.removeAttribute('open');
 </script>
 
-<div class="now_mode_container">
+<div use:clickOutside={close} class="now_mode_container">
 	<details bind:this={detailsEl}>
 		<summary>
 			<div class="mode-label">

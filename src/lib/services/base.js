@@ -69,6 +69,7 @@ export function addDecimal() {
 /**
  * Ограничение знаков и автоматическое сокращение нулей в e+
  */
+// @ts-ignore
 export function float_toFixed(num) {
 
   // 1. Убираем ошибку точности JS (например, 4.999...999 -> 5)

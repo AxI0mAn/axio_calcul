@@ -1,40 +1,42 @@
+// vite.config.js
+
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
-import { SvelteKitPWA } from '@vite-pwa/sveltekit'; // 1. Импортируем плагин
+import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 
 export default defineConfig({
 	plugins: [
 		sveltekit(),
-		// 2. Настройка PWA
 		SvelteKitPWA({
-			registerType: 'autoUpdate', // Автоматическое обновление без перезагрузки вручную
-			manifest: false,            // Используем твой manifest.json из static
+			registerType: 'autoUpdate',
+			injectRegister: null, // Мы регистрируем вручную в +layout.svelte, это надежнее
+			manifest: false, //  манифест из static
 			workbox: {
-				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json}'],
+				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json,jpg,jpeg}'],
 				cleanupOutdatedCaches: true,
-				// Для GitHub Pages fallback должен указывать на index.html внутри папки
-				navigateFallback: 'index.html',
-				// Это позволит сервис-воркеру не ломать маршруты SvelteKit
+				// Для GitHub Pages меняем на полный путь
+				navigateFallback: '/axio_calcul/index.html',
 				navigateFallbackAllowlist: [/^(?!\/__).*/]
 			},
 			devOptions: {
-				enabled: true,
-				type: 'module', // Важно для Svelte 5
-				suppressWarnings: true,
-				navigateFallbackAllowlist: [/^\/$/], // Позволяет корректно работать на главной
+				enabled: false, // Оставляем false для тестов Lighthouse!
+				type: 'module',
+				suppressWarnings: true
 			},
 		})
 	],
 
 	resolve: {
 		alias: {
+			//   алиас
 			'$utils': path.resolve('./src/lib/components/utils'),
 		},
 	},
 
 	server: {
+		// Возвращаем твою оптимизацию
 		watch: {
 			ignored: ['**/node_modules/**']
 		}
@@ -43,6 +45,7 @@ export default defineConfig({
 	css: {
 		postcss: {
 			plugins: [
+				// Твоя точная настройка автопрефиксера
 				autoprefixer({
 					overrideBrowserslist: ['last 2 versions', 'not dead']
 				})
@@ -51,6 +54,7 @@ export default defineConfig({
 
 		preprocessorOptions: {
 			scss: {
+				// Твой исправленный и надежный способ импорта
 				additionalData: `
           @use "${path.resolve('src/styles/variables').replace(/\\/g, '/')}" as *;
           @use "${path.resolve('src/styles/mixins').replace(/\\/g, '/')}" as *;
@@ -58,9 +62,16 @@ export default defineConfig({
 			}
 		},
 
+		//   Настройки CSS-модулей
 		modules: {
 			localsConvention: 'camelCase',
 			generateScopedName: '[name]__[local]--[hash:base64:5]',
 		},
 	},
+
+	// Добавим это для уменьшения веса билда (из прошлых советов)
+	build: {
+		sourcemap: false,
+		minify: 'terser'
+	}
 });

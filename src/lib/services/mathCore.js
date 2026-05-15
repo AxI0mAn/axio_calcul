@@ -62,7 +62,6 @@ export function evaluateExpression(cleanExpression) {
   try {
     let expr = cleanExpression;
 
-
     // Случайное число между двумя
     // Регулярка ищет: число X, символ #, число Y
     const randomRegExp = /([\d.]+)\s*#\s*([\d.]+)/g;

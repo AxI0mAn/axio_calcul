@@ -18,7 +18,8 @@
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
 	import LinkBlockNav from '$lib/components/Links/LinkBlockNav.svelte';
 
-	appState.now_mode = `${nowMode}`;
+	// appState.now_mode = `${nowMode}`;
+	appState.setMode(`${nowMode}`);
 
 	// обрабатываем ввод с клавиатуры ПК - только для desktop
 
