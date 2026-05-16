@@ -5,35 +5,35 @@
 */
 	import BtnText from '../BtnText.svelte';
 	import { backspace, toggleSign, addDecimal } from '$lib/services/base';
-	import { addDigit } from '$lib/services/mathActions.svelte.js';
-	import { clear } from '$lib/services/base';
+	import { enterFractionDigit } from '$lib/services/fractionActions';
+	import { handleClearAll } from '$lib/services/base';
 </script>
 
 <div class="digBlock">
 	<div class="row">
 		<BtnText buttonText="⌫" customClass="backspace op-style btn__op" onclick={() => backspace()} />
 
-		<BtnText customClass="clear-btn btn__op" onclick={() => clear()} buttonText="C" />
+		<BtnText customClass="clear-btn btn__op" onclick={() => handleClearAll()} buttonText="C" />
 	</div>
 	<div class="row">
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('7');
+				enterFractionDigit('7');
 			}}
 			buttonText="7"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('8');
+				enterFractionDigit('8');
 			}}
 			buttonText="8"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('9');
+				enterFractionDigit('9');
 			}}
 			buttonText="9"
 		/>
@@ -42,21 +42,21 @@
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('4');
+				enterFractionDigit('4');
 			}}
 			buttonText="4"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('5');
+				enterFractionDigit('5');
 			}}
 			buttonText="5"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('6');
+				enterFractionDigit('6');
 			}}
 			buttonText="6"
 		/>
@@ -65,21 +65,21 @@
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('1');
+				enterFractionDigit('1');
 			}}
 			buttonText="1"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('2');
+				enterFractionDigit('2');
 			}}
 			buttonText="2"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('3');
+				enterFractionDigit('3');
 			}}
 			buttonText="3"
 		/>
@@ -88,7 +88,7 @@
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('0');
+				enterFractionDigit('0');
 			}}
 			buttonText="0"
 		/>

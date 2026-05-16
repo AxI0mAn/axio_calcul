@@ -36,13 +36,18 @@
 	import QuickMenu from '$lib/components/aBlock/QuickMenu.svelte';
 
 	// Реактивная переменная: проверяем, есть ли для текущего пути карта меню
+
+	let pathPage = $page.url.pathname;
+
+	if (pathPage.endsWith('/') && pathPage !== '/') {
+		pathPage = pathPage.slice(0, -1);
+	}
+
 	let currentMap = $derived(
 		Object.values(menuMaps)
 			.flat()
-			.some((item) => $page.url.pathname.endsWith(item.href))
-			? Object.values(menuMaps).find((group) =>
-					group.some((item) => $page.url.pathname.endsWith(item.href))
-				)
+			.some((item) => pathPage.endsWith(item.href))
+			? Object.values(menuMaps).find((group) => group.some((item) => pathPage.endsWith(item.href)))
 			: null
 	);
 </script>

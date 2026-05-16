@@ -80,60 +80,7 @@ export function addOperator(op) {
 
 /**
 * Нажатие "=" 
-export function performCalculation() {
-
-  // 1. ИЗМЕНЕНО: Если и в памяти пусто, и на экране только "0", тогда выходить
-  if (appState.expression === '' && (appState.display === '0' || appState.display === '')) return;
-
-  let finalExpr = '';
-
-  // 2. Формируем финальное выражение
-  if (appState.isNewInput && appState.expression !== '') {
-    // Если нажали "5 + =" -> считаем как "5"
-    finalExpr = appState.expression.slice(0, -1);
-  } else {
-    // Склеиваем накопленное и то, что на экране
-    // Например: "" + "√(4" или "10+" + "5"
-    finalExpr = appState.expression + appState.display;
-  }
-
-  // 3. Вычисляем (evaluateExpression сама закроет скобки!)
-  const result = evaluateExpression(finalExpr);
-
-  if (result === "ERROR") {
-    appState.display = "ERROR";
-    appState.expression = '';
-    appState.isNewInput = true;
-    return;
-  }
-
-  // 4. Формируем красивую запись для истории (с закрытыми скобками)
-  const closedExpr = autoCloseBrackets(finalExpr);
-  appState.historySession.push(`${closedExpr} = ${result}`);
-
-  // 5. Обновляем состояние
-  appState.display = String(float_toFixed(result));
-  appState.expression = '';
-  appState.isNewInput = true;
-
-  // 6. Для y√x
-  const sqrtSym = String.fromCharCode(8730); // Объявляем один раз
-
-  let historyExpr = finalExpr;
-
-  // Если в строке есть наша техническая метка
-  if (historyExpr.includes('sqrtY_base:')) {
-    // Используем переменную в конструкторе RegExpconst  
-    const re = new RegExp(`([\\d.]+)\u207F${sqrtSym}([\\d.]+)`, 'g');
-
-    // Меняем местами: было "base:8√3", станет "3√8"
-    historyExpr = historyExpr.replace(re, `$2${sqrtSym}$1`);
-  }
-
-  appState.historySession.push(`${historyExpr} = ${result}`);
-}
 */
-
 
 export function performCalculation() {
   // console.trace("Кто вызвал вычисление?"); // Раскомментируйте для отладки, если дубли вернутся

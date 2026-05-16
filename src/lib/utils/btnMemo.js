@@ -1,5 +1,6 @@
 // src/lib/utils/btnMemo.js
 import { appState } from '../store/appState.svelte.js';
+import { Fraction } from '$lib/services/fractionCore.js';
 
 /**
  * Логика работы кнопок памяти M1-M4
@@ -20,8 +21,30 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
     return;
   }
 
+
+  // ==========================================   ПЕРЕВОД ДРОБИ В ПАМЯТЬ
+  let currentDisplay = String(appState.display);
+
+  // Если мы на странице дробей и НЕ считываем данные из истории, 
+  // а сохраняем текущий экран калькулятора
+  if (appState.isFractionMode && !sourceData) {
+    const data = appState.fractionData;
+
+    // Если в шаблоне введены числитель и знаменатель
+    if (data.focus !== 'main' && data.num && data.den) {
+      const w = data.whole === '' ? 0 : parseInt(data.whole, 10);
+      try {
+        // Создаем объект дроби из прямоугольников ввода
+        const currentFraction = new Fraction(parseInt(data.num, 10), parseInt(data.den, 10), w);
+        // Переводим в десятичное число, округляем до 6 знаков (или сколько нужно) и делаем строкой
+        currentDisplay = String(Number(currentFraction.toDecimal().toFixed(6)));
+      } catch (e) {
+        console.error("Memory fraction conversion error:", e);
+      }
+    }
+  }
+
   const currentValueInMemo = appState[slot];
-  const currentDisplay = String(appState.display);
   const lastChar = currentDisplay.slice(-1);
   const sqrtSym = String.fromCharCode(8730); //  Определяем символ корня √
   const endsWithSqrt = appState.display.endsWith(sqrtSym) || appState.display.endsWith(sqrtSym + '('); // Проверяем, заканчивается ли дисплей оператором или корнем 

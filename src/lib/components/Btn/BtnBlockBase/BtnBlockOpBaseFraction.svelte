@@ -4,7 +4,7 @@
 
 */
 	import BtnText from '../BtnText.svelte';
-	import { addOperator, performCalculation } from '$lib/services/mathActions.svelte.js';
+	import { enterFractionOperator, calculateFractionResult } from '$lib/services/fractionActions';
 </script>
 
 <div class="operBlock">
@@ -12,21 +12,21 @@
 		<BtnText
 			customClass="op"
 			onclick={() => {
-				addOperator('-');
+				enterFractionOperator('-');
 			}}
 			buttonText="-"
 		/>
 		<BtnText
 			customClass="op"
 			onclick={() => {
-				addOperator('+');
+				enterFractionOperator('+');
 			}}
 			buttonText="+"
 		/>
 		<BtnText
 			customClass="op"
 			onclick={() => {
-				addOperator('/');
+				enterFractionOperator('/');
 			}}
 			buttonText="/"
 			svgContent=""
@@ -35,12 +35,18 @@
 		<BtnText
 			customClass="op"
 			onclick={() => {
-				addOperator('*');
+				enterFractionOperator('*');
 			}}
 			buttonText="*"
 		/>
 	</div>
-	<BtnText customClass="equal-btn btn__op" onclick={performCalculation} buttonText="=" />
+	<BtnText
+		customClass="equal-btn btn__op"
+		onclick={() => {
+			calculateFractionResult();
+		}}
+		buttonText="="
+	/>
 </div>
 
 <style lang="scss">

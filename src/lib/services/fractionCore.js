@@ -1,6 +1,6 @@
 /**
  * src/lib/services/math/fractionCore.js
- * Ядро для работы с обыкновенными дробями
+ * Математическое ядро для работы с обыкновенными дробями (Только вычисления)
  */
 
 // 1. Наибольший общий делитель (для сокращения)
@@ -27,25 +27,25 @@ export class Fraction {
     if (this.den === 0) throw new Error("ERROR: Division by zero");
   }
 
-  // Сокращение дроби (≡)
+  // Сокращение дроби
   simplify() {
     const common = gcd(this.num, this.den);
     return new Fraction(this.num / common, this.den / common, this.whole);
   }
 
-  // Выделение целой части (≡)
+  // Выделение целой части
   extractWhole() {
     let newWhole = this.whole + Math.floor(this.num / this.den);
     let newNum = this.num % this.den;
     return new Fraction(newNum, this.den, newWhole);
   }
 
-  // Преобразование в десятичную (:. )
+  // Преобразование в десятичную
   toDecimal() {
     return this.whole + (this.num / this.den);
   }
 
-  // Статичный метод: Десятичное в дробь (.: )
+  // Статический метод: Десятичное в дробь
   static fromDecimal(decimal, precision = 1000000) {
     const whole = Math.floor(decimal);
     const fractionPart = decimal - whole;
@@ -57,7 +57,6 @@ export class Fraction {
 
 /**
  * Функция подготовки шагов сложения для Истории
- * Позволяет показать приведение к общему знаменателю
  */
 export function getSumSteps(f1, f2) {
   const commonDen = lcm(f1.den, f2.den);

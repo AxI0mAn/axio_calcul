@@ -3,7 +3,7 @@
 	 * шаблон страница математического калькулятора
 	 */
 
-	let { buttons, ads, nowMode = 'amoca' } = $props();
+	let { buttonsBaseOp, buttonsFunc, buttonsDigits, display, ads, nowMode = 'amoca' } = $props();
 
 	// ------------- ссылки с учётом локализации в будущем
 	// @ts-ignore
@@ -12,7 +12,6 @@
 
 	import { appState } from '$lib/store/appState.svelte';
 
-	import BtnBlockDigit from '$lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte';
 	import BtnBlockOp from '$lib/components/Btn/BtnBlockBase/BtnBlockOp.svelte';
 	import DisText from '$lib/components/Display/DisText.svelte';
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
@@ -25,11 +24,7 @@
 
 	import { onMount } from 'svelte';
 	import { handleCalculatorKey } from '$lib/utils/keyboardHandler.js';
-	import {
-		addDigit,
-		addOperator,
-		performCalculation
-	} from '$lib/services/calculatorActions.svelte';
+	import { addDigit, addOperator, performCalculation } from '$lib/services/mathActions.svelte';
 	import { addDecimal, backspace, clear } from '$lib/services/base';
 	import { percentage, toPower, bigFactorial } from '$lib/services/math/basic';
 
@@ -61,21 +56,21 @@
 	<aside class="field_left"></aside>
 	<main class="field_main basic">
 		<div class="field_displayPad">
-			<DisText />
+			{@render display()}
 		</div>
 		<div class="fieldBtn_page withScroll">
 			<div class="fieldBtn_basic">
-				{@render buttons()}
+				{@render buttonsFunc()}
 			</div>
 		</div>
 		<div class="fieldBtn_memory">
 			<BtnBlockMemo />
 		</div>
 		<div class="fieldBtn_digitPad">
-			<BtnBlockDigit />
+			{@render buttonsDigits()}
 		</div>
 		<div class="fieldBtn_basicOperators">
-			<BtnBlockOp />
+			{@render buttonsBaseOp()}
 		</div>
 		<div class="fieldBtn_nav">
 			<LinkBlockNav />
