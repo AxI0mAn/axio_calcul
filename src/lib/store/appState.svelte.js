@@ -1,4 +1,5 @@
 /**
+ * src/lib/store/appState.svelte.js
  * текущее состояние калькулятора appState.svelte.js
  */
 
@@ -30,30 +31,28 @@ class AppState {
   // ================= ДРОБИ (Fraction State Layer) =================
   isFractionMode = $state(false);
 
-  fractionData = $state({
-    whole: '',         // Пустая строка, если целой части нет
-    num: '',           // Числитель (может быть числом или выражением)
-    den: '',           // Знаменатель
-    focus: 'main',     // НАЧАЛЬНЫЙ ФОКУС: 'main' (обычный дисплей, шаблон дроби скрыт)  'whole' | 'num' | 'den'
-    showWhole: false,  // Флаг: показывать ли поле целой части на экране
-    errors: {
-      num: false,      // Флаг ошибки (красная подсветка) для числителя
-      den: false       // Флаг ошибки для знаменателя
-    }
-  });
+  // fractionData = $state({
+  //   whole: '',         // Пустая строка, если целой части нет
+  //   num: '',           // Числитель (может быть числом или выражением)
+  //   den: '',           // Знаменатель
+  //   focus: 'main',     // НАЧАЛЬНЫЙ ФОКУС: 'main' (обычный дисплей, шаблон дроби скрыт)  'whole' | 'num' | 'den'
+  //   errors: {
+  //     num: false,      // Флаг ошибки (красная подсветка) для числителя
+  //     den: false       // Флаг ошибки для знаменателя
+  //   }
+  // });
 
   /**
    * Сброс состояния дроби к начальному
    */
-  resetFraction() {
-    this.fractionData.whole = '';
-    this.fractionData.num = '';
-    this.fractionData.den = '';
-    this.fractionData.focus = 'main';
-    this.fractionData.showWhole = false;
-    this.fractionData.errors.num = false;
-    this.fractionData.errors.den = false;
-  }
+  // resetFraction() {
+  //   this.fractionData.whole = '';
+  //   this.fractionData.num = '';
+  //   this.fractionData.den = '';
+  //   this.fractionData.focus = 'main';
+  //   this.fractionData.errors.num = false;
+  //   this.fractionData.errors.den = false;
+  // }
 
   // Метод для очистки
   reset = () => {

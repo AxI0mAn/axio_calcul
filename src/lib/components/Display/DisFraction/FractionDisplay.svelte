@@ -6,6 +6,7 @@
 	import { base } from '$app/paths';
 
 	import { appState } from '$lib/store/appState.svelte.js';
+	import { parseExpressionToHtml } from '$lib/utils/fractionVisualParser.js';
 	import { longpress } from '$lib/actions/longpress';
 	import { btnMemo } from '$lib/utils/btnMemo';
 
@@ -60,13 +61,49 @@
 		{#each appState.historySession as item}
 			{#if typeof item === 'object' && item.type === 'fraction'}
 				<div class="fraction-log-item">
-					<span class="expr-part">{item.rawExpr} = </span>
+					<span class="expression-line">
+						{#each parseExpressionToHtml(item.rawExpr) as token}
+							{#if token.type === 'text'}
+								<span class="math-text">
+									<!-- {token.value} -->
+									{token.value.replace(/[\u2951\u294F]/g, '')}
+								</span>
+							{:else}
+								<div class="fraction-block">
+									{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
+									<div class="fraction-container">
+										<span class="num-part">{token.num}</span>
+										<span class="fraction-line"></span>
+										<span class="den-part">{token.den}</span>
+									</div>
+								</div>
+							{/if}
+						{/each}
+						<span class="math-text"> = </span>
+					</span>
 
 					<div class="pseudo-stack-fraction">
 						<div class="num-floor">{item.resultNum}</div>
 						<div class="fraction-line"></div>
 						<div class="den-floor">{item.resultDen}</div>
 					</div>
+				</div>
+			{:else if typeof item === 'string' && item.includes('÷')}
+				<div class="fraction-log-item expression-line">
+					{#each parseExpressionToHtml(item) as token}
+						{#if token.type === 'text'}
+							<span class="math-text">{token.value}</span>
+						{:else}
+							<div class="fraction-block">
+								{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
+								<div class="fraction-container">
+									<span class="num-part">{token.num}</span>
+									<span class="fraction-line"></span>
+									<span class="den-part">{token.den}</span>
+								</div>
+							</div>
+						{/if}
+					{/each}
 				</div>
 			{:else}
 				<div class="standard-log-item">{item}</div>
@@ -75,61 +112,42 @@
 	</div>
 
 	<div class="fraction-input-area">
-		{#if appState.fractionData.focus !== 'main'}
-			<div class="main-fraction-render">
-				{#if appState.fractionData.whole !== '' || appState.fractionData.showWhole || appState.fractionData.focus === 'whole'}
-					<button
-						type="button"
-						class="interactive-zone whole-zone"
-						class:focused={appState.fractionData.focus === 'whole'}
-						onclick={() => (appState.fractionData.focus = 'whole')}
-					>
-						{appState.fractionData.whole || '0'}
-					</button>
-				{/if}
-
-				<div class="fraction-vertical-stack">
-					<button
-						type="button"
-						class="interactive-zone num-zone"
-						class:focused={appState.fractionData.focus === 'num'}
-						class:error-blank={appState.fractionData.errors.num}
-						onclick={() => (appState.fractionData.focus = 'num')}
-					>
-						{#if appState.fractionData.num === ''}
-							<div class="placeholder-rectangle"></div>
-						{:else}
-							<span class="value-text">{appState.fractionData.num}</span>
-						{/if}
-					</button>
-
-					<div class="math-line"></div>
-
-					<button
-						type="button"
-						class="interactive-zone den-zone"
-						class:focused={appState.fractionData.focus === 'den'}
-						class:error-blank={appState.fractionData.errors.den}
-						onclick={() => (appState.fractionData.focus = 'den')}
-					>
-						{#if appState.fractionData.den === ''}
-							<div class="placeholder-rectangle"></div>
-						{:else}
-							<span class="value-text">{appState.fractionData.den}</span>
-						{/if}
-					</button>
-				</div>
-			</div>
-		{/if}
-
 		<div class="unified-bottom-line">
-			<span class="current-expression">
-				{appState.expression || '0'}
-			</span>
+			{#if appState.expression && appState.expression.trim() !== ''}
+				<div class="expression-line">
+					{#each parseExpressionToHtml(appState.expression) as token}
+						{#if token.type === 'text'}
+							<span class="math-text">{token.value}</span>
+						{:else}
+							<div class="fraction-block">
+								{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
+								<div class="fraction-container">
+									<span class="num-part">{token.num}</span>
+									<span class="fraction-line"></span>
+									<span class="den-part">{token.den}</span>
+								</div>
+							</div>
+						{/if}
+					{/each}
+				</div>
+			{/if}
 
-			<span class="main-display">
-				{appState.display}
-			</span>
+			<div class="display-line">
+				{#each parseExpressionToHtml(appState.display) as token}
+					{#if token.type === 'text'}
+						<span class="math-text">{token.value}</span>
+					{:else}
+						<div class="fraction-block">
+							{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
+							<div class="fraction-container">
+								<span class="num-part">{token.num}</span>
+								<span class="fraction-line"></span>
+								<span class="den-part">{token.den}</span>
+							</div>
+						</div>
+					{/if}
+				{/each}
+			</div>
 		</div>
 	</div>
 </div>
@@ -141,21 +159,21 @@
 		max-height: 40vh;
 		width: 100%;
 		overflow: hidden;
-		padding: 1rem;
+		padding: calc(1rem - 5px);
 		margin-bottom: 1.5rem;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 		position: relative;
 		bottom: 0;
-		background: rgba($clr-bg-darker, 0.3);
+		background: rgba($clr-bg-darker-rgb, 0.3);
 		box-shadow:
 			$shadow-inset,
-			0px 0px 2px 4px rgba($clr-black, 0.5);
+			0px 0px 2px 4px rgba(0, 0, 0, 0.5);
 		border: 1px solid $clr-slate;
 		font-size: 2.5rem;
 		text-align: left;
-		color: rgba($clr-white, 0.8);
+		color: rgba(255, 255, 255, 0.8);
 	}
 
 	.quick-nav-container {
@@ -188,7 +206,7 @@
 		line-height: 1.75rem;
 		color: $clr-slate;
 		margin-bottom: 0.5rem;
-		padding-left: 5px;
+		// padding-left: 2px;
 		display: flex;
 		flex-direction: column;
 
@@ -200,6 +218,37 @@
 			-webkit-touch-callout: none;
 			user-select: none;
 			touch-action: manipulation;
+		}
+		.fraction-log-item {
+			display: flex;
+			flex-flow: row wrap;
+			justify-content: flex-start;
+			align-items: center;
+			gap: 0.2rem;
+			padding-left: 5px;
+			padding-right: 1rem;
+			border-bottom: 1px solid rgba($clr-sky-rgb, 0.7);
+			border-right: 1px solid rgba($clr-sky-rgb, 0.7);
+			border-bottom-right-radius: 1rem;
+			max-width: fit-content;
+
+			.pseudo-stack-fraction {
+				max-width: fit-content;
+				.num-floor {
+					// === -📝=TODO=📝- ===
+					color: green;
+				}
+				.fraction-line {
+					height: 2px;
+					// === -📝=TODO=📝- ===
+					background-color: rgb(153, 0, 255);
+				}
+				.den-floor {
+					// === -📝=TODO=📝- ===
+					color: rgb(255, 153, 0);
+					text-align: center;
+				}
+			}
 		}
 	}
 
@@ -242,7 +291,7 @@
 		height: 3px;
 		background-color: $clr-white;
 		margin: 2px 0;
-		box-shadow: 0 0 4px rgba($clr-mint, 0.4);
+		box-shadow: 0 0 4px rgba($clr-mint-rgb, 0.4);
 	}
 
 	.interactive-zone {
@@ -253,7 +302,7 @@
 		color: inherit;
 		text-align: inherit;
 
-		// Твои оригинальные стили
+		// Oригинальные стили
 		padding: 2px 6px;
 		border-radius: 4px;
 		cursor: pointer;
@@ -263,13 +312,13 @@
 		justify-content: center;
 		min-height: 2rem;
 
-		// Убираем синюю обводку браузера при фокусе, так как у нас есть свой .focused
+		// Убираем синюю обводку браузера при фокусе.
 		&:focus-visible {
 			outline: none;
 		}
 
 		&.focused {
-			background: rgba($clr-blue-mid, 0.3);
+			background: rgba($clr-blue-mid-rgb, 0.3);
 			box-shadow: 0 0 0 1px $clr-mint-soft;
 		}
 	}
@@ -280,12 +329,12 @@
 		height: 1.5rem;
 		border: 2px dashed $clr-slate;
 		border-radius: 4px;
-		background: rgba($clr-black, 0.2);
+		background: rgba(0, 0, 0, 0.2);
 		transition: all 0.2s ease;
 
 		.focused & {
 			border: 2px solid $clr-mint;
-			background: rgba($clr-mint-soft, 0.1);
+			background: rgba($clr-mint-soft-rgb, 0.1);
 		}
 	}
 
@@ -307,7 +356,7 @@
 		.num-zone &,
 		.den-zone & {
 			font-size: 1.65rem;
-			color: rgba($clr-white, 0.9);
+			color: rgba(255, 255, 255, 0.9);
 		}
 	}
 
@@ -320,13 +369,15 @@
 	// Объединенная нижняя строка (Пункт 6)
 	.unified-bottom-line {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
 		align-items: center;
-		font-size: 1.1rem;
+		gap: 0.2rem;
+		font-size: 2rem;
 		font-family: 'Inter', sans-serif;
 		color: $clr-slate;
 		padding: 0 0.25rem;
 		padding-bottom: 1rem;
+		min-height: 5rem;
 	}
 
 	.current-expression {
@@ -335,6 +386,8 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		max-width: 60%;
+		// === -📝=TODO=📝- ===
+		color: orangered;
 	}
 
 	.fraction-compact-preview {
@@ -351,4 +404,70 @@
 			box-shadow: 0 0 10px #dc3545;
 		}
 	}
+	// ===================НОВЫЕ СТИЛИ
+
+	// Контейнер строки, где всё выстроено в ряд
+	.expression-line,
+	.display-line {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center; // Центрирует операторы (+, -, *, =) строго по центру дроби
+		gap: 4px;
+		font-family: inherit;
+	}
+
+	// Стили для обычных знаков (+, -, *, =, пробелы)
+	.math-text {
+		font-size: 2rem;
+		padding: 0 4px;
+		color: $clr-white;
+	}
+
+	// Общий блок дроби (целое число + сама дробь рядом)
+	.fraction-block {
+		display: inline-flex;
+		align-items: center;
+		vertical-align: middle;
+	}
+
+	.whole-part {
+		font-size: 2.4rem;
+		font-weight: bold;
+		color: $clr-mint; // Выделяем целую часть смешанного числа твоим неоновым цветом
+		margin-right: 2px;
+	}
+
+	// Вертикальный стек для числителя, черты и знаменателя
+	.fraction-fraction {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 0 4px;
+		line-height: 1.1;
+	}
+
+	.num-part {
+		font-size: 1.5rem;
+		color: rgba(255, 255, 255, 0.9);
+		padding-bottom: 2px;
+	}
+
+	// Горизонтальная дробная черта дроби
+	.fraction-line {
+		display: block;
+		width: 100%;
+		min-width: 12px;
+		height: 2px; // Толщина этажной черты
+		background-color: $clr-white;
+		margin: 2px 0;
+	}
+
+	.den-part {
+		font-size: 1.5rem;
+		color: rgba(255, 255, 255, 0.9);
+		padding-top: 2px;
+	}
+
+	//=====================================
 </style>

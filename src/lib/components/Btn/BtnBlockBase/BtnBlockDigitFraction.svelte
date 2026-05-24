@@ -1,19 +1,25 @@
 <script>
 	/**
-* btnBlockDigit.svelte
-
-*/
+	 * src/lib/components/Btn/BtnBlockBase/BtnBlockDigitFraction.svelte
+	 */
 	import BtnText from '../BtnText.svelte';
-	import { backspace, toggleSign, addDecimal } from '$lib/services/base';
-	import { enterFractionDigit } from '$lib/services/fractionActions';
-	import { handleClearAll } from '$lib/services/base';
+	import { addDecimal, toggleSign } from '$lib/services/base';
+	import {
+		enterFractionDigit,
+		backspaceFraction,
+		clearFractionAll
+	} from '$lib/services/fractionActions.js';
 </script>
 
 <div class="digBlock">
 	<div class="row">
-		<BtnText buttonText="⌫" customClass="backspace op-style btn__op" onclick={() => backspace()} />
+		<BtnText
+			buttonText="⌫"
+			customClass="backspace op-style btn__op"
+			onclick={() => backspaceFraction()}
+		/>
 
-		<BtnText customClass="clear-btn btn__op" onclick={() => handleClearAll()} buttonText="C" />
+		<BtnText customClass="clear-btn btn__op" onclick={() => clearFractionAll()} buttonText="C" />
 	</div>
 	<div class="row">
 		<BtnText

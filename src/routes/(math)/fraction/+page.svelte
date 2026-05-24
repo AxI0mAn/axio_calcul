@@ -1,4 +1,5 @@
 <script>
+	//  src/routes/(math)/fraction/+page.svelte
 	import MathPageLayout from '$lib/components/aPage/MathPageLayout.svelte';
 	import FractionDisplay from '$lib/components/Display/DisFraction/FractionDisplay.svelte';
 	import BtnBlockDigitFraction from '$lib/components/Btn/BtnBlockBase/BtnBlockDigitFraction.svelte';

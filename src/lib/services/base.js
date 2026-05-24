@@ -105,11 +105,4 @@ export function float_toFixed(num) {
 */
 export function clear() {
   appState.reset();
-}
-/** 
-* Очистка в режиме дробей (клавиша С)
-*/
-export function handleClearAll() {
-  clear();
-  appState.resetFraction();
-}
+} 
