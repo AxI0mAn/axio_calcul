@@ -33,7 +33,7 @@
 		allDivisors
 	} from '$lib/services/math/engineer.js';
 	import { addSqrtY } from '$lib/services/math/basic.js';
-	import { addOperator } from '$lib/services/calculatorActions.svelte.js';
+	import { addOperator } from '$lib/services/mathActions.svelte.js';
 </script>
 
 <div class="digBlock">

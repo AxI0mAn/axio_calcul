@@ -4,7 +4,7 @@
 
 */
 	import BtnText from '../BtnText.svelte';
-	import { addOperator, performCalculation } from '$lib/services/calculatorActions.svelte.js';
+	import { addOperator, performCalculation } from '$lib/services/mathActions.svelte.js';
 </script>
 
 <div class="operBlock">

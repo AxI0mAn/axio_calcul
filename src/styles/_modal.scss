@@ -7,7 +7,7 @@
   width: 100vw;
   height: 100vh;
   // Используем чистый черный с прозрачностью для максимального фокуса на окне
-  background-color: rgba($clr-black, 0.85);
+  background-color: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -21,7 +21,7 @@
   background-color: $clr-bg-card;
 
   // Добавляем мятную рамку для связи с дизайном калькулятора
-  border: 1px solid rgba($clr-mint, 0.3);
+  border: 1px solid rgba($clr-mint-rgb, 0.3);
   border-radius: 16px;
   padding: 24px;
   max-width: 400px;
@@ -83,7 +83,7 @@
       &:hover {
         color: $clr-text-main;
         border-color: $clr-mint;
-        background-color: rgba($clr-mint, 0.1);
+        background-color: rgba($clr-mint-rgb, 0.1);
       }
     }
   }

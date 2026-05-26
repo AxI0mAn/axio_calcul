@@ -161,30 +161,7 @@ export function evaluateExpression(cleanExpression) {
 
 
     // * Общие делители для X и Y  function allDivisors()
-    /*
-   const divsRegExp = /divs:([\d.]+):([\d.]+)/g;
 
-       if (expr.includes('divs:')) {
-         const finalStr = expr.replace(divsRegExp, (match, x, y) => {
-           const num1 = Math.abs(parseInt(x));
-           const num2 = Math.abs(parseInt(y));
-           const commonDivisors = [];
-           const limit = Math.min(num1, num2);
-   
-           for (let i = 2; i <= limit; i++) {
-             if (num1 % i === 0 && num2 % i === 0) {
-               commonDivisors.push(i);
-             }
-           }
-   
-           // НОВЫЙ ФОРМАТ: "24 ∩ 48 : [2, 4...]"
-           // Символ ∩ (\u2229) означает пересечение множеств делителей
-           return `${num1} \u2229 ${num2} : [${commonDivisors.join(', ')}]`;
-         });
-   
-         return finalStr; // ВАЖНО: выходим из функции здесь, не доходя до new Function!
-       }
-   */
     if (expr.includes('divs:')) {
       // Регулярное выражение ищет: 
       // 1. Начало divs:
