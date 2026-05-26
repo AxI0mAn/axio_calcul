@@ -15,15 +15,15 @@
 	import { addSqrt2 } from '$lib/services/math/engineer';
 	import { addOperator } from '$lib/services/mathActions.svelte.js';
 	import {
-		executeIdentity,
-		fractionToDecimal,
-		decimalToFraction,
+		// executeIdentity,
+		// fractionToDecimal,
+		// decimalToFraction,
 		handleFractionSlash
 	} from '$lib/services/fractionActions';
 </script>
 
 <div class="digBlock">
-	<div class="row">
+	<!-- <div class="row">
 		<BtnText
 			customClass="op btn__func constanta"
 			onclick={() => executeIdentity()}
@@ -39,7 +39,7 @@
 			onclick={() => decimalToFraction()}
 			buttonText=".:"
 		/>
-	</div>
+	</div> -->
 	<div class="row">
 		<BtnText customClass="op btn__func constanta" onclick={() => addOperator('(')} buttonText="(" />
 		<BtnText customClass="btn__op" onclick={() => handleFractionSlash()} buttonText="÷" />

@@ -33,8 +33,9 @@ a {
   -webkit-touch-callout: none;
 }
 
-/* Скрытие технических маркеров смешанных чисел для работы калькулятора дробей */
-.fraction-marker {
+/* Скрытие технических маркеров смешанных чисел и сложных скобок */
+.fraction-marker,
+.complex-bracket-marker {
   display: inline-block;
   width: 0;
   max-width: 0;

@@ -25,7 +25,7 @@
 		});
 	});
 
-	// Логика QuickMenu на основе trailing slash
+	// Логика QuickMenu
 	// @ts-ignore
 	import { page } from '$app/stores';
 	import { menuMaps } from '$lib/config/menuMaps.js';
@@ -64,10 +64,7 @@
 					<span class="expression-line">
 						{#each parseExpressionToHtml(item.rawExpr) as token}
 							{#if token.type === 'text'}
-								<span class="math-text">
-									<!-- {token.value} -->
-									{token.value.replace(/[\u2951\u294F]/g, '')}
-								</span>
+								<span class="math-text">{token.value}</span>
 							{:else}
 								<div class="fraction-block">
 									{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
@@ -117,7 +114,8 @@
 				<div class="expression-line">
 					{#each parseExpressionToHtml(appState.expression) as token}
 						{#if token.type === 'text'}
-							<span class="math-text">{token.value}</span>
+							<span class="math-text">{token.value.replace(/[\u2951\u294F\u297E\u297F]/g, '')}</span
+							>
 						{:else}
 							<div class="fraction-block">
 								{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
@@ -135,7 +133,7 @@
 			<div class="display-line">
 				{#each parseExpressionToHtml(appState.display) as token}
 					{#if token.type === 'text'}
-						<span class="math-text">{token.value}</span>
+						<span class="math-text">{token.value.replace(/[\u2951\u294F\u297E\u297F]/g, '')}</span>
 					{:else}
 						<div class="fraction-block">
 							{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
@@ -225,27 +223,34 @@
 			justify-content: flex-start;
 			align-items: center;
 			gap: 0.2rem;
-			padding-left: 5px;
-			padding-right: 1rem;
-			border-bottom: 1px solid rgba($clr-sky-rgb, 0.7);
-			border-right: 1px solid rgba($clr-sky-rgb, 0.7);
-			border-bottom-right-radius: 1rem;
+			padding-left: 4px;
 			max-width: fit-content;
 
-			.pseudo-stack-fraction {
+			$fontSizeFractionPart: 1rem;
+			.math-text,
+			.whole-part {
+				// === -📝=TODO=📝- ===
+				color: rgb(255, 255, 255);
+				font-size: calc(1.5 * $fontSizeFractionPart);
+				padding-right: 0.5rem;
+			}
+			.fraction-container {
 				max-width: fit-content;
-				.num-floor {
+				.num-part {
 					// === -📝=TODO=📝- ===
-					color: green;
+					color: rgb(192, 235, 3);
+					font-size: $fontSizeFractionPart;
 				}
 				.fraction-line {
 					height: 2px;
 					// === -📝=TODO=📝- ===
 					background-color: rgb(153, 0, 255);
+					font-size: $fontSizeFractionPart;
 				}
-				.den-floor {
+				.den-part {
 					// === -📝=TODO=📝- ===
 					color: rgb(255, 153, 0);
+					font-size: $fontSizeFractionPart;
 					text-align: center;
 				}
 			}
@@ -327,8 +332,6 @@
 	.placeholder-rectangle {
 		width: 3.5rem;
 		height: 1.5rem;
-		border: 2px dashed $clr-slate;
-		border-radius: 4px;
 		background: rgba(0, 0, 0, 0.2);
 		transition: all 0.2s ease;
 
@@ -467,6 +470,79 @@
 		font-size: 1.5rem;
 		color: rgba(255, 255, 255, 0.9);
 		padding-top: 2px;
+	}
+
+	/* Добавляем флекс-направление, чтобы шаги выстраивались вертикально один за другим */
+	.fraction-steps-block {
+		display: flex;
+		gap: 4px;
+		width: 100%;
+		padding: 6px 0;
+	}
+	.step-line {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	/* Контейнер для одной полной задачи в истории */
+	.history-block {
+		display: flex;
+		flex-wrap: wrap; /* Разрешаем перенос шагов на новую строку, если они не влезают */
+		align-items: center; /* Выравниваем дроби и знаки "=" строго по центру вертикали */
+		gap: 0.75rem 0.5rem; /* Отступы: между строками (0.75rem), между шагами (0.5rem) */
+		width: 100%;
+		padding: 1rem 0;
+		border-bottom: 1px solid #222; /* Элегантный разделитель сессий на чистом чёрном фоне */
+	}
+
+	/* Обертка для шага и его знака равенства */
+	.step-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	/* Стилизация знака равенства */
+	.math-equal {
+		color: #888;
+		font-family: 'Inter', sans-serif;
+		font-size: 1.2rem;
+		user-select: none;
+	}
+
+	/* Контент шага (само выражение или дробь) */
+	.step-content {
+		display: inline-block;
+		white-space: nowrap; /* Запрещаем одной конкретной дроби разрываться посредине */
+	}
+
+	/* Общий контейнер для всей цепочки шагов одной сессии */
+	.fraction-steps-block {
+		display: flex;
+		flex-wrap: wrap; /* Позволяет шагам переноситься, если они не влезают в экран */
+		align-items: center; /* Выравнивает все шаги и дроби строго по одной горизонтальной оси */
+		gap: 0.75rem 0.5rem; /* Отступы: 0.75rem между строками при переносе, 0.5rem между шагами */
+		width: 100%;
+		padding: 0.5rem 0;
+
+		border-bottom: 1px solid rgba($clr-sky-rgb, 0.7);
+		border-right: 1px solid rgba($clr-sky-rgb, 0.7);
+		border-bottom-right-radius: 1rem;
+	}
+
+	/* Конкретный шаг (блок из знака "=" и внутренних токенов дроби) */
+	.fraction-log-item.step-line {
+		display: inline-flex; /* Элементы внутри шага (знак равенства, дроби) идут в линию */
+		align-items: center; /* Центрируем знак "=" относительно дроби вертикально */
+		gap: 0.25rem; /* Небольшой отступ между знаком "=" и самой дробью */
+		white-space: nowrap; /* Запрещаем ОДНОМУ конкретному шагу разрываться пополам */
+	}
+
+	/* Дополнительно: убедись, что знак равенства имеет красивый отступ справа */
+	.fraction-log-item .math-text {
+		display: inline-block;
+		white-space: nowrap;
 	}
 
 	//=====================================

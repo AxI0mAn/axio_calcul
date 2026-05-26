@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /**
  * src/lib/services/fractionActions.js
- * Сервис действий для страницы вычисления дробей (Линейный ввод через скобки)
+ * Пошаговый образовательный движок вычисления дробей с параллельным попарным приоритетом
  */
 import { appState } from '../store/appState.svelte.js';
 import { Fraction, gcd, lcm } from './fractionCore.js';
@@ -9,6 +9,8 @@ import { Fraction, gcd, lcm } from './fractionCore.js';
 /**
  * Вспомогательная функция: Преобразует сырой линейный ввод пользователя со скобками в маркерный формат
  * Например: "1(1÷4" -> "1⥑1÷4⥏", а "(3÷2" -> "3÷2"
+ * Исправленная функция захвата: принудительно берет всё, что после ( 
+ * до тех пор, пока не встретит конец строки или следующий символ.
  */
 function convertRawInputToMarkers(expr) {
   if (!expr || expr === 'ERROR') return expr;
@@ -34,8 +36,80 @@ function convertRawInputToMarkers(expr) {
   return expr;
 }
 
+
 /**
- * Превращает объект Fraction обратно в строковый вид с системными маркерами
+ * ФОРМАТИРОВАНИЕ ДЛЯ ЭКРАНА (UI)
+ * Берёт чистый монолит и расставляет пробелы ТОЛЬКО вокруг внешних линейных операторов.
+ * Внутри дробей и скобок пробелов не будет — рендерер не порвёт вёрстку дроби.
+ */
+function formatDisplayStep(expr) {
+  let clean = expr.replace(/\s+/g, ''); // Защита: убираем случайные пробелы
+  let result = '';
+  let inMarker = 0;
+
+  for (let i = 0; i < clean.length; i++) {
+    const char = clean[i];
+
+    if (char === '\u297E') {
+      inMarker++;
+      result += char;
+    } else if (char === '\u297F') {
+      inMarker--;
+      result += char;
+    } else if (inMarker === 0 && ['+', '*', '/'].includes(char)) {
+      result += ' ' + char + ' ';
+    } else if (inMarker === 0 && char === '-') {
+      const trimmed = result.trim();
+      const lastChar = trimmed[trimmed.length - 1];
+      if (lastChar && (/\d/.test(lastChar) || lastChar === '\u297F' || lastChar === ')')) {
+        result += ' - '; // Бинарное вычитание на линейном уровне
+      } else {
+        result += char; // Знак отрицательного числа
+      }
+    } else {
+      result += char;
+    }
+  }
+  return result.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * ПОДГОТОВКА СТРОКИ ДЛЯ ДВИЖКА ТОКЕНИЗАЦИИ
+ * Выделяет пробелами операторы на беспробельной строке, чтобы split(' ') отработал идеально.
+ */
+function addSpacesForEngine(expr) {
+  let res = '';
+  for (let i = 0; i < expr.length; i++) {
+    const c = expr[i];
+    if (['+', '*', '/'].includes(c)) {
+      res += ' ' + c + ' ';
+    } else if (c === '-') {
+      if (i > 0 && /\d/.test(expr[i - 1])) {
+        res += ' - ';
+      } else {
+        res += '-';
+      }
+    } else {
+      res += c;
+    }
+  }
+  return res.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Перевод дроби в плоскую строку (без выделения целой части) для промежуточных шагов
+ */
+function fractionToFlatString(fr) {
+  const simplified = fr.simplify();
+  if (simplified.den === 1) {
+    return String(simplified.whole * simplified.den + simplified.num);
+  }
+  const totalNum = simplified.whole * simplified.den + simplified.num;
+  return `${totalNum}÷${simplified.den}`;
+}
+
+/**
+ * Перевод дроби в красивую строку с системными маркерами целой части
  */
 function fractionToString(fr) {
   const simplified = fr.simplify();
@@ -51,35 +125,17 @@ function fractionToString(fr) {
 }
 
 /**
- * Превращает дробь в плоскую строку (числитель÷знаменатель) без выделения целой части.
- * Используется только для промежуточных шагов вычислений.
- */
-function fractionToFlatString(fr) {
-  const simplified = fr.simplify();
-  // Если знаменатель равен 1, возвращаем просто число
-  if (simplified.den === 1) {
-    return String(simplified.whole * simplified.den + simplified.num);
-  }
-  // Иначе возвращаем сквозной числитель и знаменатель
-  const totalNum = simplified.whole * simplified.den + simplified.num;
-  return `${totalNum}÷${simplified.den}`;
-}
-
-/**
- * Новый неубиваемый токенизатор выражения (работает строго по пробелам)
+ * Универсальный токенизатор строки по пробелам
  */
 function tokenizeSubExpression(subExpr) {
-  // Заменяем множественные пробелы на один и бьем на массив токенов
   const rawTokens = subExpr.replace(/\s+/g, ' ').trim().split(' ');
   const tokens = [];
 
   for (let token of rawTokens) {
     if (!token) continue;
-
     if (['+', '-', '*', '/'].includes(token)) {
       tokens.push(token);
     } else {
-      // Если токен содержит маркеры смешанного числа
       if (token.includes('\u2951')) {
         const openIdx = token.indexOf('\u2951');
         const closeIdx = token.indexOf('\u294F');
@@ -93,12 +149,9 @@ function tokenizeSubExpression(subExpr) {
         }
       }
 
-      // Если это простая дробь
       if (token.includes('÷')) {
         const parts = token.split('÷');
-        const den = parseInt(parts[1], 10);
-        if (den === 0) return null;
-        tokens.push(new Fraction(parseInt(parts[0], 10), den, 0));
+        tokens.push(new Fraction(parseInt(parts[0], 10), parseInt(parts[1], 10), 0));
       } else if (token.includes('.')) {
         tokens.push(Fraction.fromDecimal(parseFloat(token)));
       } else {
@@ -110,63 +163,20 @@ function tokenizeSubExpression(subExpr) {
 }
 
 /**
- * Вспомогательная функция быстрого вычисления атомарных подвыражений
+ * Вычисление простого математического выражения
  */
-function evaluateSubExpression(subExpr) {
-  const tokens = tokenizeSubExpression(subExpr);
-  if (!tokens || tokens.length === 0) return null;
-
-  // 1. Умножение и деление
-  for (let i = 1; i < tokens.length; i += 2) {
-    const op = tokens[i];
-    if (op === '*' || op === '/') {
-      const prev = tokens[i - 1];
-      const next = tokens[i + 1];
-      if (next.den === 0 || (op === '/' && next.num === 0)) return null;
-
-      const pNum = prev.whole * prev.den + prev.num;
-      const nNum = next.whole * next.den + next.num;
-
-      let res;
-      if (op === '*') {
-        res = new Fraction(pNum * nNum, prev.den * next.den, 0);
-      } else {
-        res = new Fraction(pNum * next.den, prev.den * nNum, 0);
-      }
-      tokens.splice(i - 1, 3, res);
-      i -= 2;
-    }
+function evaluateStandardMath(exprStr) {
+  let clean = exprStr.replace(/,/g, '.').replace(/\s+/g, '').trim();
+  try {
+    const fn = new Function(`return ${clean.replace(/÷/g, '/')}`);
+    return fn();
+  } catch (e) {
+    return 0;
   }
-
-  // 2. Сложение и вычитание
-  let finalFraction = tokens[0];
-  for (let i = 1; i < tokens.length; i += 2) {
-    const op = tokens[i];
-    const next = tokens[i + 1];
-    if (next.den === 0) return null;
-
-    const fNum = finalFraction.whole * finalFraction.den + finalFraction.num;
-    const nNum = next.whole * next.den + next.num;
-
-    if (finalFraction.den === next.den) {
-      const newNum = op === '+' ? fNum + nNum : fNum - nNum;
-      finalFraction = new Fraction(newNum, finalFraction.den, 0);
-    } else {
-      const commonDen = lcm(finalFraction.den, next.den);
-      const factor1 = commonDen / finalFraction.den;
-      const factor2 = commonDen / next.den;
-      const newNum = op === '+'
-        ? (fNum * factor1) + (nNum * factor2)
-        : (fNum * factor1) - (nNum * factor2);
-      finalFraction = new Fraction(newNum, commonDen, 0);
-    }
-  }
-
-  return finalFraction.simplify();
 }
 
 /**
- * 1. Ввод цифр (0-9) на странице дробей (Чисто на главный дисплей)
+ * Ввод элементов
  */
 export function enterFractionDigit(digit) {
   if (appState.isNewInput) {
@@ -178,27 +188,29 @@ export function enterFractionDigit(digit) {
 }
 
 /**
- * 2. Ввод операторов (+, -, *, /) с автоконвертацией накопленной структуры
+ * Ввод оператора (+, -, *, /)
  */
 export function enterFractionOperator(op) {
   if (appState.display === 'ERROR') return;
 
-  // На лету превращаем сырой ввод текущего дисплея (например "1(1÷4") в маркеры
-  let currentDisplay = convertRawInputToMarkers(appState.display.trim());
+  const openCount = (appState.display.match(/\(\(/g) || []).length;
+  const closeCount = (appState.display.match(/\)\)/g) || []).length;
 
-  if (currentDisplay === '0' && appState.expression) {
-    let currentExpr = appState.expression.trim();
-    const lastChar = currentExpr.at(-1);
-    if (['+', '-', '*', '/'].includes(lastChar)) {
-      appState.expression = currentExpr.slice(0, -1) + op + ' ';
-      return;
-    }
+  if (openCount > closeCount) {
+    appState.display += ` ${op} `;
+    appState.isNewInput = false;
+    return;
   }
 
+  // УДАЛЕНО: Авто-закрытие скобок при вводе оператора.
+  // Теперь оператор не будет ломать ввод дроби.
+
+  let currentDisplay = appState.display.trim();
+
   if (!appState.expression || appState.expression.trim() === '') {
-    appState.expression = currentDisplay + ' ' + op + ' ';
+    appState.expression = currentDisplay + ` ${op} `;
   } else {
-    appState.expression = appState.expression.trim() + ' ' + currentDisplay + ' ' + op + ' ';
+    appState.expression = appState.expression.trim() + ' ' + currentDisplay + ` ${op} `;
   }
 
   appState.display = '0';
@@ -206,25 +218,11 @@ export function enterFractionOperator(op) {
 }
 
 /**
- * 3. Обработка кнопки дробной черты [÷]
- */
-export function handleFractionSlash() {
-  if (appState.isNewInput) {
-    appState.display = '0÷';
-    appState.isNewInput = false;
-  } else {
-    if (!appState.display.includes('÷')) {
-      appState.display = appState.display + '÷';
-    }
-  }
-}
-
-/**
- * Обработка ввода скобки (Используется как разделитель целой части линейно)
+ * отвечает за ввод открывающей скобки ( в интерфейс калькулятора.
  */
 export function executeIdentity(identityType) {
   if (identityType === 'bracket') {
-    if (appState.isNewInput || appState.display === '0' || appState.display === 'ERROR') {
+    if (appState.isNewInput || appState.display === '0') {
       appState.display = '(';
       appState.isNewInput = false;
     } else {
@@ -233,186 +231,50 @@ export function executeIdentity(identityType) {
   }
 }
 
+
 /**
- * ГЛАВНАЯ ФУНКЦИЯ ВЫЧИСЛЕНИЯ ВЫРАЖЕНИЯ [=]
+ * Кнопка дроби (÷)
+ * Теперь она максимально "чистая" и не вмешивается в структуру скобок.
  */
-export function calculateFractionResult() {
-  let cleanDisplay = convertRawInputToMarkers(appState.display.trim());
+export function handleFractionSlash() {
+  if (appState.display === 'ERROR') return;
 
-  let rawExpression = appState.expression.trim();
-  if (rawExpression) {
-    rawExpression += ' ' + cleanDisplay;
+  let currentDisplay = appState.display.trim();
+
+  if (currentDisplay === '' || currentDisplay === '0') {
+    appState.display = '0÷';
   } else {
-    rawExpression = cleanDisplay;
+    // Просто добавляем ÷. Никаких закрытий скобок!
+    appState.display = currentDisplay + '÷';
   }
 
-  if (!rawExpression || rawExpression === '0') return;
-
-  // 1. Предварительная очистка: убираем лишние пробелы вокруг маркеров
-  let currentExpr = rawExpression.replace(/(-?\d+)\s*\u2951/g, '$1\u2951');
-
-  // 2. Изолируем операторы пробелами БЕЗ лишних экранирований (линтер доволен)
-  currentExpr = currentExpr.replace(/\u294F([+\-*/])/g, '\u294F $1 ');
-  currentExpr = currentExpr.replace(/([+\-*/])/g, ' $1 ');
-  currentExpr = currentExpr.replace(/\s+/g, ' ').trim();
-
-  let stepsSequence = currentExpr;
-
-  const addStep = (nextStep) => {
-    const formattedNext = nextStep.replace(/\s+/g, ' ').trim();
-    if (stepsSequence.includes(' = ')) {
-      const parts = stepsSequence.split(' = ');
-      if (parts[parts.length - 1].trim() !== formattedNext) {
-        stepsSequence += ` = ${formattedNext}`;
-      }
-    } else {
-      if (stepsSequence.trim() !== formattedNext) {
-        stepsSequence += ` = ${formattedNext}`;
-      }
-    }
-  };
-
-  try {
-    // === ЧАСТЬ А: НАДЁЖНО РАСКРЫВАЕМ СМЕШАННЫЕ ЧИСЛА С МАРКЕРАМИ ===
-    const mixedFractionRegex = /(-?\d+)\u2951(\d+)÷(\d+)\u294F/;
-
-    let safetyCounter = 0;
-    while (mixedFractionRegex.test(currentExpr) && safetyCounter < 40) {
-      safetyCounter++;
-
-      currentExpr = currentExpr.replace(mixedFractionRegex, (match, wholeStr, numStr, denStr) => {
-        const whole = parseInt(wholeStr, 10);
-        const num = parseInt(numStr, 10);
-        const den = parseInt(denStr, 10);
-
-        if (den === 0) throw new Error("Division by zero in mixed fraction");
-
-        const sign = whole < 0 ? -1 : 1;
-        const combinedNum = whole * den + (sign * num);
-
-        const combinedFraction = new Fraction(combinedNum, den, 0);
-
-        // Используем ТОЛЬКО плоскую строку, чтобы гарантированно уничтожить маркеры в цикле!
-        return fractionToFlatString(combinedFraction);
-      });
-
-      addStep(currentExpr);
-    }
-
-    if (safetyCounter >= 40) throw new Error("Invalid Mixed Fraction Loop");
-    // === ЧАСТЬ Б: РАСКРЫВАЕМ МАТЕМАТИЧЕСКИЕ КРУГЛЫЕ СКОБКИ ===
-    safetyCounter = 0;
-    while (currentExpr.includes('(') && safetyCounter < 40) {
-      safetyCounter++;
-
-      const openIdx = currentExpr.lastIndexOf('(');
-      let closeIdx = currentExpr.indexOf(')', openIdx);
-
-      if (closeIdx === -1) {
-        currentExpr += ')';
-        closeIdx = currentExpr.length - 1;
-      }
-
-      const subBody = currentExpr.substring(openIdx + 1, closeIdx);
-      const subResultFraction = evaluateSubExpression(subBody);
-      if (!subResultFraction) throw new Error("Sub-expression error");
-
-      const replacementStr = fractionToString(subResultFraction);
-      currentExpr = currentExpr.substring(0, openIdx) + ' ' + replacementStr + ' ' + currentExpr.substring(closeIdx + 1);
-      currentExpr = currentExpr.replace(/\s+/g, ' ').trim();
-      addStep(currentExpr);
-    }
-
-    // === ЧАСТЬ В: ЛИНЕЙНОЕ ВЫЧИСЛЕНИЕ ВЫРАЖЕНИЯ ===
-    let tokens = tokenizeSubExpression(currentExpr);
-    if (!tokens || tokens.length === 0) throw new Error("Tokens parsing error");
-
-    // 1. Умножение и деление
-    for (let i = 1; i < tokens.length; i += 2) {
-      const op = tokens[i];
-      if (op === '*' || op === '/') {
-        const prev = tokens[i - 1];
-        const next = tokens[i + 1];
-        const pNum = prev.whole * prev.den + prev.num;
-        const nNum = next.whole * next.den + next.num;
-
-        if (next.den === 0 || (op === '/' && nNum === 0)) throw new Error("Division by zero");
-
-        let res = op === '*'
-          ? new Fraction(pNum * nNum, prev.den * next.den, 0)
-          : new Fraction(pNum * next.den, prev.den * nNum, 0);
-
-        const currentStepView = `${fractionToString(prev)} ${op} ${fractionToString(next)}`;
-        currentExpr = currentExpr.replace(currentStepView, fractionToString(res));
-        addStep(currentExpr);
-
-        tokens.splice(i - 1, 3, res);
-        i -= 2;
-      }
-    }
-
-    // 2. Сложение и вычитание
-    let finalFraction = tokens[0];
-    for (let i = 1; i < tokens.length; i += 2) {
-      const op = tokens[i];
-      const next = tokens[i + 1];
-
-      const fNum = finalFraction.whole * finalFraction.den + finalFraction.num;
-      const nNum = next.whole * next.den + next.num;
-      const currentStepView = `${fractionToString(finalFraction)} ${op} ${fractionToString(next)}`;
-
-      if (finalFraction.den === next.den) {
-        const newNum = op === '+' ? fNum + nNum : fNum - nNum;
-        finalFraction = new Fraction(newNum, finalFraction.den, 0);
-      } else {
-        const commonDen = lcm(finalFraction.den, next.den);
-        const factor1 = commonDen / finalFraction.den;
-        const factor2 = commonDen / next.den;
-        const newNum = op === '+' ? (fNum * factor1) + (nNum * factor2) : (fNum * factor1) - (nNum * factor2);
-        finalFraction = new Fraction(newNum, commonDen, 0);
-      }
-
-      currentExpr = currentExpr.replace(currentStepView, fractionToString(finalFraction));
-      addStep(currentExpr);
-      tokens[i + 1] = finalFraction;
-    }
-
-    const finalRawStr = fractionToString(finalFraction);
-    appState.historySession.push(stepsSequence);
-    appState.display = finalRawStr;
-    appState.expression = '';
-    appState.isNewInput = true;
-
-  } catch (err) {
-    console.error("Критическая ошибка расчёта:", err);
-    appState.historySession.push(`${stepsSequence} = ERROR`);
-    appState.display = 'ERROR';
-    appState.expression = '';
-  }
+  appState.isNewInput = false;
 }
 
 /**
- * Очистка дисплея и накопленного выражения дробей
+ * ГЛАВНЫЙ ПОШАГОВЫЙ ДВИЖОК ВЫЧИСЛЕНИЙ (РАБОТАЕТ НА БЕСПРОБЕЛЬНОМ СТРИМЕ)
+ * 
+ * 
+ * 
+ * 
  */
+
+
 export function clearFractionAll() {
   appState.display = '0';
   appState.expression = '';
   appState.isNewInput = true;
 }
 
-/**
- * Метод Backspace для линейного дисплея дробей
- */
 export function backspaceFraction() {
   if (appState.isNewInput || appState.display === '0' || appState.display === 'ERROR') {
     appState.display = '0';
     appState.isNewInput = true;
   } else {
-    let current = appState.display.trim();
-    current = current.slice(0, -1);
-    appState.display = current === '' || current === '-' ? '0' : current;
+    appState.display = appState.display.trim().slice(0, -1) || '0';
   }
 }
+
 
 export function fractionToDecimal() {
   let currentDisplay = convertRawInputToMarkers(appState.display.trim());
