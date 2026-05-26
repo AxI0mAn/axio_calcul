@@ -4,26 +4,74 @@
 // 1. ДИНАМИЧЕСКИЕ ЦВЕТА (Меняются в зависимости от темы)
 // =============================================================================
 
+/*
+Если ты запишешь в тему --clr-slate: 100, 116, 139;, то ты не сможешь использовать эту переменную в чистом виде для обычного цвета (без прозрачности). Тебе придется везде писать либо rgb($clr-slate), либо rgba($clr-slate, 1).
+
+Поэтому разработчики обычно создают две переменные: 
+одну для обычного цвета, 
+вторую — чисто из цифр для прозрачности (например, --clr-slate-rgb).
+
+Например, 
+		--clr-slate: #64748b;
+		--clr-slate-rgb: 100, 116, 139; - БЕЗ rgba( !!!
+
+тогда в компоненте можно применить прозрачность background-color: rgba($clr-slate-rgb, 0.3);
+
+Правиьно для градиентов:  
+$grad-btn-main: linear-gradient(215deg, $clr-blue-light 0%, $clr-bg-darker 50%, $clr-blue-mid} 100%;
+
+Золотое правило для твоего проекта:
+Если ты передаешь в rgba() Sass-переменную, которая является CSS-переменной (содержит внутри var()), то пиши БЕЗ решетки: rgba($var, 0.5) (потому что для Sass это функция, которую он пропустит в браузер).
+
+// Если ты передаешь в rgba() строку с голыми цифрами (как 0, 0, 0), то ОБЯЗАТЕЛЬНО оборачивай её в решетку: rgba(# { $var}, 0.5).
+*/
+
+
 :root {
 
 	// --- DARK THEME (Default) ---
 	&,
 	&[data-theme='dark'] {
 		--clr-bg: #1f1f1f;
+		--clr-bg-rgb: 31, 31, 31;
+
 		--clr-bg-darker: #000d37;
+		--clr-bg-darker-rgb: 0, 13, 55;
+
 		--clr-bg-card: #0f172a;
+		--clr-bg-card-rgb: 15, 23, 42;
+
 		--clr-text-main: #ffffff;
+		--clr-text-main-rgb: 255, 255, 255;
+
 		--clr-slate: #64748b;
+		--clr-slate-rgb: 100, 116, 139;
 
 		--clr-mint: #01d9c3;
+		--clr-mint-rgb: 1, 217, 195;
+
 		--clr-mint-soft: #86edf2;
+		--clr-mint-soft-rgb: 134, 237, 242;
+
 		--clr-sky: #00d1ff;
+		--clr-sky-rgb: 0, 209, 255;
+
 		--clr-coral: #ff7f50;
+		--clr-coral-rgb: 255, 127, 80;
+
 
 		--clr-blue-light: #02427e;
+		--clr-blue-light-rgb: 2, 66, 126;
+
 		--clr-blue-mid: #02273e;
+		--clr-blue-mid-rgb: 2, 39, 62;
+
 		--clr-blue-hover: #344e66;
+		--clr-blue-hover-rgb: 52, 78, 102;
+
 		--clr-blue-deep: #00051a;
+		--clr-blue-deep-rgb: 0, 5, 26;
+
 
 		// Свечение (RGBA значения для динамики)
 		--shd-mint-glow: rgba(1, 217, 195, 0.5);
@@ -34,25 +82,50 @@
 
 	&[data-theme='light'] {
 		// Базовые фоны - уходим в "стерильный" чистый интерфейс
-		--clr-bg: #f1f5f9; // Светлый серо-голубой (Slate 100)
-		--clr-bg-darker: #e2e8f0; // Slate 200
-		--clr-bg-card: #c2e0fc; // Чистый белый
-		--clr-text-main: #1e293b; // Глубокий Slate 800 (лучше чем чистый черный)
+		--clr-bg: #f1f5f9;
+		--clr-bg-rgb: 241, 245, 249;
+
+		--clr-bg-darker: #e2e8f0;
+		--clr-bg-darker-rgb: 226, 232, 240;
+
+		--clr-bg-card: #c2e0fc;
+		--clr-bg-card-rgb: 194, 224, 252;
+
+		--clr-text-main: #1e293b;
+		--clr-text-main-rgb: 30, 41, 59;
+
 		--clr-slate: #353e4b;
+		--clr-slate-rgb: 53, 62, 75;
 
 		// Акценты - делаем их более насыщенными, т.к. нет свечения
-		--clr-mint: #0a7770; // Teal 600
-		--clr-mint-soft: #0e463e; // Teal 400
-		--clr-sky: #0284c7; // Sky 600
+		--clr-mint: #0a7770;
+		--clr-mint-rgb: 10, 119, 112;
+
+		--clr-mint-soft: #0e463e;
+		--clr-mint-soft-rgb: 14, 70, 62;
+
+		--clr-sky: #0284c7;
+		--clr-sky-rgb: 2, 132, 199;
+
 
 		// ЗАМЕНА КОРАЛЛОВОГО: Переходим к Indigo, чтобы сочетаться с PNG иконками
-		--clr-coral: #726beb; // Indigo 600 (теперь это наш Primary Accent)
+		--clr-coral: #726beb;
+		--clr-coral-rgb: 114, 107, 235;
+
 
 		// Синяя палитра (инвертированная, для мягких подложек)
 		--clr-blue-light: #f8fafc;
+		--clr-blue-light-rgb: 248, 250, 252;
+
 		--clr-blue-mid: #cbd5e1;
+		--clr-blue-mid-rgb: 203, 213, 225;
+
 		--clr-blue-hover: #e2e8f0;
+		--clr-blue-hover-rgb: 226, 232, 240;
+
 		--clr-blue-deep: #dee2e6;
+		--clr-blue-deep-rgb: 222, 226, 230;
+
 
 		// Тени - вместо свечения используем объем
 		--shd-mint-glow: rgba(13, 148, 136, 0.15);
@@ -68,30 +141,56 @@
 }
 
 // =============================================================================
-// 2. СТАТИЧЕСКИЕ ЦВЕТА (Не меняются никогда)
+// 2. СТАТИЧЕСКИЕ ЦВЕТА (Не меняются никогда) 
 // =============================================================================
 $clr-black: #000000;
+// вместо $clr-black-rgb в стилях используем 0,0,0 
+
 $clr-white: #ffffff;
+// вместо $clr-white-rgb в стилях используем 255, 255, 255
 
 // =============================================================================
 // 3. SASS-ПЕРЕМЕННЫЕ (Связки с CSS-переменными)
 // =============================================================================
 
 $clr-bg: var(--clr-bg);
+$clr-bg-rgb: var(--clr-bg-rgb);
+
 $clr-bg-darker: var(--clr-bg-darker);
+$clr-bg-darker-rgb: var(--clr-bg-darker-rgb);
+
 $clr-bg-card: var(--clr-bg-card);
+$clr-bg-card-rgb: var(--clr-bg-card-rgb);
+
 $clr-text-main: var(--clr-text-main);
+$clr-text-main-rgb: var(--clr-text-main-rgb);
+
 $clr-slate: var(--clr-slate);
+$clr-slate-rgb: var(--clr-slate-rgb);
 
 $clr-mint: var(--clr-mint);
+$clr-mint-rgb: var(--clr-mint-rgb);
+
 $clr-mint-soft: var(--clr-mint-soft);
+$clr-mint-soft-rgb: var(--clr-mint-soft-rgb);
+
 $clr-sky: var(--clr-sky);
+$clr-sky-rgb: var(--clr-sky-rgb);
+
 $clr-coral: var(--clr-coral);
+$clr-coral-rgb: var(--clr-coral-rgb);
 
 $clr-blue-light: var(--clr-blue-light);
+$clr-blue-light-rgb: var(--clr-blue-light-rgb);
+
 $clr-blue-mid: var(--clr-blue-mid);
+$clr-blue-mid-rgb: var(--clr-blue-mid-rgb);
+
 $clr-blue-hover: var(--clr-blue-hover);
+$clr-blue-hover-rgb: var(--clr-blue-hover-rgb);
+
 $clr-blue-deep: var(--clr-blue-deep);
+$clr-blue-deep-rgb: var(--clr-blue-deep-rgb);
 
 // =============================================================================
 // 4. КОМПЛЕКСНЫЕ СТИЛИ (Градиенты и Тени)
@@ -99,9 +198,9 @@ $clr-blue-deep: var(--clr-blue-deep);
 // =============================================================================
 
 // Градиенты
-$grad-btn-main: linear-gradient(215deg, #{$clr-blue-light} 0%, #{$clr-bg-darker} 50%, #{$clr-blue-mid} 100%);
-$grad-op: linear-gradient(45deg, #{$clr-slate} 0%, #252c35 50%, #4b5768 100%);
-$grad-memo: linear-gradient(45deg, #{$clr-slate} 0%, #{$clr-mint} 50%, #4b5768 100%);
+$grad-btn-main: linear-gradient(215deg, $clr-blue-light 0%, $clr-bg-darker 50%, $clr-blue-mid 100%);
+$grad-op: linear-gradient(45deg, $clr-slate 0%, #252c35 50%, #4b5768 100%);
+$grad-memo: linear-gradient(45deg, $clr-slate 0%, $clr-mint 50%, #4b5768 100%);
 
 // Тени и Неон
 $shadow-neon-mint: 0 0 8px var(--shd-mint-glow);
