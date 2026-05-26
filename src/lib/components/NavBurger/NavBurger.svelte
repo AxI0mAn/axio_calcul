@@ -332,10 +332,10 @@
 		&:focus-visible {
 			outline: 2px solid $clr-mint;
 			outline-offset: -2px;
-			background-color: rgba(255, 255, 255, 0.1);
+			background-color: rgba($clr-white, 0.1);
 		}
 		&:active {
-			background-color: rgba(0, 0, 0, 0.1);
+			background-color: rgba($clr-black, 0.1);
 		}
 	}
 
@@ -365,11 +365,11 @@
 		&:focus-visible {
 			outline: 2px solid $clr-mint;
 			outline-offset: -2px;
-			background-color: rgba(255, 255, 255, 0.1);
+			background-color: rgba($clr-white, 0.1);
 		}
 
 		&:active {
-			background-color: rgba(0, 0, 0, 0.1);
+			background-color: rgba($clr-black, 0.1);
 		}
 	}
 
@@ -377,7 +377,7 @@
 	@media (hover: hover) and (pointer: fine) {
 		.menu-button-wrapper:hover,
 		.menu-link:hover {
-			background-color: rgba(255, 255, 255, 0.2);
+			background-color: rgba($clr-white, 0.2);
 		}
 	}
 
@@ -390,12 +390,12 @@
 		&.level-1 {
 			padding-left: 20px;
 			// Вместо #ccc
-			border-left: 2px solid rgba($clr-bg-darker-rgb, 0.3);
+			border-left: 2px solid rgba($clr-bg-darker, 0.3);
 		}
 
 		&.level-2 {
 			padding-left: 15px;
-			border-left: 1px solid rgba($clr-bg-darker-rgb, 0.2);
+			border-left: 1px solid rgba($clr-bg-darker, 0.2);
 		}
 	}
 

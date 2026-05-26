@@ -42,7 +42,7 @@
 
 		// Свечение (Внутреннее и внешнее)
 		box-shadow:
-			1px 1px 4px 0px rgba($clr-bg-darker-rgb, 0.5),
+			1px 1px 4px 0px rgba($clr-bg-darker, 0.5),
 			inset 0px 0px 2px $clr-mint-soft;
 
 		@media (orientation: portrait) and (max-width: 432px) {

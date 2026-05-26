@@ -18,7 +18,7 @@
 		addPi
 	} from '$lib/services/math/basic.js';
 	import { addSqrtY } from '$lib/services/math/basic.js';
-	import { addOperator } from '$lib/services/mathActions.svelte.js';
+	import { addOperator } from '$lib/services/calculatorActions.svelte.js';
 </script>
 
 <div class="digBlock">

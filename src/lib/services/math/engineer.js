@@ -6,7 +6,7 @@
 import { appState } from "$lib/store/appState.svelte";
 import { float_toFixed } from "../base";
 import { showConstanta } from "$lib/utils/showConstanta";
-import { performCalculation } from "../mathActions.svelte";
+import { performCalculation } from "../calculatorActions.svelte";
 
 //=======================================
 /**

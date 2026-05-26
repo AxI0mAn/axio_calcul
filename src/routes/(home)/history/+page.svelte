@@ -1,9 +1,8 @@
 <script>
-	// src/routes/(home)/history/+page.svelte
 	// @ts-ignore
 	import { base } from '$app/paths';
+	import Catalog from '$lib/assets/svgIcon/catalog.svg?raw';
 	import { historyStore } from '$lib/store/historyStore.svelte';
-	import { parseExpressionToHtml } from '$lib/utils/fractionVisualParser.js';
 </script>
 
 <h1 class="header">history of calculated</h1>
@@ -21,31 +20,7 @@
 
 				<ul class="history-lines">
 					{#each record.items as line}
-						<li>
-							{#if typeof line === 'string' && line.includes('÷')}
-								<div class="global-expression-line">
-									{#each parseExpressionToHtml(line) as token}
-										{#if token.type === 'text'}
-											<span class="global-math-text">
-												<!-- {token.value} -->
-												{token.value.replace(/[\u2951\u294F]/g, '')}
-											</span>
-										{:else}
-											<div class="global-fraction-block">
-												{#if token.whole}<span class="global-whole-part">{token.whole}</span>{/if}
-												<div class="global-fraction-container">
-													<span class="global-num-part">{token.num}</span>
-													<span class="global-fraction-line"></span>
-													<span class="global-den-part">{token.den}</span>
-												</div>
-											</div>
-										{/if}
-									{/each}
-								</div>
-							{:else}
-								{line}
-							{/if}
-						</li>
+						<li>{line}</li>
 					{/each}
 				</ul>
 			</div>
@@ -73,7 +48,7 @@
 
 	.history-item {
 		background-color: $clr-bg-card;
-		border: 1px solid rgba($clr-mint-rgb, 0.3);
+		border: 1px solid rgba($clr-mint, 0.3);
 		margin-bottom: 1rem;
 		padding: 10px;
 		border-radius: 8px;
@@ -109,7 +84,7 @@
 	ul li {
 		line-height: 1.5rem;
 		// Можно добавить разделитель между строками истории
-		border-bottom: 1px solid rgba($clr-slate-rgb, 0.1);
+		border-bottom: 1px solid rgba($clr-slate, 0.1);
 		&:last-child {
 			border-bottom: none;
 		}
@@ -120,55 +95,5 @@
 		.header {
 			font-size: 2rem;
 		}
-	}
-
-	.global-expression-line {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 4px;
-		width: 100%;
-		padding: 2px 0;
-	}
-
-	.global-math-text {
-		font-size: 1.1rem;
-		color: rgba(255, 255, 255, 0.9);
-	}
-
-	.global-fraction-block {
-		display: inline-flex;
-		align-items: center;
-		vertical-align: middle;
-	}
-
-	.global-whole-part {
-		font-size: 1.2rem;
-		font-weight: bold;
-		margin-right: 2px;
-		color: #fff;
-	}
-
-	.global-fraction-container {
-		display: inline-flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		line-height: 1;
-		padding: 0 3px;
-	}
-
-	.global-num-part,
-	.global-den-part {
-		font-size: 0.85rem;
-		color: #fff;
-	}
-
-	.global-fraction-line {
-		display: block;
-		width: 100%;
-		height: 1px;
-		background-color: rgba(255, 255, 255, 0.8);
-		margin: 2px 0;
 	}
 </style>

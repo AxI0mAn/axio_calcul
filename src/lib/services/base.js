@@ -105,4 +105,4 @@ export function float_toFixed(num) {
 */
 export function clear() {
   appState.reset();
-} 
+}
