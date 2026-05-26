@@ -48,7 +48,7 @@
 
 	.history-item {
 		background-color: $clr-bg-card;
-		border: 1px solid rgba($clr-mint, 0.3);
+		border: 1px solid rgba($clr-mint-rgb, 0.3);
 		margin-bottom: 1rem;
 		padding: 10px;
 		border-radius: 8px;

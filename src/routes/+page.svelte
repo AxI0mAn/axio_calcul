@@ -272,9 +272,9 @@
 
 		padding: 1rem;
 
-		background: rgba($clr-bg-darker, 0.1);
+		background: rgba($clr-bg-darker-rgb, 0.1);
 		box-shadow:
-			0px 0px 30px rgba($clr-coral, 0.4),
+			0px 0px 30px rgba($clr-coral-rgb, 0.4),
 			$shadow-inset;
 	}
 
@@ -339,13 +339,13 @@
 		text-align: center;
 
 		backdrop-filter: blur(10px);
-		background: rgba($clr-bg-darker, 0.3);
+		background: rgba($clr-bg-darker-rgb, 0.3);
 		box-shadow:
-			0px 0px 16px rgba($clr-mint-soft, 0.4),
+			0px 0px 16px rgba($clr-mint-soft-rgb, 0.4),
 			$shadow-inset;
 
-		border-top: 1px solid rgba($clr-coral, 0.2);
-		border-bottom: 1px solid rgba($clr-coral, 0.2);
+		border-top: 1px solid rgba($clr-coral-rgb, 0.2);
+		border-bottom: 1px solid rgba($clr-coral-rgb, 0.2);
 		transition: all 0.35s;
 	}
 
@@ -360,7 +360,7 @@
 
 		&:hover {
 			box-shadow:
-				0px 0px 12px rgba($clr-coral, 0.4),
+				0px 0px 12px rgba($clr-coral-rgb, 0.4),
 				$shadow-inset;
 			border-top: none;
 			border-right: 8px groove $clr-coral;
@@ -382,7 +382,7 @@
 	/* Состояние Hover для устройств с мышью */
 	@media (hover: hover) {
 		.catalog__card:hover {
-			box-shadow: -4px 4px 2px 2px rgba($clr-coral, 0.5);
+			box-shadow: -4px 4px 2px 2px rgba($clr-coral-rgb, 0.5);
 			outline: 4px solid $clr-coral;
 
 			transition: box-shadow 0.05s;
@@ -393,9 +393,9 @@
 		}
 
 		.catalog__card:hover .catalog__card--title {
-			box-shadow: 0px 0px 30px rgba($clr-mint, 0.9);
-			border-top: 1px solid rgba($clr-mint, 0.2);
-			border-bottom: 1px solid rgba($clr-mint, 0.2);
+			box-shadow: 0px 0px 30px rgba($clr-mint-rgb, 0.9);
+			border-top: 1px solid rgba($clr-mint-rgb, 0.2);
+			border-bottom: 1px solid rgba($clr-mint-rgb, 0.2);
 			color: $clr-coral;
 			min-width: 100%;
 			width: fit-content;
@@ -403,7 +403,7 @@
 			font-size: 2rem;
 
 			padding: 2px 4px;
-			text-shadow: -2px 2px 2px rgba($clr-mint, 0.9);
+			text-shadow: -2px 2px 2px rgba($clr-mint-rgb, 0.9);
 
 			transition: all 0.35s;
 
@@ -422,7 +422,7 @@
 	}
 
 	.catalog__card:active:not(.isHovered) {
-		box-shadow: -4px 4px 2px 2px rgba($clr-black, 0.3);
+		box-shadow: -4px 4px 2px 2px rgba(0, 0, 0, 0.3);
 		outline: none;
 		box-shadow: none;
 		text-decoration: none;
@@ -437,7 +437,7 @@
 		box-shadow: none;
 		border-top: none;
 		border-bottom: none;
-		color: rgba($clr-mint, 0.9);
+		color: rgba($clr-mint-rgb, 0.9);
 		padding-top: 2px;
 		padding-bottom: 2px;
 		text-shadow: none;
@@ -448,7 +448,7 @@
 
 	/* Состояние "Первого клика" для мобильных (через класс .isHovered ) */
 	:global(.catalog__card.isHovered) {
-		box-shadow: -4px 4px 2px 2px rgba($clr-coral, 0.5);
+		box-shadow: -4px 4px 2px 2px rgba($clr-coral-rgb, 0.5);
 		outline: 4px solid $clr-coral;
 
 		transition: box-shadow 0.05s;
@@ -459,9 +459,9 @@
 	}
 
 	:global(.catalog__card.isHovered .catalog__card--title) {
-		box-shadow: 0px 0px 30px rgba($clr-mint, 0.9);
-		border-top: 1px solid rgba($clr-mint, 0.2);
-		border-bottom: 1px solid rgba($clr-mint, 0.2);
+		box-shadow: 0px 0px 30px rgba($clr-mint-rgb, 0.9);
+		border-top: 1px solid rgba($clr-mint-rgb, 0.2);
+		border-bottom: 1px solid rgba($clr-mint-rgb, 0.2);
 		color: $clr-coral;
 		min-width: 100%;
 		width: fit-content;
@@ -469,7 +469,7 @@
 		font-size: 2rem;
 
 		padding: 2px 4px;
-		text-shadow: -2px 2px 2px rgba($clr-mint, 0.9);
+		text-shadow: -2px 2px 2px rgba($clr-mint-rgb, 0.9);
 
 		transition: all 0.05s;
 
