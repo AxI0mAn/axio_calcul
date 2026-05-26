@@ -123,14 +123,14 @@
 							<h3 class="catalog__card--title"><span>trigonometry</span></h3>
 						</a>
 					</div>
-					<div class="catalog__post">
+					<!-- <div class="catalog__post">
 						<a href="{base}/fraction" class="catalog__card">
 							<Picture
 								src={{
 									webp: `${srcFraction_jpeg}`,
 									jpeg: `${srcFraction_webp}`
 								}}
-								alt="Фон тригонометрического калькулятора"
+								alt="Фон калькулятора дробей"
 								class="catalog__card--content"
 								loading="eager"
 								decoding="sync"
@@ -140,7 +140,7 @@
 							/>
 							<h3 class="catalog__card--title"><span>fraction</span></h3>
 						</a>
-					</div>
+					</div> -->
 				</section>
 			</details>
 			<details class="groupCalc" name="my-accordion">
