@@ -107,7 +107,7 @@
 		padding: 2px 10px;
 		border: 1px solid $clr-sky;
 		border-radius: 4px;
-		box-shadow: 0 0 10px rgba($clr-sky-rgb, 0.3);
+		box-shadow: 0 0 10px rgba($clr-sky, 0.3);
 	}
 
 	/* Стилизация Radio как кнопок */
@@ -136,7 +136,7 @@
 
 	.radio-item input:checked + .btn-check {
 		border-color: $clr-sky;
-		box-shadow: inset 0 0 10px rgba($clr-sky-rgb, 0.5);
+		box-shadow: inset 0 0 10px rgba($clr-sky, 0.5);
 		color: $clr-sky;
 	}
 

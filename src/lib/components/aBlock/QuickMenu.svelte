@@ -91,7 +91,7 @@
 		top: 100%;
 		right: 0;
 
-		background: rgba($clr-bg-darker-rgb, 0.2);
+		background: rgba($clr-bg-darker, 0.2);
 		padding: 2px;
 
 		display: flex;
@@ -116,7 +116,6 @@
 		border: 1px solid $clr-mint;
 		border-radius: 0.5rem;
 
-		background-color: rgba($clr-bg-darker-rgb, 0.3);
 		img {
 			width: 40px;
 			height: 40px;

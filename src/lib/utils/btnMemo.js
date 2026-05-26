@@ -1,36 +1,5 @@
 // src/lib/utils/btnMemo.js
 import { appState } from '../store/appState.svelte.js';
-import { appStore } from '$lib/store/appStore.svelte.js';
-import FractionJS from 'fraction.js'; // Используется для красивой конвертации на обычных страницах
-
-/**
- * Вспомогательная функция для перевода сохраненной дроби в десятичный вид с округлением
- */
-function convertFractionIfNeeded(val) {
-  // Если мы НЕ на странице дробей (isFractionMode === false), а в памяти лежит маркерная дробь
-  if (!appState.isFractionMode && (val.includes('÷') || val.includes('\u2951'))) {
-    try {
-      // Регулярное выражение ищет маркеры \u2951 и \u294F, извлекая: целое (1), числитель (2), знаменатель (3)
-      const match = val.match(/(?:(-?\d+)\u2951)?(-?\d+)÷(\d+)\u294F?/);
-
-      if (match) {
-        const whole = match[1] ? parseInt(match[1], 10) : 0;
-        const num = parseInt(match[2], 10);
-        const den = parseInt(match[3], 10);
-
-        // Считаем точное значение с помощью fraction.js
-        const sign = whole < 0 ? -1 : 1;
-        const fObj = new FractionJS(whole).add(new FractionJS(sign * num, den));
-
-        // Возвращаем чистое десятичное число, округленное по настройкам приложения
-        return String(Number(fObj.valueOf().toFixed(appStore.toFix)));
-      }
-    } catch (e) {
-      console.error("Ошибка конвертации дроби из памяти:", e);
-    }
-  }
-  return val;
-}
 
 /**
  * Логика работы кнопок памяти M1-M4
@@ -40,10 +9,12 @@ function convertFractionIfNeeded(val) {
  */
 export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
   // --- ПРОВЕРКА НА ERROR ---
+  // Если мы пытаемся сохранить слово ERROR из истории
   if (sourceData && appState.extractResult(sourceData) === 'ERROR') {
     console.warn('Попытка сохранить ERROR из истории заблокирована');
     return;
   }
+  // Если мы пытаемся сохранить слово ERROR из текущего дисплея
   if (!sourceData && appState.display === 'ERROR' && appState[slot] === null) {
     console.warn('Попытка сохранить ERROR с дисплея заблокирована');
     return;
@@ -52,40 +23,39 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
   const currentValueInMemo = appState[slot];
   const currentDisplay = String(appState.display);
   const lastChar = currentDisplay.slice(-1);
-  const sqrtSym = String.fromCharCode(8730);
-  const endsWithSqrt = appState.display.endsWith(sqrtSym) || appState.display.endsWith(sqrtSym + '(');
+  const sqrtSym = String.fromCharCode(8730); //  Определяем символ корня √
+  const endsWithSqrt = appState.display.endsWith(sqrtSym) || appState.display.endsWith(sqrtSym + '('); // Проверяем, заканчивается ли дисплей оператором или корнем 
+  // Проверяем, является ли последний символ оператором
   const isOperator = ['+', '-', '*', '/'].includes(lastChar);
 
   // --- СЦЕНАРИЙ 1: Двойной клик (Извлечение копии без удаления) ---
   if (isDoubleClick && slot && !sourceData) {
     if (currentValueInMemo !== null) {
       let val = String(currentValueInMemo);
-
-      // Автоматическая конвертация дроби в float, если ушли с экрана дробей
-      val = convertFractionIfNeeded(val);
-
+      // Сначала очищаем от пробелов
       let cleanVal = val.trim();
+      // Если в конце конструкция с "M", извлекаем само число
       if (cleanVal.at(-2) === 'M') {
         cleanVal = String(parseFloat(cleanVal));
       }
+      // Проверяем на отрицательность и берем в скобки
       if (parseFloat(cleanVal) < 0) {
         val = `(${cleanVal})`;
       } else {
         val = cleanVal;
       }
-
       if (isOperator) {
         appState.display = currentDisplay + val;
       } else {
         appState.display = val;
       }
 
-      appState.isNewInput = false;
+      appState.isNewInput = false; // Блокируем склейку для следующего ввода
     }
     return;
   }
 
-  // --- СЦЕНАРИЙ 2: Запись из ИСТОРИИ ---
+  // --- СЦЕНАРИЙ 2: Запись из ИСТОРИИ (Длинное нажатие на строку истории) ---
   if (sourceData) {
     const valueToSave = appState.extractResult(sourceData);
     const targetSlot = appState.firstEmptySlot;
@@ -108,27 +78,40 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
     return;
   }
 
+
   // --- СЦЕНАРИЙ 4: КЛИК ПО КНОПКЕ ПАМЯТИ ---
   if (currentValueInMemo === null) {
-    // Сохраняем значение дисплея "как есть" (если это дробь — она сохранится с невидимыми маркерами)
+    // ЗАПИСЬ: Сохраняем и блокируем склейку
     appState.memoryUpdate(slot, appState.display);
     appState.historySession.push(`${appState.display} → ${slot}`);
     appState.isNewInput = true;
   } else {
+    // ВЫДАЧА (ИЗВЛЕЧЕНИЕ)
     let val = String(currentValueInMemo);
+    const lastChar = String(appState.display).slice(-1);
+    // const preLastChar = val.slice(-1);
+    const isOperator = ['+', '-', '*', '/'].includes(lastChar);
 
-    // Автоматическая конвертация дроби в float, если ушли с экрана дробей
-    val = convertFractionIfNeeded(val);
-
+    // избавляемся от -> М* и отрицательное число берём в скобки
+    // Сначала очищаем от пробелов
     let cleanVal = val.trim();
+    //  Если в конце конструкция с "M", извлекаем само число
     if (cleanVal.at(-2) === 'M') {
+      // parseFloat сам заберет "-206" или "206" из начала строки
       cleanVal = String(parseFloat(cleanVal));
     }
+    // Теперь проверяем на отрицательность (parseFloat преобразует строку в число для сравнения)
     if (parseFloat(cleanVal) < 0) {
       val = `(${cleanVal})`;
     } else {
       val = cleanVal;
     }
+
+    // ЗОЛОТОЕ ПРАВИЛО:
+    // 1. Если на экране оператор (30+) — ПРИКЛЕИВАЕМ (30+1)
+    // 2. Если на экране 0 или флаг нового ввода (после "=" или записи) — ЗАМЕНЯЕМ
+    // 3. Если на экране просто другое число (121) БЕЗ оператора — ЗАМЕНЯЕМ (предотвращаем конкатенацию)
+    // 4. Если строка на экране заканчивается как  String.fromCharCode(8730) или "√(" ,то не заменить а добавить цифры из памяти
 
     if (isOperator || endsWithSqrt) {
       appState.display = currentDisplay + val;
@@ -136,11 +119,13 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
       appState.display = val;
     }
 
+    // После того как число извлечено:
+    // Мы ставим false, чтобы кнопка [+] увидела это число и смогла его забрать в expression.
     appState.isNewInput = false;
 
-    // Очищаем ячейку после извлечения (обычный клик)
+    // Очищаем память, если это не двойной клик
     if (!isDoubleClick) {
       appState.memoryUpdate(slot, null);
     }
   }
-}
+} 

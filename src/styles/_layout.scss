@@ -28,21 +28,21 @@
     }
 
     .field_left {
-      background: linear-gradient(to right, $clr-black 0%, rgba($clr-bg-darker-rgb, 0.4) 100%);
-      box-shadow: -8px 0px 16px 8px rgba(0, 0, 0, 0.75);
+      background: linear-gradient(to right, $clr-black 0%, rgba($clr-bg-darker, 0.4) 100%);
+      box-shadow: -8px 0px 16px 8px rgba($clr-black, 0.75);
       left: 0;
       grid-area: left;
     }
 
     .field_right {
-      background: linear-gradient(to left, $clr-black 0%, rgba($clr-bg-darker-rgb, 0.4) 100%);
+      background: linear-gradient(to left, $clr-black 0%, rgba($clr-bg-darker, 0.4) 100%);
       right: 0;
       grid-area: right;
     }
 
     .field_main {
       background: $grad-btn-main;
-      box-shadow: 0px 0px 8px 4px rgba($clr-mint-rgb, 0.75);
+      box-shadow: 0px 0px 8px 4px rgba($clr-mint, 0.75);
       top: 0;
       grid-area: calc;
       width: 50vh;
@@ -50,8 +50,8 @@
     }
 
     .instruction {
-      background: linear-gradient(180deg, rgba($clr-mint-rgb, 0.05) 0%, rgba($clr-bg-darker-rgb, 0.8) 100%);
-      border-top: 1px solid rgba($clr-mint-rgb, 0.2);
+      background: linear-gradient(180deg, rgba($clr-mint, 0.05) 0%, rgba($clr-bg-darker, 0.8) 100%);
+      border-top: 1px solid rgba($clr-mint, 0.2);
       grid-area: instr;
       width: 50vh;
       min-height: 20vh;
@@ -59,8 +59,8 @@
     }
 
     .reviews__old {
-      background: linear-gradient(0deg, rgba($clr-coral-rgb, 0.05) 0%, rgba($clr-bg-darker-rgb, 0.8) 100%);
-      border-bottom: 1px solid rgba($clr-coral-rgb, 0.2);
+      background: linear-gradient(0deg, rgba($clr-coral, 0.05) 0%, rgba($clr-bg-darker, 0.8) 100%);
+      border-bottom: 1px solid rgba($clr-coral, 0.2);
       grid-area: revi;
       width: 50vh;
       min-height: 20vh;
@@ -101,7 +101,7 @@
       padding: 1rem;
       min-height: 4rem;
       background: $clr-bg-darker;
-      border: 1px solid rgba($clr-mint-rgb, 0.3);
+      border: 1px solid rgba($clr-mint, 0.3);
       border-radius: 8px;
     }
 
@@ -110,7 +110,7 @@
       padding: 1rem;
       min-height: 4rem;
       background: $clr-bg-darker;
-      border: 1px solid rgba($clr-coral-rgb, 0.3);
+      border: 1px solid rgba($clr-coral, 0.3);
       border-radius: 8px;
     }
 
@@ -166,12 +166,12 @@
     background: $clr-blue-mid !important; // Цвет ползунка
     border-radius: 10px;
     // Добавляем эффект свечения
-    box-shadow: 0 0 5px rgba($clr-mint-soft-rgb, 0.5);
+    box-shadow: 0 0 5px rgba($clr-mint-soft, 0.5);
     // border: 1px solid rgba(2, 17, 85, 0.2);
 
     &:hover {
       background: $clr-bg !important;
-      box-shadow: 0 0 10px rgba($clr-mint-rgb, 0.8);
+      box-shadow: 0 0 10px rgba($clr-mint, 0.8);
     }
 
     &:active {

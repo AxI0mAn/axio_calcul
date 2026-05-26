@@ -12,37 +12,28 @@
 		addE,
 		addPi
 	} from '$lib/services/math/basic.js';
+	import { addSqrtY } from '$lib/services/math/basic.js';
 	import { addSqrt2 } from '$lib/services/math/engineer';
-	import { addOperator } from '$lib/services/mathActions.svelte.js';
-	import {
-		// executeIdentity,
-		// fractionToDecimal,
-		// decimalToFraction,
-		handleFractionSlash
-	} from '$lib/services/fractionActions';
+	import { addOperator } from '$lib/services/calculatorActions.svelte.js';
 </script>
 
 <div class="digBlock">
-	<!-- <div class="row">
+	<div class="row">
+		<BtnText customClass="op btn__func constanta" onclick={() => addOperator('≡')} buttonText="≡" />
 		<BtnText
 			customClass="op btn__func constanta"
-			onclick={() => executeIdentity()}
-			buttonText="≡"
-		/>
-		<BtnText
-			customClass="op btn__func constanta"
-			onclick={() => fractionToDecimal()}
+			onclick={() => addOperator(':.')}
 			buttonText=":."
 		/>
 		<BtnText
 			customClass="op btn__func constanta"
-			onclick={() => decimalToFraction()}
+			onclick={() => addOperator('.:')}
 			buttonText=".:"
 		/>
-	</div> -->
+	</div>
 	<div class="row">
 		<BtnText customClass="op btn__func constanta" onclick={() => addOperator('(')} buttonText="(" />
-		<BtnText customClass="btn__op" onclick={() => handleFractionSlash()} buttonText="÷" />
+		<BtnText customClass="op btn__func constanta" onclick={() => addOperator('÷')} buttonText="÷" />
 		<BtnText customClass="op btn__func constanta" onclick={() => addOperator(')')} buttonText=")" />
 	</div>
 	<div class="row">

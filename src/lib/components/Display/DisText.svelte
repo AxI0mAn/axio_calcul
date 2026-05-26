@@ -36,18 +36,13 @@
 	import QuickMenu from '$lib/components/aBlock/QuickMenu.svelte';
 
 	// Реактивная переменная: проверяем, есть ли для текущего пути карта меню
-
-	let pathPage = $page.url.pathname;
-
-	if (pathPage.endsWith('/') && pathPage !== '/') {
-		pathPage = pathPage.slice(0, -1);
-	}
-
 	let currentMap = $derived(
 		Object.values(menuMaps)
 			.flat()
-			.some((item) => pathPage.endsWith(item.href))
-			? Object.values(menuMaps).find((group) => group.some((item) => pathPage.endsWith(item.href)))
+			.some((item) => $page.url.pathname.endsWith(item.href))
+			? Object.values(menuMaps).find((group) =>
+					group.some((item) => $page.url.pathname.endsWith(item.href))
+				)
 			: null
 	);
 </script>
@@ -108,19 +103,19 @@
 		bottom: 0;
 
 		// Используем темно-синюю базу с прозрачностью
-		background: rgba($clr-bg-darker-rgb, 0.3);
+		background: rgba($clr-bg-darker, 0.3);
 
 		box-shadow:
 			$shadow-inset,
 			// Наш готовый мятный инсет
-			0px 0px 2px 4px rgba(0, 0, 0, 0.5);
+			0px 0px 2px 4px rgba($clr-black, 0.5);
 
 		// Цвет рамки дисплея (был #99c3fd - это светлый серо-голубой)
 		border: 1px solid $clr-slate;
 
 		font-size: 2.5rem;
 		text-align: left;
-		color: rgba(255, 255, 255, 0.8);
+		color: rgba($clr-white, 0.8);
 	}
 
 	.quick-nav-container {
@@ -172,13 +167,6 @@
 			-webkit-touch-callout: none;
 			user-select: none;
 			touch-action: manipulation;
-			padding: 4px;
-			padding-left: 4px;
-			padding-right: 1rem;
-			border-bottom: 1px solid rgba($clr-sky-rgb, 0.7);
-			border-right: 1px solid rgba($clr-sky-rgb, 0.7);
-			border-bottom-right-radius: 1rem;
-			max-width: fit-content;
 		}
 	}
 

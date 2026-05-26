@@ -98,9 +98,9 @@
 		// СТАЛО: Темно-синий фон с неоновым бликом (Mint или Coral на выбор)
 		background: linear-gradient(
 			90deg,
-			rgba($clr-bg-darker-rgb, 0.9) 25%,
-			rgba($clr-mint-rgb, 0.2) 50%,
-			rgba($clr-bg-darker-rgb, 0.9) 75%
+			rgba($clr-bg-darker, 0.9) 25%,
+			rgba($clr-mint, 0.2) 50%,
+			rgba($clr-bg-darker, 0.9) 75%
 		);
 
 		background-size: 200% 100%;

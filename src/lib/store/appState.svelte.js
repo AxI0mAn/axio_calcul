@@ -1,5 +1,4 @@
 /**
- * src/lib/store/appState.svelte.js
  * текущее состояние калькулятора appState.svelte.js
  */
 
@@ -20,48 +19,10 @@ class AppState {
   /** @type {string} */
   now_mode = $state('amoca'); // Режим калькулятора - отображается в окне div class="now_mode"
 
+  // ========= дроби 
 
-  // Метод для переключения режима на страницах математического калькулятора нуден для QuickMenu
-  setMode(mode) {
-    this.now_mode = mode;
-    this.isFractionMode = (mode === 'fractions');
-  }
+  // ========= дроби 
 
-  // =================
-  // ================= ДРОБИ (Fraction State Layer) =================
-  isFractionMode = $state(false);
-
-  // fractionData = $state({
-  //   whole: '',         // Пустая строка, если целой части нет
-  //   num: '',           // Числитель (может быть числом или выражением)
-  //   den: '',           // Знаменатель
-  //   focus: 'main',     // НАЧАЛЬНЫЙ ФОКУС: 'main' (обычный дисплей, шаблон дроби скрыт)  'whole' | 'num' | 'den'
-  //   errors: {
-  //     num: false,      // Флаг ошибки (красная подсветка) для числителя
-  //     den: false       // Флаг ошибки для знаменателя
-  //   }
-  // });
-
-  /**
-   * Сброс состояния дроби к начальному
-   */
-  // resetFraction() {
-  //   this.fractionData.whole = '';
-  //   this.fractionData.num = '';
-  //   this.fractionData.den = '';
-  //   this.fractionData.focus = 'main';
-  //   this.fractionData.errors.num = false;
-  //   this.fractionData.errors.den = false;
-  // }
-
-  // Метод для очистки
-  reset = () => {
-    this.display = '0';
-    this.expression = '';
-    this.isNewInput = true;
-  }
-
-  //==============
   // ========= ячейки памяти
   /** @type {number} */
   M1 = $state(null); // значение сохранённое в ячейке памяти калькулятора М1
@@ -88,8 +49,19 @@ class AppState {
   /** @type {Array} */
   historySessionTime = $state([]); // Массив строк завершенных вычислений в этой сессии для страниц обработки времени.
 
+  // Метод для очистки
+  reset = () => {
+    this.display = '0';
+    this.expression = '';
+    this.isNewInput = true;
+  }
 
-  //==============
+  // Метод для переключения режима 
+  setMode(mode) {
+    this.now_mode = mode;
+    this.isFractionMode = (mode === 'fractions');
+  }
+
   //============== всё что касается работы с ячейками памяти в режиме математики
 
   //метод для записи данных в ячейку памяти 
@@ -124,7 +96,6 @@ class AppState {
   }
 
 
-  //==============
   //============== всё что касается работы с historyStore
 
 
