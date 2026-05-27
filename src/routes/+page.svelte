@@ -123,7 +123,7 @@
 							<h3 class="catalog__card--title"><span>trigonometry</span></h3>
 						</a>
 					</div>
-					<!-- <div class="catalog__post">
+					<div class="catalog__post">
 						<a href="{base}/fraction" class="catalog__card">
 							<Picture
 								src={{
@@ -140,7 +140,7 @@
 							/>
 							<h3 class="catalog__card--title"><span>fraction</span></h3>
 						</a>
-					</div> -->
+					</div>
 				</section>
 			</details>
 			<details class="groupCalc" name="my-accordion">
@@ -192,6 +192,12 @@
 </div>
 
 <style lang="scss">
+	.field_left,
+	.instruction,
+	.reviews__old,
+	.field_right {
+		color: $clr-mint-soft;
+	}
 	.field_main.catalog {
 		width: 100%;
 		background: $clr-bg-card;
