@@ -1,4 +1,5 @@
 <script>
+	// атом - единичная кнопка
 	// src/lib/components/Btn/BtnText.svelte
 	let {
 		buttonText = '',

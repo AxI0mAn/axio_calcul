@@ -1,4 +1,8 @@
 <script>
+	/**
+	 * src/lib/components/Links/LinkInstallReady.svelte
+	 * установить приложение, если установлено - то поделиться приложением
+	 */
 	// @ts-ignore
 	import { base } from '$app/paths';
 	import { appStore } from '$lib/store/appStore.svelte';

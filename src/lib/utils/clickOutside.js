@@ -1,4 +1,5 @@
 /**
+ * src/lib/utils/clickOutside.js
  * отслеживает клик вне элемента
  */
 

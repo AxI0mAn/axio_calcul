@@ -1,4 +1,10 @@
 <script>
+	/**
+	 * src/lib/components/NavBurger/NavBurger.svelte
+	 * многоуровневая навигация с вложениями подстраниц
+	// === -📝=TODO=📝- ===
+	// ------------- ссылки с учётом локализации в будущем
+	 */
 	// @ts-ignore
 	import { base } from '$app/paths';
 	import { clickOutside } from '$lib/utils/clickOutside';

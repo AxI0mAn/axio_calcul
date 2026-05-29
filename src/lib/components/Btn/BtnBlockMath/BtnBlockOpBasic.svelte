@@ -1,6 +1,6 @@
 <script>
 	/**
-* btnBlockOpBasic.svelte
+* src/lib/components/Btn/BtnBlockMath/BtnBlockOpBasic.svelte
 
 */
 	import BtnText from '../BtnText.svelte';
@@ -16,9 +16,8 @@
 		roundUp,
 		addE,
 		addPi
-	} from '$lib/services/math/basic.js';
-	import { addSqrtY } from '$lib/services/math/basic.js';
-	import { addOperator } from '$lib/services/calculatorActions.svelte.js';
+	} from '$lib/services/math/opBtnBasic.js';
+	import { addSqrtY } from '$lib/services/math/opBtnBasic.js';
 </script>
 
 <div class="digBlock">

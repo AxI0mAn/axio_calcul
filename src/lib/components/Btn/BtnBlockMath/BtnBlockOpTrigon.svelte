@@ -1,10 +1,9 @@
 <script>
 	/**
-* BtnBlockOpTrigon.svelte
+* src/lib/components/Btn/BtnBlockMath/BtnBlockOpTrigon.svelte
 
 */
 	import BtnText from '../BtnText.svelte';
-	import CornerSwitch from './CornerSwitch.svelte';
 	import {
 		sinFunc,
 		sinhFunc,
@@ -22,7 +21,7 @@
 		cothFunc,
 		acotFunc,
 		acothFunc
-	} from '$lib/services/math/trigon.js';
+	} from '$lib/services/math/opBtnTrigon.js';
 </script>
 
 <div class="digBlockT">

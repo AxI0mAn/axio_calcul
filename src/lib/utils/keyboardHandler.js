@@ -1,7 +1,7 @@
 /**
  * src/lib/utils/keyboardHandler.js
  * 
- * Универсальный обработчик клавиш для калькуляторов.
+ * Универсальный обработчик клавиш физической клавиатуры для калькуляторов.
  * @param {KeyboardEvent} e - Событие клавиатуры
  * @param {Object} actions - Объект с функциями калькулятора
  */
@@ -81,3 +81,37 @@ export function handleCalculatorKey(e, actions) {
     addOperator?.(operators[key]);
   }
 }
+
+/** Применение на странице
+ * // обрабатываем ввод с клавиатуры ПК - только для desktop
+
+  import { onMount } from 'svelte';
+  import { handleCalculatorKey } from '$lib/utils/keyboardHandler.js';
+  import { addDigit, addOperator, performCalculation } from '$lib/services/math/mathActions.svelte';
+  import { addDecimal, backspace, clear } from '$lib/services/math/mathBaseBtn';
+  import { percentage, toPower, bigFactorial } from '$lib/services/math/opBtnBasic';
+
+  // поддержка ввода с клавиатуры на ПК
+  onMount(() => {
+    // 1. Проверка на десктоп
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    // 2. Создаем замыкание обработчика
+    const onKeyDown = (e) =>
+      handleCalculatorKey(e, {
+        addDigit,
+        addOperator,
+        addDecimal,
+        backspace,
+        clear,
+        performCalculation,
+        percentage,
+        toPower,
+        bigFactorial
+      });
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+ * 
+ * */

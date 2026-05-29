@@ -1,6 +1,6 @@
 <script>
 	/**
-* btnBlockOpFraction.svelte
+* src/lib/components/Btn/BtnBlockMath/BtnBlockOpFraction.svelte
 
 */
 	import BtnText from '../BtnText.svelte';
@@ -11,10 +11,10 @@
 		toPower2,
 		addE,
 		addPi
-	} from '$lib/services/math/basic.js';
-	import { addSqrtY } from '$lib/services/math/basic.js';
-	import { addSqrt2 } from '$lib/services/math/engineer';
-	import { addOperator } from '$lib/services/calculatorActions.svelte.js';
+	} from '$lib/services/math/opBtnBasic.js';
+	import { addSqrtY } from '$lib/services/math/opBtnBasic.js';
+	import { addSqrt2 } from '$lib/services/math/opBtnEngineer';
+	import { addOperator } from '$lib/services/math/mathActions.svelte.js';
 </script>
 
 <div class="digBlock">

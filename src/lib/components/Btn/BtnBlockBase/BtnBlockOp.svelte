@@ -1,10 +1,10 @@
 <script>
 	/**
-* btnBlockOp.svelte
+* src/lib/components/Btn/BtnBlockBase/BtnBlockOp.svelte
 
 */
 	import BtnText from '../BtnText.svelte';
-	import { addOperator, performCalculation } from '$lib/services/calculatorActions.svelte.js';
+	import { addOperator, performCalculation } from '$lib/services/math/mathActions.svelte';
 </script>
 
 <div class="operBlock">
