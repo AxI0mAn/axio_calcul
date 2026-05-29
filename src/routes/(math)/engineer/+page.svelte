@@ -1,6 +1,6 @@
 <script>
 	import MathPageLayout from '$lib/components/aPage/MathPageLayout.svelte';
-	import BtnBlockOpEngineer from '$lib/components/Btn/BtnBlockFeatures/BtnBlockOpEngineer.svelte';
+	import BtnBlockOpEngineer from '$lib/components/Btn/BtnBlockMath/BtnBlockOpEngineer.svelte';
 	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
 </script>
 

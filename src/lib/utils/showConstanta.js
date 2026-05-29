@@ -4,13 +4,7 @@
  * показывает результат на экране
  * */
 import { appState } from "$lib/store/appState.svelte";
-import { float_toFixed } from "$lib/services/base";
-
-/** 
- * общая функция для констант
- * принимает значение 
- * показывает результат на экране
- * */
+import { float_toFixed } from "$lib/services/math/mathBaseBtn";
 
 export function showConstanta(constanta) {
   // 1. Берем полное значение константы

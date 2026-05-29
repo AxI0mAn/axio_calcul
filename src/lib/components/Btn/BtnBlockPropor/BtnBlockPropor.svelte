@@ -1,7 +1,7 @@
 <script>
 	/**
-* src/lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte
-* клавиатура с цифрами , +/- backspace clear
+   * кнопки для группы страниц - пропорции и конвертеры
+* src/lib/components/Btn/BtnBlockPropor/BtnBlockPropor.svelte
 
 */
 	import BtnText from '../BtnText.svelte';
@@ -13,7 +13,7 @@
 	<div class="row">
 		<BtnText buttonText="⌫" customClass="backspace op-style btn__op" onclick={() => backspace()} />
 
-		<BtnText buttonText="C" customClass="clear-btn btn__op" onclick={() => clear()} />
+		<BtnText customClass="clear-btn btn__op" onclick={() => clear()} buttonText="C" />
 	</div>
 	<div class="row">
 		<BtnText

@@ -1,6 +1,7 @@
 <script>
 	/**
 	 *  src/lib/components/Display/DisText.svelte
+	 * текстовый дисплей для группы математических страниц
 	 */
 	// @ts-ignore
 	import { base } from '$app/paths';
@@ -32,7 +33,7 @@
 	// QuickMenu
 	// @ts-ignore
 	import { page } from '$app/stores';
-	import { menuMaps } from '$lib/config/menuMaps.js';
+	import { menuMaps } from '$lib/config/mathMenuMaps.js';
 	import QuickMenu from '$lib/components/aBlock/QuickMenu.svelte';
 
 	// Реактивная переменная: проверяем, есть ли для текущего пути карта меню

@@ -1,7 +1,7 @@
 <script>
 	/**
-	 * шаблон страница математического калькулятора
-	 * src/lib/components/aPage/MathPageLayout.svelte
+	 * шаблон страница калькулятора пропорции и конвертаторов
+	 * src/lib/components/aPage/ProporPageLayout.svelte
 	 */
 
 	let { buttons, ads, nowMode = 'amoca' } = $props();

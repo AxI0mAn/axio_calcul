@@ -39,7 +39,7 @@
 	// export const trailingSlash = 'always';
 
 	// ============ плавные переходы для работы QuickMenu.svelte
-	import { menuMaps } from '$lib/config/menuMaps';
+	import { menuMaps } from '$lib/config/mathMenuMaps';
 	// АВТОМАТИЧЕСКАЯ ЛОГИКА:
 	// 1. Берем все массивы из menuMaps (math, geometry, date и т.д.)
 	// 2. Объединяем их в один плоский массив .flat()

@@ -1,5 +1,6 @@
 <script>
 	/**
+	 * src/lib/components/advertisement/advertisementLine.svelte
 	 * Компонент для рекламного объявления узкая полоса между блоками
 	 * одна картинка исчезает и вторая падает сверху вниз
 	 */

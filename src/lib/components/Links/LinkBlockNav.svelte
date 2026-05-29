@@ -1,4 +1,12 @@
 <script>
+	/**
+	 * src/lib/components/Links/LinkBlockNav.svelte
+	 * группа внутренних перекрёстных ссылок:
+	 * каталог на главной странице
+	 * инструкция для этого калькулятора
+	 * открыть страницу истории
+	 * установить приложение, если установлено - то поделиться приложением
+	 * */
 	// @ts-ignore
 	import { base } from '$app/paths';
 	import { handleScroll } from '$lib/utils/handleScroll';

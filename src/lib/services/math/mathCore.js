@@ -5,7 +5,7 @@
 * "движок" парсинга строки (чтобы 2+2*2 считалось правильно)
 */
 
-import { float_toFixed } from "./base.js";
+import { float_toFixed } from "./mathBaseBtn.js";
 import { appState } from "$lib/store/appState.svelte.js";
 
 

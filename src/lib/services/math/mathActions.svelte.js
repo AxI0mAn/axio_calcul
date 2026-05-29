@@ -6,9 +6,9 @@
 * Нажатие "="
 * Очистка (клавиша С) 
 */
-import { appState } from '../store/appState.svelte.js';
+import { appState } from '../../store/appState.svelte.js';
 import { evaluateExpression } from './mathCore.js';
-import { float_toFixed } from './base.js';
+import { float_toFixed } from './mathBaseBtn.js';
 import { toSuperscript } from '$lib/utils/toSuperscript.js';
 
 /**

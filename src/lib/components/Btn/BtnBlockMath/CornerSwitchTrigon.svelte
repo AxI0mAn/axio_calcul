@@ -1,8 +1,12 @@
 <script>
+	/**
+	 * src/lib/components/Btn/BtnBlockMath/CornerSwitchTrigon.svelte
+	 * строка кнопок с переключателем едениц вычисления 'deg', 'rad', 'grad', 'П' и '1/x'
+	 * */
 	import BtnText from '$lib/components/Btn/BtnText.svelte';
 	import { appState } from '$lib/store/appState.svelte';
-	import { addPi } from '$lib/services/math/basic';
-	import { denominator } from '$lib/services/math/basic';
+	import { addPi } from '$lib/services/math/opBtnBasic';
+	import { denominator } from '$lib/services/math/opBtnBasic';
 
 	// Список доступных режимов
 	const modes = ['deg', 'rad', 'grad'];
