@@ -1,12 +1,17 @@
 <script>
 	/**
-* src/lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte
+* src/lib/components/Btn/BtnBlockMath/BtnBlockFraction/BtnBlockDigitFraction.svelte
 * клавиатура с цифрами , +/- backspace clear
 
 */
-	import BtnText from '../BtnText.svelte';
-	import { backspace, toggleSign, addDecimal, clear } from '$lib/services/math/mathBaseBtn';
-	import { addDigit } from '$lib/services/math/mathActions.js';
+	import BtnText from '../../BtnText.svelte';
+	import {
+		backspace,
+		toggleSign,
+		addDecimal,
+		clear,
+		addDigit
+	} from '$lib/services/math/fractionActions.js';
 </script>
 
 <div class="digBlock">

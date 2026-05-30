@@ -1,11 +1,11 @@
 <script>
 	/**
-* src/lib/components/Btn/BtnBlockBase/BtnBlockOp.svelte
+* src/lib/components/Btn/BtnBlockMath/BtnBlockFraction/BtnBlockBaseFraction.svelte
 основные операторы и =
 
 */
-	import BtnText from '../BtnText.svelte';
-	import { addOperator, performCalculation } from '$lib/services/math/mathActions';
+	import BtnText from '../../BtnText.svelte';
+	import { addOperator, performCalculation } from '$lib/services/math/fractionActions.js';
 </script>
 
 <div class="operBlock">

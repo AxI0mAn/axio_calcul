@@ -4,7 +4,7 @@
 
 */
 import { appState } from "$lib/store/appState.svelte";
-import { isLastCharOperator } from "./mathActions.svelte";
+import { isLastCharOperator } from "./mathActions";
 import { float_toFixed } from "./mathBaseBtn";
 import { showConstanta } from "$lib/utils/showConstanta";
 

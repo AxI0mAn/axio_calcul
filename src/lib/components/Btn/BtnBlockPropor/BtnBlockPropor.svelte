@@ -6,7 +6,7 @@
 */
 	import BtnText from '../BtnText.svelte';
 	import { backspace, toggleSign, addDecimal, clear } from '$lib/services/math/mathBaseBtn';
-	import { addDigit } from '$lib/services/math/mathActions.svelte.js';
+	import { addDigit } from '$lib/services/math/mathActions.js';
 </script>
 
 <div class="digBlock">
