@@ -145,11 +145,90 @@
 			</details>
 			<details class="groupCalc" name="my-accordion">
 				<summary>
+					<h2 class="groupCalc__title">proportion and converter</h2>
+				</summary>
+				<section class="group__catalog">
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон калькулятора пропорции"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>proportion</span></h3>
+						</a>
+					</div>
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон конвертера скоростей"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>speed</span></h3>
+						</a>
+					</div>
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон конвертера времени"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>time</span></h3>
+						</a>
+					</div>
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон конвертера площади"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>area</span></h3>
+						</a>
+					</div>
+				</section>
+			</details>
+			<details class="groupCalc" name="my-accordion">
+				<summary>
 					<h2 class="groupCalc__title">geometry calculators</h2>
 				</summary>
 				<section class="group__catalog">
 					<div class="catalog__post">
-						<a href="{base}/basic" class="catalog__card">
+						<a href="{base}/settings" class="catalog__card">
 							<Picture
 								src={{
 									webp: `${srcExample_webp}`,

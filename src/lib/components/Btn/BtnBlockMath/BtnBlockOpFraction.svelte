@@ -12,14 +12,13 @@
 		addE,
 		addPi
 	} from '$lib/services/math/opBtnBasic.js';
-	import { addSqrtY } from '$lib/services/math/opBtnBasic.js';
 	import { addSqrt2 } from '$lib/services/math/opBtnEngineer';
 	import { addOperator } from '$lib/services/math/mathActions.svelte.js';
 </script>
 
 <div class="digBlock">
 	<div class="row">
-		<BtnText customClass="op btn__func constanta" onclick={() => addOperator('≡')} buttonText="≡" />
+		<!-- <BtnText customClass="op btn__func constanta" onclick={() => addOperator('≡')} buttonText="≡" /> -->
 		<BtnText
 			customClass="op btn__func constanta"
 			onclick={() => addOperator(':.')}
