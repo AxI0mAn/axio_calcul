@@ -5,6 +5,8 @@
  * для рендеринга двухэтажных дробей и плоских выражений.
  */
 
+import { fromSuperscript } from "$lib/utils/toSuperscript";
+
 // Специальные символы (определены в ТЗ)
 const MARKERS = {
   WHOLE_START: '\u2951', // ⥑
@@ -174,16 +176,50 @@ export function parseExpressionToTokens(expression) {
       }
     }
 
-    // 3. условие проверки операторов и скобок:
+    // 3. Условие проверки операторов, степеней и скобок:
 
-    if ('+-*/=()^√'.includes(ch)) { // Добавили ^ и √
+    if (ch === '^') {
+      let j = i + 1;
+      let exponentBuf = '';
+
+      // Собираем всё, что идет за знаком ^
+      while (j < expression.length && (
+        /[\d.]/.test(expression[j]) ||
+        '⁰¹²³⁴⁵⁶⁷⁸⁹⁻˙'.includes(expression[j])
+      )) {
+        exponentBuf += expression[j];
+        j++;
+      }
+
+      // Если цифры степени найдены — создаем токен superscript
+      if (exponentBuf.length > 0) {
+        const cleanExponent = fromSuperscript(exponentBuf);
+        tokens.push({
+          type: 'superscript',
+          value: cleanExponent
+        });
+      } else {
+        // ЕСЛИ СТЕПЕНЬ ПУСТАЯ (пользователь только что нажал кнопку ^)
+        // Рендерим пустой невидимый символ или знак-подсказку, 
+        // но главное — не даем парсеру упасть или зациклиться.
+        tokens.push({
+          type: 'superscript',
+          value: ''
+        });
+      }
+
+      // Гарантированный сдвиг указателя: 
+      // если цифр не было, j равен i + 1, то есть мы просто перешагнем '^'
+      i = j;
+      continue;
+    }
+
+    // Обработка остальных операторов (без '^')
+    if ('+-*/=()√'.includes(ch)) {
       tokens.push({ type: 'text', value: ch });
       i++;
       continue;
     }
-
-    // 4. Остальное (пробелы, одиночные маркеры) – пропускаем
-    i++;
   }
 
   // Склеиваем соседние текстовые токены

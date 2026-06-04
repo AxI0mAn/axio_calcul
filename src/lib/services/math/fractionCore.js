@@ -189,23 +189,23 @@ function tokenizeFractionExpression(expr) {
     const ch = expr[i];
     if (ch === ' ') { i++; continue; }
 
-    // 1. Сначала обрабатываем операторы, которые не могут быть частью чисел
-    if ('+*/()^√'.includes(ch)) {
+    // 1. Обрабатываем операторы и скобки (добавили '÷' и '^')
+    if ('+*/()^√'.includes(ch) || ch === '÷') {
       tokens.push({ type: 'operator', value: ch });
       i++;
       continue;
     }
 
-    // 2. Обработка минуса (ключевой момент)
+    // 2. Обработка минуса (бинарный vs унарный)
     if (ch === '-') {
+      // Если перед минусом стоит число, закрывающая скобка или маркер конца дроби — это бинарный минус
       const isBinary = i > 0 && /[\d)⥏]/.test(expr[i - 1]);
       if (isBinary) {
         tokens.push({ type: 'operator', value: '-' });
         i++;
         continue;
       } else {
-        // Унарный минус перед открывающей скобкой превращаем в оператор унарного умножения или обрабатываем отдельно.
-        // Для Shunting-yard проще всего запушить число -1 и оператор '*' в стек, если далее идет скобка:
+        // Унарный минус перед открывающей скобкой: превращаем в (-1 *)
         if (expr[i + 1] === '(') {
           tokens.push({ type: 'number', value: -1 });
           tokens.push({ type: 'operator', value: '*' });
@@ -215,30 +215,33 @@ function tokenizeFractionExpression(expr) {
       }
     }
 
-    // 3. Сбор числа или дроби (включая возможный унарный минус)
-    // Начинаем с текущей позиции – это может быть цифра или унарный минус
+    // 3. Сбор чисел, простых и смешанных дробей
     let j = i;
-    // Если текущий символ минус (унарный), включаем его в токен
-    if (expr[j] === '-') j++;
-    // Захватываем цифры, точку, ÷, маркеры целой части
+    if (expr[j] === '-') j++; // Учитываем унарный минус в начале числа
+
+    // ВАЖНО: Мы поглощаем символы в строку raw только если это:
+    // - цифры или точка
+    // - или специальные маркеры смешанной дроби (⥑, ⥏)
+    // - символ '÷' поглощается ТУТ только если он зажат между цифрами (простая дробь)
     while (j < len && (
       expr[j].match(/[\d.]/) ||
-      expr[j] === MARKERS.DIV ||
       expr[j] === MARKERS.WHOLE_START ||
-      expr[j] === MARKERS.WHOLE_END
+      expr[j] === MARKERS.WHOLE_END ||
+      (expr[j] === MARKERS.DIV && j + 1 < len && /\d/.test(expr[j + 1]) && !expr.includes('^'))
+      // ^ Если в выражении вообще есть знак степени, запрещаем склеивать дробь атомарно!
     )) {
       j++;
     }
-    // Если удалось захватить хотя бы один символ
+
+    // Если удалось захватить подстроку
     if (j > i) {
       const raw = expr.substring(i, j);
-      // Пропускаем одиночный минус (ошибка)
       if (raw === '-') {
         i++;
         continue;
       }
 
-      // Смешанная дробь
+      // Кейс А: Смешанная дробь (например, 2⥑1÷3⥏)
       const mixedMatch = raw.match(/^(-?)(\d+)⥑(\d+)÷(\d+)⥏$/);
       if (mixedMatch) {
         const sign = mixedMatch[1] === '-' ? -1 : 1;
@@ -251,7 +254,7 @@ function tokenizeFractionExpression(expr) {
         continue;
       }
 
-      // Простая дробь
+      // Кейс Б: Простая дробь (например, 1÷2)
       const simpleMatch = raw.match(/^(-?)(\d+)÷(\d+)$/);
       if (simpleMatch) {
         const sign = simpleMatch[1] === '-' ? -1 : 1;
@@ -262,7 +265,7 @@ function tokenizeFractionExpression(expr) {
         continue;
       }
 
-      // Обычное число (целое или десятичное)
+      // Кейс В: Обычное число (целое или десятичное)
       const numVal = parseFloat(raw);
       if (!isNaN(numVal)) {
         tokens.push({ type: 'number', value: numVal });
@@ -271,18 +274,20 @@ function tokenizeFractionExpression(expr) {
       }
     }
 
-    // Если ничего не подошло – переходим к следующему символу
+    // Если ни один шаблон не подошел, двигаем указатель
     i++;
   }
+
+  console.log("Сгенерированные токены ядра (отладка):", tokens);
   return tokens;
 }
 
-function precedence(op) {
-  if (op === '+' || op === '-') return 1;
-  if (op === '*' || op === '/') return 2;
-  if (op === '^' || op === '√') return 3; // Высший приоритет
-  return 0;
-}
+// function precedence(op) {
+//   if (op === '+' || op === '-') return 1;
+//   if (op === '*' || op === '/' || op === '÷') return 2; //
+//   if (op === '^' || op === '√') return 3; // Высший приоритет
+//   return 0;
+// }
 
 function applyOperator(op, a, b = null) {
   const left = toFraction(a);
@@ -303,9 +308,8 @@ function applyOperator(op, a, b = null) {
   }
 }
 
-// ----- Главный парсер (Shunting-yard) -----
+
 export function evaluateFractionExpression(expression) {
-  // Трассировка для отладки в консоли браузера
   console.log('=== evaluateFractionExpression ===');
   console.log('Input expression:', expression);
 
@@ -313,77 +317,116 @@ export function evaluateFractionExpression(expression) {
   const output = [];
   const ops = [];
 
+  // Функция определения приоритета операторов
+  const getPrecedence = (op) => {
+    if (op === '+' || op === '-') return 1;
+    if (op === '*' || op === '/' || op === '÷') return 2;
+    if (op === '^' || op === '√') return 3;
+    return 0;
+  };
+
   for (const tok of tokens) {
+    // 1. Если токен — число или готовый объект Fraction, сразу отправляем в output
     if (tok.type === 'number' || tok.type === 'fraction') {
-      output.push(tok.value);
-    } else if (tok.type === 'operator') {
+      // Превращаем обычные числа в объекты Fraction для стандартизации вычислений
+      output.push(tok.value instanceof Fraction ? tok.value : new Fraction(tok.value, 1));
+    }
+    // 2. Если токен — открывающая скобка, просто кладем в стек операторов
+    else if (tok.value === '(') {
+      ops.push('(');
+    }
+    // 3. Если токен — закрывающая скобка
+    else if (tok.value === ')') {
+      while (ops.length && ops[ops.length - 1] !== '(') {
+        output.push(ops.pop());
+      }
+      if (ops.length && ops[ops.length - 1] === '(') {
+        ops.pop(); // Удаляем саму открывающую скобку
+      }
+    }
+    // 4. Если токен — оператор (+, -, *, /, ÷, ^, √)
+    else if (tok.type === 'operator') {
       const o1 = tok.value;
 
+      // Унарный корень (префиксный) просто кладем в стек
       if (o1 === '√') {
         ops.push(o1);
       } else {
+        // Для бинарных операторов выталкиваем операторы с БОЛЬШИМ или РАВНЫМ приоритетом
         while (
           ops.length &&
           ops[ops.length - 1] !== '(' &&
-          ops[ops.length - 1] !== '√' &&
-          precedence(ops[ops.length - 1]) >= precedence(o1)
+          getPrecedence(ops[ops.length - 1]) >= getPrecedence(o1)
         ) {
           output.push(ops.pop());
         }
         ops.push(o1);
       }
-    } else if (tok.value === '(') {
-      ops.push('(');
-    } else if (tok.value === ')') {
-      // Выталкиваем все операторы до открывающей скобки
-      while (ops.length && ops[ops.length - 1] !== '(') {
-        output.push(ops.pop());
-      }
-
-      if (ops.length && ops[ops.length - 1] === '(') {
-        ops.pop(); // Нашли и удалили открывающую скобку
-      }
-
-      // Если перед скобкой стоял корень — выталкиваем его в output К контенту скобки
-      if (ops.length && ops[ops.length - 1] === '√') {
-        output.push(ops.pop());
-      }
     }
   }
 
-  // Выталкиваем всё, что осталось в стеке операторов
+  // Выталкиваем оставшиеся операторы
   while (ops.length) {
-    const topOp = ops.pop();
-    if (topOp !== '(' && topOp !== ')') { // Игнорируем случайные сиротские скобки
-      output.push(topOp);
-    }
+    output.push(ops.pop());
   }
 
   console.log('Final Output Stack (RPN):', output);
 
-  // Вычисление стека
+  // --- ВЫЧИСЛЕНИЕ СТЕКА ---
   const stack = [];
+
   for (const item of output) {
-    if (item instanceof Fraction || typeof item === 'number') {
+    if (item instanceof Fraction) {
       stack.push(item);
     } else if (item === '√') {
+      // Унарный оператор корня
       const a = stack.pop();
       if (a === undefined) throw new Error('Invalid expression for sqrt');
-      const result = applyOperator(item, a);
-      stack.push(result);
+      // Вызываем наш точный метод sqrt(), который мы настроили ранее
+      stack.push(a.sqrt());
     } else {
-      // Бинарные операторы (+, -, *, /, ^)
-      const b = stack.pop();
-      const a = stack.pop();
+      // Бинарные операторы (+, -, *, /, ÷, ^)
+      const b = stack.pop(); // Правый операнд
+      const a = stack.pop(); // Левый операнд
       if (a === undefined || b === undefined) throw new Error('Invalid expression structure');
-      const result = applyOperator(item, a, b);
+
+      let result;
+      switch (item) {
+        case '+': result = applyOperator('+', a, b); break;
+        case '-': result = applyOperator('-', a, b); break;
+        case '*': result = applyOperator('*', a, b); break;
+        case '/':
+        case '÷': result = applyOperator('/', a, b); break;
+
+        case '^': {
+          // b.den === 1 означает, что степень целая (например, 8÷1, а не дробная)
+          if (b.den === 1) {
+            const power = b.num;
+            if (power >= 0) {
+              // Изолированно возводим числитель и знаменатель в степень без плавающей запятой
+              const newNum = Math.pow(a.num, power);
+              const newDen = Math.pow(a.den, power);
+              result = new Fraction(newNum, newDen);
+            } else {
+              // Отрицательная степень — переворачиваем дробь
+              const positivePower = Math.abs(power);
+              const newNum = Math.pow(a.den, positivePower);
+              const newDen = Math.pow(a.num, positivePower);
+              result = new Fraction(newNum, newDen);
+            }
+          } else {
+            // Если степень дробная, откатываемся к стандартному методу библиотеки
+            result = a.pow(b);
+          }
+          break;
+        }
+
+        default: throw new Error(`Unknown operator: ${item}`);
+      }
       stack.push(result);
     }
   }
 
   if (stack.length !== 1) throw new Error('Invalid expression: stack mismatch');
-
-  let result = stack[0];
-  if (!(result instanceof Fraction)) result = toFraction(result);
-  return result;
+  return stack[0];
 }

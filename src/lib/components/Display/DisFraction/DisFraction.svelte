@@ -85,6 +85,8 @@
 									{:else}
 										<span class="math-text">{stripMarkers(token.value)}</span>
 									{/if}
+								{:else if token.type === 'superscript'}
+									<span class="super-exponent">{token.value}</span>
 								{:else if token.type === 'fraction'}
 									<div
 										class="fraction-block {stepTokens[tokenIdx - 1]?.value === '√'
@@ -121,6 +123,8 @@
 						{:else}
 							<span class="math-text">{stripMarkers(token.value)}</span>
 						{/if}
+					{:else if token.type === 'superscript'}
+						<span class="super-exponent">{token.value}</span>
 					{:else if token.type === 'fraction'}
 						<div
 							class="fraction-block {expressionTokens[tokenIdx - 1]?.value === '√'
@@ -151,6 +155,8 @@
 					{:else}
 						<span class="math-text">{stripMarkers(token.value)}</span>
 					{/if}
+				{:else if token.type === 'superscript'}
+					<span class="super-exponent">{token.value}</span>
 				{:else if token.type === 'fraction'}
 					<div
 						class="fraction-block {displayTokens[tokenIdx - 1]?.value === '√'
@@ -396,6 +402,15 @@
 		.whole-part {
 			padding-top: 0; // Коррекция шрифта целой части под линией
 		}
+	}
+
+	// указатель степени в надстрочном шрифте
+	.super-exponent {
+		font-size: 1.2rem; /* Уменьшенный размер */
+		vertical-align: super; /* Смещение вверх */
+		line-height: 0;
+		color: $clr-mint-soft; /* Выделим цветом для красоты */
+		margin-left: -2px;
 	}
 
 	.history-section::-webkit-scrollbar {

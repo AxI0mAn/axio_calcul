@@ -50,7 +50,6 @@
 		<BtnText customClass="op btn__func constanta" onclick={() => addSqrt2()} buttonText="√2" />
 	</div>
 	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => addOperatorFraction('^')} buttonText="xʸ" />
 		<BtnText
 			customClass="op btn__func"
 			onclick={() => {
@@ -59,9 +58,11 @@
 			}}
 			buttonText="√"
 		/>
+		<BtnText customClass="op btn__func" onclick={() => addOperatorFraction('^')} buttonText="xʸ" />
+		<!-- <BtnText customClass="op btn__func" onclick={() => addSqrtYXforFraction()} buttonText="ʸ√x" /> -->
 	</div>
 	<div class="row">
-		<!-- <BtnText customClass="op btn__func" onclick={() => toPower2()} buttonText="x^2" /> -->
+		<!-- <BtnText customClass="op btn__func" onclick={() => toPower2()} buttonText="x²" /> -->
 		<!-- <BtnText customClass="op btn__func" onclick={() => denominator()} buttonText="1/x" /> -->
 	</div>
 </div>
