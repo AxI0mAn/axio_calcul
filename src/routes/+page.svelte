@@ -145,7 +145,7 @@
 			</details>
 			<details class="groupCalc" name="my-accordion">
 				<summary>
-					<h2 class="groupCalc__title">proportion and converter</h2>
+					<h2 class="groupCalc__title">converters</h2>
 				</summary>
 				<section class="group__catalog">
 					<div class="catalog__post">
@@ -243,6 +243,31 @@
 								// height={512}
 							/>
 							<h3 class="catalog__card--title"><span>example</span></h3>
+						</a>
+					</div>
+				</section>
+			</details>
+			<details class="groupCalc" name="my-accordion">
+				<summary>
+					<h2 class="groupCalc__title">house helpers</h2>
+				</summary>
+				<section class="group__catalog">
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон арифметического калькулятора"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>proportions</span></h3>
 						</a>
 					</div>
 				</section>

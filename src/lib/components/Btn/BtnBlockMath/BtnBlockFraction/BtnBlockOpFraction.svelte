@@ -14,25 +14,35 @@
 	} from '$lib/services/math/opBtnBasic.js';
 	import { addSqrt2 } from '$lib/services/math/opBtnEngineer';
 	import { addOperator } from '$lib/services/math/mathActions.js';
+	import {
+		addBracketFraction,
+		addOperatorFraction,
+		decimalToFraction,
+		fractionToDecimal
+	} from '$lib/services/math/fractionActions.js';
 </script>
 
 <div class="digBlock">
 	<div class="row">
-		<BtnText
-			customClass="op btn__func constanta"
-			onclick={() => addOperator(':.')}
-			buttonText=":."
-		/>
-		<BtnText
-			customClass="op btn__func constanta"
-			onclick={() => addOperator('.:')}
-			buttonText=".:"
-		/>
+		<BtnText customClass="op btn__func constanta" onclick={fractionToDecimal} buttonText=":." />
+		<BtnText customClass="op btn__func constanta" onclick={decimalToFraction} buttonText=".:" />
 	</div>
 	<div class="row">
-		<BtnText customClass="op btn__func constanta" onclick={() => addOperator('(')} buttonText="(" />
-		<BtnText customClass="op btn__func constanta" onclick={() => addOperator('÷')} buttonText="÷" />
-		<BtnText customClass="op btn__func constanta" onclick={() => addOperator(')')} buttonText=")" />
+		<BtnText
+			customClass="op btn__func constanta"
+			onclick={() => addBracketFraction('(')}
+			buttonText="("
+		/>
+		<BtnText
+			customClass="op-style btn__op "
+			onclick={() => addOperatorFraction('÷')}
+			buttonText="÷"
+		/>
+		<BtnText
+			customClass="op btn__func constanta"
+			onclick={() => addBracketFraction(')')}
+			buttonText=")"
+		/>
 	</div>
 	<div class="row">
 		<BtnText customClass="op btn__func constanta" onclick={() => addPi()} buttonText="π" />
@@ -40,10 +50,19 @@
 		<BtnText customClass="op btn__func constanta" onclick={() => addSqrt2()} buttonText="√2" />
 	</div>
 	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => toPower()} buttonText="x^y" />
-		<BtnText customClass="op btn__func" onclick={() => toPower2()} buttonText="x^2" />
-		<BtnText customClass="op btn__func" onclick={() => addSqrt()} buttonText="&Sqrt;x" />
-		<BtnText customClass="op btn__func" onclick={() => denominator()} buttonText="1/x" />
+		<BtnText customClass="op btn__func" onclick={() => addOperatorFraction('^')} buttonText="xʸ" />
+		<BtnText
+			customClass="op btn__func"
+			onclick={() => {
+				addOperatorFraction('√');
+				addBracketFraction('(');
+			}}
+			buttonText="√"
+		/>
+	</div>
+	<div class="row">
+		<!-- <BtnText customClass="op btn__func" onclick={() => toPower2()} buttonText="x^2" /> -->
+		<!-- <BtnText customClass="op btn__func" onclick={() => denominator()} buttonText="1/x" /> -->
 	</div>
 </div>
 

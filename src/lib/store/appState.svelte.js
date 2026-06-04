@@ -19,9 +19,19 @@ class AppState {
   /** @type {string} */
   now_mode = $state('amoca'); // Режим калькулятора - отображается в окне div class="now_mode"
 
+  // Метод для переключения режима 
+  setMode(mode) {
+    this.now_mode = mode;
+    // this.isFractionMode = (mode === 'fractions');
+  }
+
   // ========= дроби 
 
   // ========= дроби 
+
+  // ========= proporcia
+
+  // ========= 
 
   // ========= ячейки памяти
   /** @type {number} */
@@ -54,12 +64,6 @@ class AppState {
     this.display = '0';
     this.expression = '';
     this.isNewInput = true;
-  }
-
-  // Метод для переключения режима 
-  setMode(mode) {
-    this.now_mode = mode;
-    this.isFractionMode = (mode === 'fractions');
   }
 
   //============== всё что касается работы с ячейками памяти в режиме математики

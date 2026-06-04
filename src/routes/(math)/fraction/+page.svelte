@@ -1,5 +1,5 @@
 <script>
-// src/routes/(math)/fraction/+page.svelte
+	// src/routes/(math)/fraction/+page.svelte
 	import MathPageLayout from '$lib/components/aPage/MathPageLayout.svelte';
 	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
 
@@ -9,7 +9,7 @@
 	import BtnBlockBaseFraction from '$lib/components/Btn/BtnBlockMath/BtnBlockFraction/BtnBlockBaseFraction.svelte';
 </script>
 
-<MathPageLayout nowMode="ENGINEER">
+<MathPageLayout nowMode="FRACTION">
 	{#snippet display()}
 		<DisFraction />
 	{/snippet}

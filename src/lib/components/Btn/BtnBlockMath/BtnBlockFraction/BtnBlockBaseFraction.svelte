@@ -1,47 +1,17 @@
 <script>
-	/**
-* src/lib/components/Btn/BtnBlockMath/BtnBlockFraction/BtnBlockBaseFraction.svelte
-основные операторы и =
-
-*/
+	// src/lib/components/Btn/BtnBlockMath/BtnBlockFraction/BtnBlockBaseFraction.svelte
 	import BtnText from '../../BtnText.svelte';
-	import { addOperator, performCalculation } from '$lib/services/math/fractionActions.js';
+	import { addOperatorFraction, evaluateFraction } from '$lib/services/math/fractionActions.js';
 </script>
 
 <div class="operBlock">
 	<div class="col">
-		<BtnText
-			customClass="op"
-			onclick={() => {
-				addOperator('-');
-			}}
-			buttonText="-"
-		/>
-		<BtnText
-			customClass="op"
-			onclick={() => {
-				addOperator('+');
-			}}
-			buttonText="+"
-		/>
-		<BtnText
-			customClass="op"
-			onclick={() => {
-				addOperator('/');
-			}}
-			buttonText="/"
-			svgContent=""
-		/>
-
-		<BtnText
-			customClass="op"
-			onclick={() => {
-				addOperator('*');
-			}}
-			buttonText="*"
-		/>
+		<BtnText customClass="op__btn" onclick={() => addOperatorFraction('+')} buttonText="+" />
+		<BtnText customClass="op__btn" onclick={() => addOperatorFraction('-')} buttonText="-" />
+		<BtnText customClass="op__btn" onclick={() => addOperatorFraction('*')} buttonText="×" />
+		<BtnText customClass="op__btn" onclick={() => addOperatorFraction('/')} buttonText="/" />
 	</div>
-	<BtnText customClass="equal-btn btn__op" onclick={performCalculation} buttonText="=" />
+	<BtnText customClass="op__btn equal" onclick={evaluateFraction} buttonText="=" />
 </div>
 
 <style lang="scss">

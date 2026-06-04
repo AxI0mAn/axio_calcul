@@ -115,6 +115,9 @@
 			justify-content: flex-start;
 			align-items: center;
 			overflow-x: scroll;
+			.fieldBtn_basic {
+				min-width: 100%;
+			}
 		}
 
 		.fieldBtn_memory {

@@ -1,19 +1,30 @@
 <script>
-	/**
-	 * src/lib/components/Display/FractionDisplay.svelte
-	 */
-	// @ts-ignore
-	import { base } from '$app/paths';
+	// src/lib/components/Display/DisFraction/DisFraction.svelte
 
 	import { appState } from '$lib/store/appState.svelte.js';
-	import { parseExpressionToHtml } from '$lib/services/math/fractionVisualParser';
-	import { longpress } from '$lib/actions/longpress';
-	import { btnMemo } from '$lib/utils/btnMemo';
+	import {
+		parseExpressionToTokens,
+		stripMarkers
+	} from '$lib/services/math/fractionVisualParser.js';
 
-	import { tick } from 'svelte';
+	let expressionTokens = $derived(parseExpressionToTokens(appState.expression));
+	let displayTokens = $derived(parseExpressionToTokens(appState.display));
 
-	// История вычислений и автоскролл
-	let historyContain = $state();
+	// ИСПРАВЛЕНО: Ссылки на DOM-элементы в Svelte 5 НЕ должны быть $state()
+	let historyContain;
+
+	// Кешируем токенизированную историю, чтобы парсер не дергался на каждый чих в инпуте
+	let tokenizedHistory = $derived(
+		appState.historySession.map((entry) => {
+			if (typeof entry === 'object' && entry.type === 'fractionSteps') {
+				return {
+					...entry,
+					tokenizedSteps: entry.steps.map((step) => parseExpressionToTokens(step))
+				};
+			}
+			return entry;
+		})
+	);
 
 	$effect(() => {
 		const historyLength = appState.historySession.length;
@@ -24,12 +35,13 @@
 			behavior: 'smooth'
 		});
 	});
-
-	// Логика QuickMenu
+	// QuickMenu
 	// @ts-ignore
 	import { page } from '$app/stores';
 	import { menuMaps } from '$lib/config/mathMenuMaps.js';
 	import QuickMenu from '$lib/components/aBlock/QuickMenu.svelte';
+
+	// Реактивная переменная: проверяем, есть ли для текущего пути карта меню
 
 	let pathPage = $page.url.pathname;
 
@@ -56,87 +68,68 @@
 			<p>{appState.now_mode}</p>
 		</div>
 	{/if}
-
-	<div bind:this={historyContain} class="history-section">
-		{#each appState.historySession as item}
-			{#if typeof item === 'object' && item.type === 'fraction'}
-				<div class="fraction-log-item">
-					<span class="expression-line">
-						{#each parseExpressionToHtml(item.rawExpr) as token}
-							{#if token.type === 'text'}
-								<span class="math-text">{token.value}</span>
-							{:else}
-								<div class="fraction-block">
-									{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
-									<div class="fraction-container">
-										<span class="num-part">{token.num}</span>
-										<span class="fraction-line"></span>
-										<span class="den-part">{token.den}</span>
+	<!-- Блок истории вычислений -->
+	<div class="history-section" bind:this={historyContain}>
+		{#each tokenizedHistory as entry}
+			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
+				<div class="history-steps-block">
+					{#each entry.tokenizedSteps as stepTokens, idx}
+						<div class="step-line">
+							{#if idx > 0}<span class="math-text"> = </span>{/if}
+							{#each stepTokens as token, tokenIdx (tokenIdx)}
+								{#if token.type === 'text'}
+									{#if token.value === '√'}
+										<div class="radical-wrapper">
+											<span class="radical-tick">√</span>
+										</div>
+									{:else}
+										<span class="math-text">{stripMarkers(token.value)}</span>
+									{/if}
+								{:else if token.type === 'fraction'}
+									<div
+										class="fraction-block {stepTokens[tokenIdx - 1]?.value === '√'
+											? 'under-radical'
+											: ''}"
+									>
+										{#if token.whole && token.whole !== '0'}
+											<span class="whole-part">{token.whole}</span>
+										{/if}
+										<div class="fraction-container">
+											<span class="num-part">{token.num}</span>
+											<span class="fraction-line"></span>
+											<span class="den-part">{token.den}</span>
+										</div>
 									</div>
-								</div>
-							{/if}
-						{/each}
-						<span class="math-text"> = </span>
-					</span>
-
-					<div class="pseudo-stack-fraction">
-						<div class="num-floor">{item.resultNum}</div>
-						<div class="fraction-line"></div>
-						<div class="den-floor">{item.resultDen}</div>
-					</div>
-				</div>
-			{:else if typeof item === 'string' && item.includes('÷')}
-				<div class="fraction-log-item expression-line">
-					{#each parseExpressionToHtml(item) as token}
-						{#if token.type === 'text'}
-							<span class="math-text">{token.value}</span>
-						{:else}
-							<div class="fraction-block">
-								{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
-								<div class="fraction-container">
-									<span class="num-part">{token.num}</span>
-									<span class="fraction-line"></span>
-									<span class="den-part">{token.den}</span>
-								</div>
-							</div>
-						{/if}
+								{/if}
+							{/each}
+						</div>
 					{/each}
 				</div>
-			{:else}
-				<div class="standard-log-item">{item}</div>
-			{/if}
+			{:else}{/if}
 		{/each}
 	</div>
 
 	<div class="fraction-input-area">
-		<div class="unified-bottom-line">
-			{#if appState.expression && appState.expression.trim() !== ''}
-				<div class="expression-line">
-					{#each parseExpressionToHtml(appState.expression) as token}
-						{#if token.type === 'text'}
-							<span class="math-text">{token.value.replace(/[\u2951\u294F\u297E\u297F]/g, '')}</span
-							>
-						{:else}
-							<div class="fraction-block">
-								{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
-								<div class="fraction-container">
-									<span class="num-part">{token.num}</span>
-									<span class="fraction-line"></span>
-									<span class="den-part">{token.den}</span>
-								</div>
-							</div>
-						{/if}
-					{/each}
-				</div>
-			{/if}
-
-			<div class="display-line">
-				{#each parseExpressionToHtml(appState.display) as token}
+		{#if appState.expression}
+			<div class="expression-line">
+				{#each expressionTokens as token, tokenIdx (tokenIdx)}
 					{#if token.type === 'text'}
-						<span class="math-text">{token.value.replace(/[\u2951\u294F\u297E\u297F]/g, '')}</span>
-					{:else}
-						<div class="fraction-block">
-							{#if token.whole}<span class="whole-part">{token.whole}</span>{/if}
+						{#if token.value === '√'}
+							<div class="radical-wrapper">
+								<span class="radical-tick">√</span>
+							</div>
+						{:else}
+							<span class="math-text">{stripMarkers(token.value)}</span>
+						{/if}
+					{:else if token.type === 'fraction'}
+						<div
+							class="fraction-block {expressionTokens[tokenIdx - 1]?.value === '√'
+								? 'under-radical'
+								: ''}"
+						>
+							{#if token.whole && token.whole !== '0'}
+								<span class="whole-part">{token.whole}</span>
+							{/if}
 							<div class="fraction-container">
 								<span class="num-part">{token.num}</span>
 								<span class="fraction-line"></span>
@@ -146,6 +139,35 @@
 					{/if}
 				{/each}
 			</div>
+		{/if}
+
+		<div class="display-line">
+			{#each displayTokens as token, tokenIdx (tokenIdx)}
+				{#if token.type === 'text'}
+					{#if token.value === '√'}
+						<div class="radical-wrapper">
+							<span class="radical-tick">√</span>
+						</div>
+					{:else}
+						<span class="math-text">{stripMarkers(token.value)}</span>
+					{/if}
+				{:else if token.type === 'fraction'}
+					<div
+						class="fraction-block {displayTokens[tokenIdx - 1]?.value === '√'
+							? 'under-radical'
+							: ''}"
+					>
+						{#if token.whole && token.whole !== '0'}
+							<span class="whole-part">{token.whole}</span>
+						{/if}
+						<div class="fraction-container">
+							<span class="num-part">{token.num}</span>
+							<span class="fraction-line"></span>
+							<span class="den-part">{token.den}</span>
+						</div>
+					</div>
+				{/if}
+			{/each}
 		</div>
 	</div>
 </div>
@@ -195,219 +217,18 @@
 		border-bottom-left-radius: 0.5rem;
 	}
 
-	.history-section {
-		flex: 1;
-		min-height: 0;
-		overflow-y: scroll;
-		overflow-x: hidden;
-		font-size: 1.25rem;
-		line-height: 1.75rem;
-		color: $clr-slate;
-		margin-bottom: 0.5rem;
-		// padding-left: 2px;
-		display: flex;
-		flex-direction: column;
+	// ===================НОВЫЕ СТИЛИ
 
-		p:first-child {
-			margin-top: auto;
-		}
-		p {
-			-webkit-tap-highlight-color: transparent;
-			-webkit-touch-callout: none;
-			user-select: none;
-			touch-action: manipulation;
-		}
-		.fraction-log-item {
-			display: flex;
-			flex-flow: row wrap;
-			justify-content: flex-start;
-			align-items: center;
-			gap: 0.2rem;
-			padding-left: 4px;
-			max-width: fit-content;
-
-			$fontSizeFractionPart: 1rem;
-			.math-text,
-			.whole-part {
-				// === -📝=TODO=📝- ===
-				color: rgb(255, 255, 255);
-				font-size: calc(1.5 * $fontSizeFractionPart);
-				padding-right: 0.5rem;
-			}
-			.fraction-container {
-				max-width: fit-content;
-				.num-part {
-					// === -📝=TODO=📝- ===
-					color: rgb(192, 235, 3);
-					font-size: $fontSizeFractionPart;
-				}
-				.fraction-line {
-					height: 2px;
-					// === -📝=TODO=📝- ===
-					background-color: rgb(153, 0, 255);
-					font-size: $fontSizeFractionPart;
-				}
-				.den-part {
-					// === -📝=TODO=📝- ===
-					color: rgb(255, 153, 0);
-					font-size: $fontSizeFractionPart;
-					text-align: center;
-				}
-			}
-		}
-	}
-
-	.history-section::-webkit-scrollbar {
-		width: 4px;
-	}
-	.history-section::-webkit-scrollbar-thumb {
-		background: $clr-blue-mid;
-		border-radius: 10px;
-	}
-
-	// Специфичный UI для интерактивного двухэтажного ввода дробей
 	.fraction-input-area {
 		display: flex;
-		flex-direction: column;
-		flex-shrink: 0;
-		gap: 0.5rem;
-		border-top: 1px solid $clr-slate;
-		padding-top: 0.5rem;
-	}
-
-	.main-fraction-render {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end; // Выравнивание калькулятора по правому краю
-		gap: 1rem;
-		min-height: 5rem;
-		font-family: 'Lora', serif;
-	}
-
-	.fraction-vertical-stack {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		min-width: 4.5rem;
-	}
-
-	.math-line {
-		width: 100%;
-		height: 3px;
-		background-color: $clr-white;
-		margin: 2px 0;
-		box-shadow: 0 0 4px rgba($clr-mint-rgb, 0.4);
-	}
-
-	.interactive-zone {
-		// Сброс дефолтных стилей кнопки
-		background: none;
-		border: none;
-		font: inherit;
-		color: inherit;
-		text-align: inherit;
-
-		// Oригинальные стили
-		padding: 2px 6px;
-		border-radius: 4px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 2rem;
-
-		// Убираем синюю обводку браузера при фокусе.
-		&:focus-visible {
-			outline: none;
-		}
-
-		&.focused {
-			background: rgba($clr-blue-mid-rgb, 0.3);
-			box-shadow: 0 0 0 1px $clr-mint-soft;
-		}
-	}
-
-	// Прямоугольники-плейсхолдеры
-	.placeholder-rectangle {
-		width: 3.5rem;
-		height: 1.5rem;
-		background: rgba(0, 0, 0, 0.2);
-		transition: all 0.2s ease;
-
-		.focused & {
-			border: 2px solid $clr-mint;
-			background: rgba($clr-mint-soft-rgb, 0.1);
-		}
-	}
-
-	// Вариант 3: Ошибка пустого прямоугольника при операторе или [=]
-	.interactive-zone.error-blank {
-		.placeholder-rectangle {
-			border: 2px solid #dc3545 !important;
-			background: rgba(#dc3545, 0.2) !important;
-			animation: pulse-error 0.4s infinite alternate;
-		}
-	}
-
-	.value-text {
-		font-size: 2.2rem;
-		font-weight: bold;
-		color: $clr-white;
-
-		// Числитель и знаменатель делаем чуть компактнее целой части
-		.num-zone &,
-		.den-zone & {
-			font-size: 1.65rem;
-			color: rgba(255, 255, 255, 0.9);
-		}
-	}
-
-	.whole-zone {
-		font-size: 2.8rem;
-		font-weight: bold;
-		color: $clr-mint; // Целая часть выделена основным неоновым цветом
-	}
-
-	// Объединенная нижняя строка (Пункт 6)
-	.unified-bottom-line {
-		display: flex;
+		flex-flow: row wrap;
 		justify-content: flex-start;
 		align-items: center;
-		gap: 0.2rem;
-		font-size: 2rem;
-		font-family: 'Inter', sans-serif;
-		color: $clr-slate;
-		padding: 0 0.25rem;
-		padding-bottom: 1rem;
-		min-height: 5rem;
-	}
 
-	.current-expression {
-		margin: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		max-width: 60%;
-		// === -📝=TODO=📝- ===
-		color: orangered;
+		padding-top: 0.4rem;
+		padding-left: 1.2rem;
+		border-top: 4px groove rgba($clr-mint-soft-rgb, 0.4);
 	}
-
-	.fraction-compact-preview {
-		font-weight: bold;
-		color: $clr-mint-soft;
-		text-align: right;
-	}
-
-	@keyframes pulse-error {
-		0% {
-			box-shadow: 0 0 2px #dc3545;
-		}
-		100% {
-			box-shadow: 0 0 10px #dc3545;
-		}
-	}
-	// ===================НОВЫЕ СТИЛИ
 
 	// Контейнер строки, где всё выстроено в ряд
 	.expression-line,
@@ -426,123 +247,163 @@
 		color: $clr-white;
 	}
 
-	// Общий блок дроби (целое число + сама дробь рядом)
-	.fraction-block {
-		display: inline-flex;
-		align-items: center;
-		vertical-align: middle;
-	}
-
-	.whole-part {
-		font-size: 2.4rem;
-		font-weight: bold;
-		color: $clr-mint; // Выделяем целую часть смешанного числа твоим неоновым цветом
-		margin-right: 2px;
-	}
-
-	// Вертикальный стек для числителя, черты и знаменателя
-	.fraction-fraction {
-		display: inline-flex;
+	.history-section {
+		flex: 1;
+		min-height: 0;
+		overflow-y: scroll;
+		overflow-x: hidden;
+		font-size: 1.25rem;
+		line-height: 1.75rem;
+		color: $clr-slate;
+		margin-bottom: 0.5rem;
+		// padding-left: 2px;
+		display: flex;
 		flex-direction: column;
+
+		div:first-child {
+			margin-top: auto;
+		}
+	}
+	.history-steps-block {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
 		align-items: center;
-		justify-content: center;
-		padding: 0 4px;
-		line-height: 1.1;
+		gap: 0.2rem;
+		padding: 4px 8px 4px 4px;
+		max-width: fit-content;
+		-webkit-tap-highlight-color: transparent;
+		-webkit-touch-callout: none;
+		user-select: none;
+		touch-action: manipulation;
+		border-bottom: 1px solid $clr-mint-soft;
+		border-right: 1px solid rgba($clr-mint-soft-rgb, 0.4);
+		border-bottom-right-radius: 0.5rem;
 	}
 
+	.step-line {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+		align-items: center;
+		gap: 0.2rem;
+		padding-left: 4px;
+		max-width: fit-content;
+	}
+
+	.expression-line,
+	.display-line,
+	.step-line {
+		.fraction-block {
+			display: inline-flex !important;
+			flex-flow: row nowrap !important;
+			white-space: nowrap;
+
+			justify-content: center;
+			align-items: center;
+		}
+	}
+	$fontSizeFractionPart: 1rem;
+
+	.fraction-container {
+		max-width: fit-content;
+		display: flex;
+		flex-direction: column;
+	}
+	.math-text,
+	.whole-part {
+		// === -📝=TODO=📝- ===
+		color: rgb(255, 255, 255);
+		font-size: calc(1.5 * $fontSizeFractionPart);
+		padding-right: 0.5rem;
+	}
 	.num-part {
-		font-size: 1.5rem;
-		color: rgba(255, 255, 255, 0.9);
-		padding-bottom: 2px;
+		// === -📝=TODO=📝- ===
+		color: rgb(192, 235, 3);
+		font-size: $fontSizeFractionPart;
+		text-align: center;
 	}
-
-	// Горизонтальная дробная черта дроби
 	.fraction-line {
 		display: block;
 		width: 100%;
-		min-width: 12px;
-		height: 2px; // Толщина этажной черты
-		background-color: $clr-white;
+		height: 2px;
 		margin: 2px 0;
-	}
 
+		// === -📝=TODO=📝- ===
+		background-color: rgb(153, 0, 255);
+		font-size: $fontSizeFractionPart;
+	}
 	.den-part {
-		font-size: 1.5rem;
-		color: rgba(255, 255, 255, 0.9);
+		// === -📝=TODO=📝- ===
+		color: rgb(255, 153, 0);
+		font-size: $fontSizeFractionPart;
+		text-align: center;
+	}
+
+	.expression-line,
+	.display-line {
+		.math-text,
+		.whole-part {
+			font-size: calc(1.75 * $fontSizeFractionPart);
+		}
+		.num-part,
+		.fraction-line,
+		.den-part {
+			font-size: calc(1.5 * $fontSizeFractionPart);
+		}
+	}
+
+	// Контейнер для самой галочки корня
+	.radical-wrapper {
+		display: inline-flex;
+		align-items: flex-start;
+		height: 100%;
 		padding-top: 2px;
+		margin-right: -2px; // Прижимаем контент вплотную к галочке
 	}
 
-	/* Добавляем флекс-направление, чтобы шаги выстраивались вертикально один за другим */
-	.fraction-steps-block {
-		display: flex;
-		gap: 4px;
-		width: 100%;
-		padding: 6px 0;
-	}
-	.step-line {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-	}
-
-	/* Контейнер для одной полной задачи в истории */
-	.history-block {
-		display: flex;
-		flex-wrap: wrap; /* Разрешаем перенос шагов на новую строку, если они не влезают */
-		align-items: center; /* Выравниваем дроби и знаки "=" строго по центру вертикали */
-		gap: 0.75rem 0.5rem; /* Отступы: между строками (0.75rem), между шагами (0.5rem) */
-		width: 100%;
-		padding: 1rem 0;
-		border-bottom: 1px solid #222; /* Элегантный разделитель сессий на чистом чёрном фоне */
-	}
-
-	/* Обертка для шага и его знака равенства */
-	.step-item {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	/* Стилизация знака равенства */
-	.math-equal {
-		color: #888;
-		font-family: 'Inter', sans-serif;
-		font-size: 1.2rem;
+	.radical-tick {
+		font-size: 1.45em; // Делаем галочку чуть выше контента
+		line-height: 0.9;
+		color: $clr-white;
 		user-select: none;
 	}
 
-	/* Контент шага (само выражение или дробь) */
-	.step-content {
-		display: inline-block;
-		white-space: nowrap; /* Запрещаем одной конкретной дроби разрываться посредине */
+	// Элемент (дробь или текст), который находится под корнем
+	.under-radical {
+		position: relative;
+		display: inline-flex !important;
+		padding-top: 6px; // Отступ сверху для линии крышки
+		padding-left: 2px;
+		padding-right: 4px;
+
+		// Сама линия крышки корня
+		&::before {
+			content: '';
+			position: absolute;
+			top: 4px; // Выравниваем стык с верхним краем галочки √
+			left: 0;
+			width: 100%;
+			height: 2px; // Толщина крышки корня
+			background-color: $clr-white; // Цвет крышки (синхронно с галочкой)
+		}
 	}
 
-	/* Общий контейнер для всей цепочки шагов одной сессии */
-	.fraction-steps-block {
-		display: flex;
-		flex-wrap: wrap; /* Позволяет шагам переноситься, если они не влезают в экран */
-		align-items: center; /* Выравнивает все шаги и дроби строго по одной горизонтальной оси */
-		gap: 0.75rem 0.5rem; /* Отступы: 0.75rem между строками при переносе, 0.5rem между шагами */
-		width: 100%;
-		padding: 0.5rem 0;
+	// Корректировка для дроби под корнем, чтобы убрать лишние смещения
+	.fraction-block.under-radical {
+		align-items: center;
 
-		border-bottom: 1px solid rgba($clr-sky-rgb, 0.7);
-		border-right: 1px solid rgba($clr-sky-rgb, 0.7);
-		border-bottom-right-radius: 1rem;
+		.whole-part {
+			padding-top: 0; // Коррекция шрифта целой части под линией
+		}
 	}
 
-	/* Конкретный шаг (блок из знака "=" и внутренних токенов дроби) */
-	.fraction-log-item.step-line {
-		display: inline-flex; /* Элементы внутри шага (знак равенства, дроби) идут в линию */
-		align-items: center; /* Центрируем знак "=" относительно дроби вертикально */
-		gap: 0.25rem; /* Небольшой отступ между знаком "=" и самой дробью */
-		white-space: nowrap; /* Запрещаем ОДНОМУ конкретному шагу разрываться пополам */
+	.history-section::-webkit-scrollbar {
+		width: 4px;
 	}
-
-	/* Дополнительно: убедись, что знак равенства имеет красивый отступ справа */
-	.fraction-log-item .math-text {
-		display: inline-block;
-		white-space: nowrap;
+	.history-section::-webkit-scrollbar-thumb {
+		background: $clr-blue-mid;
+		border-radius: 10px;
 	}
 
 	//=====================================

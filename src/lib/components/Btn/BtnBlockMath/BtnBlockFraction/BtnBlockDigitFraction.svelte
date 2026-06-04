@@ -6,39 +6,42 @@
 */
 	import BtnText from '../../BtnText.svelte';
 	import {
-		backspace,
-		toggleSign,
-		addDecimal,
-		clear,
-		addDigit
+		backspaceFraction,
+		clearFraction,
+		addDigitFraction,
+		toggleSignFraction
 	} from '$lib/services/math/fractionActions.js';
 </script>
 
 <div class="digBlock">
 	<div class="row">
-		<BtnText buttonText="⌫" customClass="backspace op-style btn__op" onclick={() => backspace()} />
+		<BtnText
+			buttonText="⌫"
+			customClass="backspace op-style btn__op"
+			onclick={() => backspaceFraction()}
+		/>
 
-		<BtnText buttonText="C" customClass="clear-btn btn__op" onclick={() => clear()} />
+		<BtnText buttonText="C" customClass="clear-btn btn__op" onclick={() => clearFraction()} />
 	</div>
 	<div class="row">
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('7');
+				addDigitFraction('7');
 			}}
 			buttonText="7"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('8');
+				addDigitFraction('8');
 			}}
 			buttonText="8"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('9');
+				addDigitFraction('9');
 			}}
 			buttonText="9"
 		/>
@@ -47,21 +50,21 @@
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('4');
+				addDigitFraction('4');
 			}}
 			buttonText="4"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('5');
+				addDigitFraction('5');
 			}}
 			buttonText="5"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('6');
+				addDigitFraction('6');
 			}}
 			buttonText="6"
 		/>
@@ -70,21 +73,21 @@
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('1');
+				addDigitFraction('1');
 			}}
 			buttonText="1"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('2');
+				addDigitFraction('2');
 			}}
 			buttonText="2"
 		/>
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('3');
+				addDigitFraction('3');
 			}}
 			buttonText="3"
 		/>
@@ -93,14 +96,14 @@
 		<BtnText
 			customClass="font-digits"
 			onclick={() => {
-				addDigit('0');
+				addDigitFraction('0');
 			}}
 			buttonText="0"
 		/>
 
-		<BtnText buttonText="." customClass="btn__op" onclick={() => addDecimal()} />
+		<BtnText customClass="btn__op" onclick={() => addDigitFraction('.')} buttonText="." />
 
-		<BtnText buttonText="+/-" customClass="btn__op" onclick={() => toggleSign()} />
+		<BtnText buttonText="+/-" customClass="btn__op" onclick={() => toggleSignFraction()} />
 	</div>
 </div>
 
