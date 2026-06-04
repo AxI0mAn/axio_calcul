@@ -300,13 +300,21 @@
 	.expression-line,
 	.display-line,
 	.step-line {
+		// Контекстная корректировка для дробей, чтобы степень не падала на числитель!
 		.fraction-block {
-			display: inline-flex !important;
-			flex-flow: row nowrap !important;
-			white-space: nowrap;
-
-			justify-content: center;
+			display: inline-flex;
 			align-items: center;
+			vertical-align: middle;
+			position: relative;
+			margin: 0 4px;
+
+			// Если степень идет сразу за блоком дроби без скобок (как 1/5 в квадрате)
+			+ .super-exponent {
+				// Опускаем чуть ниже по сравнению со скобочной степенью
+				font-size: 0.75rem;
+				transform: translateX(-0.4rem) translateY(0.7em);
+				margin-left: 1px;
+			}
 		}
 	}
 	$fontSizeFractionPart: 1rem;
@@ -406,11 +414,15 @@
 
 	// указатель степени в надстрочном шрифте
 	.super-exponent {
-		font-size: 1.2rem; /* Уменьшенный размер */
-		vertical-align: super; /* Смещение вверх */
-		line-height: 0;
-		color: $clr-mint-soft; /* Выделим цветом для красоты */
-		margin-left: -2px;
+		display: inline-block;
+		font-size: 0.95rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
+		font-weight: bold;
+		line-height: 1;
+		color: $clr-mint-soft;
+		// Базовый подъем для степени после скобок или обычных чисел
+		transform: translateX(-0.4rem) translateY(-0.8em);
+		margin-left: 2px; /* Отступ от скобки, чтобы не липла */
+		margin-right: 2px; /* Отступ перед знаком равенства */
 	}
 
 	.history-section::-webkit-scrollbar {
