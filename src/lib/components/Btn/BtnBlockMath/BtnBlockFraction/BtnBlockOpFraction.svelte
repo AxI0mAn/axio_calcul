@@ -17,6 +17,7 @@
 	import {
 		addBracketFraction,
 		addOperatorFraction,
+		fractionToPower2,
 		decimalToFraction,
 		fractionToDecimal
 	} from '$lib/services/math/fractionActions.js';
@@ -59,11 +60,7 @@
 			buttonText="√"
 		/>
 		<BtnText customClass="op btn__func" onclick={() => addOperatorFraction('^')} buttonText="xʸ" />
-		<!-- <BtnText customClass="op btn__func" onclick={() => addSqrtYXforFraction()} buttonText="ʸ√x" /> -->
-	</div>
-	<div class="row">
-		<BtnText customClass="op btn__func" onclick={() => toPower2()} buttonText="x²" />
-		<!-- <BtnText customClass="op btn__func" onclick={() => denominator()} buttonText="1/x" /> -->
+		<BtnText customClass="op btn__func" onclick={() => fractionToPower2()} buttonText="x²" />
 	</div>
 </div>
 

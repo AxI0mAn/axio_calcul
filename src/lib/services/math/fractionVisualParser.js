@@ -130,7 +130,6 @@ export function parseExpressionToTokens(expression) {
         j++;
       }
 
-      // Если сразу за числом идет запуск смешанной дроби ⥑
       if (j < len && expression[j] === MARKERS.WHOLE_START) {
         const endIdx = expression.indexOf(MARKERS.WHOLE_END, j);
         if (endIdx !== -1) {
@@ -151,7 +150,6 @@ export function parseExpressionToTokens(expression) {
 
       const candidate = expression.substring(i, j);
 
-      // Простая дробь вида "числитель÷знаменатель"
       if (candidate.includes(MARKERS.DIV) &&
         !candidate.includes(MARKERS.WHOLE_START) &&
         !candidate.includes(MARKERS.COMPLEX_NUM_START)) {
@@ -168,7 +166,6 @@ export function parseExpressionToTokens(expression) {
         }
       }
 
-      // Обычное число
       if (isNumber(candidate)) {
         tokens.push({ type: 'text', value: candidate });
         i = j;
@@ -176,16 +173,13 @@ export function parseExpressionToTokens(expression) {
       }
     }
 
-    // 3. Условие проверки операторов, степеней и скобок:
-    // 3. Условие проверки операторов, степеней и скобок:
-
+    // 3. ОБРАБОТКА СТЕПЕНИ (Изолированная и безопасная)
     if (ch === '^') {
       let j = i + 1;
       let exponentBuf = '';
 
-      // Собираем всё, что может относиться к степени:
-      // Цифры, точки, спецсимволы, а ТАКЖЕ знак деления '÷' и скобки '()'
-      while (j < expression.length && (
+      // Собираем всё, что идет за знаком ^
+      while (j < len && (
         /[\d.()÷]/.test(expression[j]) ||
         '⁰¹²³⁴⁵⁶⁷⁸⁹⁻˙'.includes(expression[j])
       )) {
@@ -193,46 +187,43 @@ export function parseExpressionToTokens(expression) {
         j++;
       }
 
-      // КЛЮЧЕВАЯ ЛОГИКА ЗАМЕНЫ:
       if (exponentBuf.length > 0) {
-        // Если что-то ввели, убираем знак '^' из отображения,
-        // а всё содержимое бережно переводим из верхних индексов в нормальную строку
-        const cleanExponent = fromSuperscript(exponentBuf);
-
+        // Если цифры степени есть — создаем токен superscript без птички ^
         tokens.push({
           type: 'superscript',
-          value: cleanExponent // Здесь будет лежать чистая строка, например "1÷2" или "(1÷2)"
+          value: fromSuperscript(exponentBuf)
         });
       } else {
-        // Если пользователь только что нажал кнопку "xʸ" и степень пустая,
-        // показываем временный знак '^'
+        // Если после ^ пусто (только что нажали xʸ) — рендерим ^ как обычный текст
         tokens.push({
           type: 'text',
           value: '^'
         });
       }
 
-      // Гарантированно сдвигаем указатель за пределы ВСЕЙ собранной степени
-      i = j;
+      i = j; // Жесткий гарантированный сдвиг указателя цикла
       continue;
     }
 
-    // Обработка остальных операторов (без '^')
+    // 4. Обычные операторы и скобки
     if ('+-*/=()√'.includes(ch)) {
       tokens.push({ type: 'text', value: ch });
       i++;
       continue;
     }
+
+    // 5. Предохранитель для пропуска неизвестных символов/пробелов
+    i++;
   }
 
-  // Склеиваем соседние текстовые токены
+  // Склеиваем соседние текстовые токены БЕЗ мутации объектов для реактивности Svelte 5
   const merged = [];
   for (let k = 0; k < tokens.length; k++) {
-    if (tokens[k].type === 'text' && merged.length && merged[merged.length - 1].type === 'text') {
-      // @ts-ignore
-      merged[merged.length - 1].value += tokens[k].value;
+    const current = tokens[k];
+    if (current.type === 'text' && merged.length && merged[merged.length - 1].type === 'text') {
+      merged[merged.length - 1].value += current.value;
     } else {
-      merged.push({ ...tokens[k] });
+      merged.push(current); // Передаем ссылку напрямую, без деструктуризации {...}
     }
   }
   return merged;
