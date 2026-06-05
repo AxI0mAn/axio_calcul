@@ -1,5 +1,6 @@
 <script>
 	// src/lib/components/Btn/BtnBlockMath/BtnBlockFraction/BtnBlockBaseFraction.svelte
+
 	import BtnText from '../../BtnText.svelte';
 	import { addOperatorFraction, evaluateFraction } from '$lib/services/math/fractionActions.js';
 </script>

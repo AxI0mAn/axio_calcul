@@ -1,7 +1,6 @@
 // src/lib/store/appStore.svelte.js
 
-// Вместо этого:
-// import { browser } from '$app/environment';
+// Вместо import { browser } from '$app/environment';
 // Используем это:
 const browser = typeof window !== 'undefined' && typeof document !== 'undefined';
 

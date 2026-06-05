@@ -4,14 +4,7 @@
 
 */
 	import BtnText from '../../BtnText.svelte';
-	import {
-		denominator,
-		addSqrt,
-		toPower,
-		toPower2,
-		addE,
-		addPi
-	} from '$lib/services/math/opBtnBasic.js';
+	import { addE, addPi } from '$lib/services/math/opBtnBasic.js';
 	import { addSqrt2 } from '$lib/services/math/opBtnEngineer';
 	import { addOperator } from '$lib/services/math/mathActions.js';
 	import {

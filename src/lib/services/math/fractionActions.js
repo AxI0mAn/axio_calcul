@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /**
- * fractionActions.js
+ * src/lib/services/math/fractionActions.js
  * Обработчики кнопок для страницы дробей.
  */
 
@@ -106,8 +106,7 @@ export function addBracketFraction(bracket) {
     if (appState.isNewInput || appState.display === '0') {
       appState.display = '(';
     } else {
-      // Если пользователь ввел, например, "2" и нажал "(", это превратится в "2("
-      // (на Шаге 2 мы научим ядро понимать это как умножение 2 * (...) )
+      // Если пользователь ввел, например, "2" и нажал "(", это превратится в "2(" 
       appState.display += '(';
     }
     appState.isNewInput = false;
@@ -164,8 +163,7 @@ export function toggleSignFraction() {
   }
 }
 
-// ---- преобразование десятичной -> обычная ( .: ) ----
-// ---- преобразование десятичной -> обычная ( .: ) ----
+// ---- преобразование десятичной -> обычная ( .: ) ---- 
 export function decimalToFraction() {
   clearErrorIfNeeded();
 
@@ -204,7 +202,6 @@ export function decimalToFraction() {
       resultStr = `${signStr}${remainder}÷${den}`;
     }
 
-    // КОРРЕКТНЫЙ ФИКС СТЭЙТА:
     appState.display = resultStr;
 
     // Очищаем expression, чтобы дробь не дублировалась на экране!

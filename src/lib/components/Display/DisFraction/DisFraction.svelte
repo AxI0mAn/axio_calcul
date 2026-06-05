@@ -10,7 +10,7 @@
 	let expressionTokens = $derived(parseExpressionToTokens(appState.expression));
 	let displayTokens = $derived(parseExpressionToTokens(appState.display));
 
-	// ИСПРАВЛЕНО: Ссылки на DOM-элементы в Svelte 5 НЕ должны быть $state()
+	//  Ссылки на DOM-элементы в Svelte 5 НЕ должны быть $state()
 	let historyContain;
 
 	// Кешируем токенизированную историю, чтобы парсер не дергался на каждый чих в инпуте
@@ -110,7 +110,7 @@
 			{:else}{/if}
 		{/each}
 	</div>
-
+	<!-- Блок вычислений -->
 	<div class="fraction-input-area">
 		{#if appState.expression}
 			<div class="expression-line">
