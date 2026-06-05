@@ -251,13 +251,6 @@
 		font-family: inherit;
 	}
 
-	// Стили для обычных знаков (+, -, *, =, пробелы)
-	.math-text {
-		font-size: 2rem;
-		padding: 0 4px;
-		color: $clr-white;
-	}
-
 	.history-section {
 		flex: 1;
 		min-height: 0;
@@ -278,7 +271,7 @@
 	.history-steps-block {
 		display: flex;
 		flex-flow: row wrap;
-		justify-content: flex-start;
+		justify-content: center;
 		align-items: center;
 		gap: 0.2rem;
 		padding: 4px 8px 4px 4px;
@@ -296,12 +289,23 @@
 		display: flex;
 		flex-flow: row wrap;
 		justify-content: flex-start;
-		align-items: center;
+		align-items: stretch;
 		gap: 0.2rem;
 		padding-left: 4px;
 		max-width: fit-content;
+		min-height: 100%;
 	}
 
+	// Стили для обычных знаков (+, -, *, =, пробелы) и десятичных дробей
+	.math-text {
+		font-size: 2rem;
+		padding: 0 4px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: 4rem; // чтоб отцентрировать по вертикали десятичные дроби
+		line-height: 1;
+	}
 	.expression-line,
 	.display-line,
 	.step-line {
@@ -332,7 +336,7 @@
 	.math-text,
 	.whole-part {
 		// === -📝=TODO=📝- ===
-		color: rgb(255, 255, 255);
+		color: $clr-mint;
 		font-size: calc(1.5 * $fontSizeFractionPart);
 		padding-right: 0.5rem;
 	}
@@ -354,7 +358,7 @@
 	}
 	.den-part {
 		// === -📝=TODO=📝- ===
-		color: rgb(255, 153, 0);
+		color: $clr-coral;
 		font-size: $fontSizeFractionPart;
 		text-align: center;
 	}

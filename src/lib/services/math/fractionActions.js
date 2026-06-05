@@ -195,6 +195,7 @@ export function toggleSignFraction() {
   }
 }
 
+/*
 // ---- преобразование десятичной -> обычная ( .: ) ---- 
 export function decimalToFraction() {
   clearErrorIfNeeded();
@@ -251,6 +252,7 @@ export function decimalToFraction() {
   }
 }
 
+
 // ---- преобразование обычной -> десятичная ( :. ) ----
 export function fractionToDecimal() {
   clearErrorIfNeeded();
@@ -260,6 +262,104 @@ export function fractionToDecimal() {
     const frac = new FractionJS(normalized);
     const decimal = frac.valueOf();
     appState.display = String(decimal);
+    appState.isNewInput = false;
+  } catch (e) {
+    console.error(e);
+    appState.display = 'ERROR';
+  }
+}
+*/
+
+// ---- преобразование десятичной -> обычная ( .: ) ---- 
+export function decimalToFraction() {
+  clearErrorIfNeeded();
+
+  // Если на экране уже дробь, то ничего делать не нужно
+  if (appState.display.includes('÷') || appState.display.includes('⥑')) {
+    return;
+  }
+
+  // Фиксируем исходное значение для записи в историю сессии
+  const originalDisplay = appState.display;
+
+  let value = parseFloat(appState.display);
+  if (isNaN(value)) {
+    appState.display = 'ERROR';
+    return;
+  }
+
+  if (value === 0) {
+    appState.display = '0';
+    appState.isNewInput = true;
+    return;
+  }
+
+  try {
+    const frac = new FractionJS(value);
+    const num = Math.abs(Number(frac.n));
+    const den = Math.abs(Number(frac.d));
+    const signStr = value < 0 ? '-' : '';
+
+    const whole = Math.floor(num / den);
+    const remainder = num % den;
+
+    let resultStr = '';
+    if (whole !== 0 && remainder !== 0) {
+      resultStr = `${signStr}${whole}⥑${remainder}÷${den}⥏`;
+    } else if (whole !== 0) {
+      resultStr = `${signStr}${whole}`;
+    } else {
+      resultStr = `${signStr}${remainder}÷${den}`;
+    }
+
+    // ДОПОЛНЕНИЕ: Запись операции перевода в историю сессии
+    appState.historySession.push({
+      type: 'fractionSteps',
+      steps: [originalDisplay, resultStr]
+    });
+
+    appState.display = resultStr;
+
+    // Очищаем expression, чтобы дробь не дублировалась на экране!
+    if (appState.expression !== undefined) {
+      appState.expression = '';
+    }
+
+    // Ставим true, чтобы этот результат вел себя как готовое число,
+    // и ввод новых цифр начинался заново, а не приклеивался к дроби
+    appState.isNewInput = true;
+
+  } catch (e) {
+    console.error(e);
+    appState.display = 'ERROR';
+  }
+}
+
+
+// ---- преобразование обычной -> десятичная ( :. ) ----
+export function fractionToDecimal() {
+  clearErrorIfNeeded();
+
+  if (isError()) return;
+
+  // Фиксируем исходное значение для записи в историю сессии
+  const originalDisplay = appState.display;
+  const expr = appState.display;
+
+  try {
+    let normalized = expr.replace(/⥑/g, ' ').replace(/÷/g, '/').replace(/⥏/g, '');
+    const frac = new FractionJS(normalized);
+    const decimal = frac.valueOf();
+
+    const resultStr = String(decimal);
+
+    // ДОПОЛНЕНИЕ: Запись операции перевода в историю сессии
+    appState.historySession.push({
+      type: 'fractionSteps',
+      steps: [originalDisplay, resultStr]
+    });
+
+    appState.display = resultStr;
     appState.isNewInput = false;
   } catch (e) {
     console.error(e);
