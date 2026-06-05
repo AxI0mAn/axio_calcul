@@ -165,32 +165,57 @@ export function toggleSignFraction() {
 }
 
 // ---- преобразование десятичной -> обычная ( .: ) ----
+// ---- преобразование десятичной -> обычная ( .: ) ----
 export function decimalToFraction() {
   clearErrorIfNeeded();
+
+  // Если на экране уже дробь, то ничего делать не нужно
+  if (appState.display.includes('÷') || appState.display.includes('⥑')) {
+    return;
+  }
+
   let value = parseFloat(appState.display);
   if (isNaN(value)) {
     appState.display = 'ERROR';
     return;
   }
+
+  if (value === 0) {
+    appState.display = '0';
+    appState.isNewInput = true;
+    return;
+  }
+
   try {
     const frac = new FractionJS(value);
-    let num = Number(frac.n);
-    let den = Number(frac.d);
+    const num = Math.abs(Number(frac.n));
+    const den = Math.abs(Number(frac.d));
+    const signStr = value < 0 ? '-' : '';
 
-    const whole = Math.floor(Math.abs(num) / den);
-    const remainder = Math.abs(num) % den;
-    const sign = num < 0 ? -1 : 1;
+    const whole = Math.floor(num / den);
+    const remainder = num % den;
 
-    let resultStr;
+    let resultStr = '';
     if (whole !== 0 && remainder !== 0) {
-      resultStr = `${sign * whole}⥑${remainder}÷${den}⥏`;
+      resultStr = `${signStr}${whole}⥑${remainder}÷${den}⥏`;
     } else if (whole !== 0) {
-      resultStr = `${sign * whole}`;
+      resultStr = `${signStr}${whole}`;
     } else {
-      resultStr = `${num}÷${den}`;
+      resultStr = `${signStr}${remainder}÷${den}`;
     }
+
+    // КОРРЕКТНЫЙ ФИКС СТЭЙТА:
     appState.display = resultStr;
-    appState.isNewInput = false;
+
+    // Очищаем expression, чтобы дробь не дублировалась на экране!
+    if (appState.expression !== undefined) {
+      appState.expression = '';
+    }
+
+    // Ставим true, чтобы этот результат вел себя как готовое число,
+    // и ввод новых цифр начинался заново, а не приклеивался к дроби
+    appState.isNewInput = true;
+
   } catch (e) {
     console.error(e);
     appState.display = 'ERROR';
@@ -213,7 +238,7 @@ export function fractionToDecimal() {
   }
 }
 
-// ---- возведение в квадрат (Надежный фикс) ----
+// ---- возведение в квадрат  ----
 export function fractionToPower2() {
   clearErrorIfNeeded();
 
@@ -233,6 +258,21 @@ export function evaluateFraction() {
     appState.expression = '';
     appState.isNewInput = true;
     return;
+  }
+
+  // автозакрытие скобок для √
+  const openDisplayBrackets = (appState.display.match(/\(/g) || []).length;
+  const closeDisplayBrackets = (appState.display.match(/\)/g) || []).length;
+
+  if (appState.display.includes('√') && openDisplayBrackets > closeDisplayBrackets) {
+    const missingCount = openDisplayBrackets - closeDisplayBrackets;
+    const bracketsToAdd = ')'.repeat(missingCount);
+
+    // Дописываем скобки в стейты, чтобы пользователь увидел изменения
+    appState.display += bracketsToAdd;
+    if (appState.expression !== '') {
+      appState.expression += bracketsToAdd;
+    }
   }
 
   // Собираем выражение в том виде, в каком оно есть

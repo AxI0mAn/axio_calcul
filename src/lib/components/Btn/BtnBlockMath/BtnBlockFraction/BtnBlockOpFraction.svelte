@@ -57,7 +57,7 @@
 				addOperatorFraction('√');
 				addBracketFraction('(');
 			}}
-			buttonText="√"
+			buttonText="√x"
 		/>
 		<BtnText customClass="op btn__func" onclick={() => addOperatorFraction('^')} buttonText="xʸ" />
 		<BtnText customClass="op btn__func" onclick={() => fractionToPower2()} buttonText="x²" />
