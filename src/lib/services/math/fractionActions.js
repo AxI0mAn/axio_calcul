@@ -1,9 +1,10 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-useless-escape */
 /**
  * src/lib/services/math/fractionActions.js
  * Обработчики кнопок для страницы дробей.
  */
 
+/* eslint-disable no-unused-vars */
 import { appState } from '$lib/store/appState.svelte.js';
 import { Fraction, evaluateFractionExpression } from './fractionCore.js';
 import { toSuperscript, fromSuperscript } from "$lib/utils/toSuperscript";
@@ -32,7 +33,14 @@ export function addDigitFraction(digit) {
   }
 
   if (digit === '.') {
-    if (appState.display.includes('.')) return;
+    // Защита: нельзя поставить точку, если строка пустая, уже содержит точку или заканчивается на спецсимвол
+    if (appState.display === '' || /[\.^÷√\(\)]$/.test(appState.display)) return;
+
+    // Защита от второй точки в текущем вводимом числе (с учетом знаков)
+    const currentParts = appState.display.split(/[\+\-\*\/÷\^\(]/);
+    const lastPart = currentParts[currentParts.length - 1];
+    if (lastPart.includes('.')) return;
+
     appState.display += '.';
     return;
   }
@@ -42,8 +50,10 @@ export function addDigitFraction(digit) {
   // мы принудительно переводим в верхний индекс (superscript)!
   if (appState.display.includes('^')) {
     const parts = appState.display.split('^');
-    parts[1] += toSuperscript(digit); // Конвертируем '2' -> '²'
-    appState.display = parts[0] + '^' + parts[1]; // Строка станет например "4^²"
+    // Гарантируем, что parts[1] существует и является строкой, даже если split дал сбой
+    if (parts[1] === undefined) parts[1] = '';
+    parts[1] += toSuperscript(digit);
+    appState.display = parts[0] + '^' + parts[1];
   } else {
     // Обычный ввод числа
     if (appState.display === '0') {
@@ -54,38 +64,60 @@ export function addDigitFraction(digit) {
   }
 }
 
-// ---- операторы + - * / ÷ ----
+// ---- операторы + - * / ÷ √ ^ ---- 
 export function addOperatorFraction(op) {
   clearErrorIfNeeded();
 
+  const lastChar = appState.display.slice(-1);
+
+  // 1. Защита для корня √
   if (op === '√') {
-    if (appState.display === '0' || appState.isNewInput) appState.display = '√';
-    else appState.display += '√';
+    // Единственная защита — от точки прямо перед корнем
+    if (lastChar === '.') return false;
+
+    if (appState.display === '0' || appState.isNewInput) {
+      appState.display = '√';
+    } else {
+      appState.display += '√';
+    }
     appState.isNewInput = false;
-    return;
+    return true; // Всегда разрешаем добавить скобку ( в BtnBlockOpFraction
   }
 
-  // При нажатии на xʸ просто добавляем знак '^' к текущему числу на дисплее
+  // 2. Защита для знака степени ^
   if (op === '^') {
     if (appState.display === '0' && appState.expression === '') return;
+    // Запрещаем ставить степень после операторов, точек, открывающих скобок или если степень уже есть
+    if (/[\+\-\*\/÷\^\.\(√]$/.test(appState.display)) return;
+
     appState.display += '^';
     appState.isNewInput = false;
     return;
   }
 
+  // 3. Защита для знака деления ÷
   if (op === '÷') {
     if (appState.display === '0' && appState.expression === '') return;
+    // Запрещаем ставить деление после любого оператора, точки или открывающей скобки
+    if (/[\+\-\*\/÷\^\.\(√]$/.test(appState.display)) return;
+
     appState.display += '÷';
     appState.isNewInput = false;
     return;
   }
 
-  // Обычные операторы (+ - * /)
+  // 4. Обычные операторы (+ - * /)
   if ((appState.display === '0' || appState.display === '') && appState.expression === '') {
-    appState.display = op;
-    appState.isNewInput = false;
+    // Разрешаем унарный минус в начале ввода
+    if (op === '-') {
+      appState.display = op;
+      appState.isNewInput = false;
+    }
     return;
   }
+
+  // Запрещаем ставить бинарный оператор после другого оператора или точки
+  if (/[\+\-\*\/÷\^\.√]$/.test(appState.display) && !appState.isNewInput) return;
 
   if (appState.isNewInput && appState.expression !== '') {
     appState.expression = appState.expression.slice(0, -1) + op;
@@ -248,8 +280,13 @@ export function fractionToPower2() {
   appState.isNewInput = false;
 }
 
-// ---- равно (вычисление) ----
+/**
+ * Равно (вычисление финального выражения).
+ * Собирает цепочку из expression и display, автоматически закрывает скобки,
+ * передает выражение в математическое ядро и управляет выводом результата или ERROR.
+ */
 export function evaluateFraction() {
+  // Если калькулятор уже находится в состоянии ошибки, нажатие "=" сбрасывает его в "0"
   if (isError()) {
     appState.display = '0';
     appState.expression = '';
@@ -257,22 +294,7 @@ export function evaluateFraction() {
     return;
   }
 
-  // автозакрытие скобок для √
-  const openDisplayBrackets = (appState.display.match(/\(/g) || []).length;
-  const closeDisplayBrackets = (appState.display.match(/\)/g) || []).length;
-
-  if (appState.display.includes('√') && openDisplayBrackets > closeDisplayBrackets) {
-    const missingCount = openDisplayBrackets - closeDisplayBrackets;
-    const bracketsToAdd = ')'.repeat(missingCount);
-
-    // Дописываем скобки в стейты, чтобы пользователь увидел изменения
-    appState.display += bracketsToAdd;
-    if (appState.expression !== '') {
-      appState.expression += bracketsToAdd;
-    }
-  }
-
-  // Собираем выражение в том виде, в каком оно есть
+  // Собираем полное выражение: склеиваем накопленную цепочку (expression) и текущий ввод (display)
   let fullExpr = '';
   if (appState.expression === '') {
     fullExpr = appState.display;
@@ -281,10 +303,26 @@ export function evaluateFraction() {
   }
   fullExpr = fullExpr.trim();
 
+  // Предохранитель: если выражение пустое или равно нулю, ничего не делаем
   if (fullExpr === '' || fullExpr === '0') return;
 
+  // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
+  // Считаем количество открывающих и закрывающих скобок во всей строке
+  const openBrackets = (fullExpr.match(/\(/g) || []).length;
+  const closeBrackets = (fullExpr.match(/\)/g) || []).length;
+
+  // Если есть незакрытые скобки (например, при вводе вложенных корней вида "√(√(64"),
+  // калькулятор автоматически дописывает их в конец строки перед расчетом
+  if (openBrackets > closeBrackets) {
+    const missingCount = openBrackets - closeBrackets;
+    const bracketsToAdd = ')'.repeat(missingCount);
+
+    fullExpr += bracketsToAdd;
+  }
+
   try {
-    // 1. Переводим всю строку в чистый текстовый вид (например, из "1÷2^³" в "1÷2^3")
+    // 1. Переводим всю строку в чистый текстовый вид для математического ядра
+    // (например, конвертируем superscript-символы степени: "2^³" -> "2^3")
     let cleanExpr = fromSuperscript(fullExpr);
 
     console.log("Исходная строка перед фиксом скобок:", cleanExpr);
@@ -295,48 +333,71 @@ export function evaluateFraction() {
     // или "число÷(выражение)^степень" на изолированные скобки.
 
     // Случай А: Число ÷ Число ^ Любое выражение (включая дробные степени вроде 2÷3)
-    // Пример: "1÷4^2" -> "1÷(4^2)" или "1÷5^2÷3" -> "1÷(5^(2÷3))"
     if (cleanExpr.includes('÷') && cleanExpr.includes('^')) {
-      // Сначала изолируем сам показатель степени, если там идет деление без скобок
-      // "5^2÷3" -> "5^(2÷3)"
+      // Сначала изолируем сам показатель степени, если там идет деление без скобок: "5^2÷3" -> "5^(2÷3)"
       cleanExpr = cleanExpr.replace(/\^([\d.÷]+)/g, '^($1)');
 
-      // Теперь изолируем всю правую часть деления (основание вместе со степенью)
-      // "1÷5^(2÷3)" -> "1÷(5^(2÷3))"
+      // Теперь изолируем всю правую часть деления (основание вместе со степенью): "1÷5^(2÷3)" -> "1÷(5^(2÷3))"
       cleanExpr = cleanExpr.replace(/(\d+)÷(\d+)\^([(\d.÷)]+)/g, '$1÷($2^$3)');
     }
 
-    // Убираем возможные дубликаты двойных скобок вокруг степеней, если они случайно возникли:
+    // Убираем возможные дубликаты двойных скобок вокруг степеней, если они случайно возникли
     cleanExpr = cleanExpr.replace(/\^\(\(([^)]+)\)\)/g, '^($1)');
 
     console.log("Строка, отправляемая в ядро (ФИКС СКОБОК):", cleanExpr);
 
+    // 3. ВЫЧИСЛЕНИЕ
+    // Отправляем полностью сбалансированное и подготовленное выражение в парсер ядра
     const resultFraction = evaluateFractionExpression(cleanExpr);
 
+    // Жесткая проверка на деление на ноль на уровне результата
     if (resultFraction.den === 0) throw new Error('Division by zero');
 
+    // 4. ФОРМАТИРОВАНИЕ РЕЗУЛЬТАТА
+    // Переводим полученную правильную дробь в смешанный вид для отображения
     const mixed = resultFraction.toMixed();
     let displayStr;
+
     if (mixed.whole !== 0 && mixed.num !== 0) {
+      // Смешанная дробь с маркерами начала и конца дробной части (целое⥑числитель÷знаменатель⥏)
       displayStr = `${mixed.whole}⥑${mixed.num}÷${mixed.den}⥏`;
     } else if (mixed.whole !== 0) {
+      // Только целое число
       displayStr = `${mixed.whole}`;
     } else {
+      // Простая дробь без целой части
       displayStr = `${mixed.num}÷${mixed.den}`;
     }
 
+    // 5. ЗАПИСЬ В ИСТОРИЮ СЕССИИ
+    // Добавляем красивую строку с автоматически закрытыми скобками в массив истории
     appState.historySession.push({
       type: 'fractionSteps',
       steps: [fullExpr, displayStr]
     });
 
+    // Обновляем состояние дисплея для пользователя
     appState.display = displayStr;
     appState.expression = '';
     appState.isNewInput = true;
+
   } catch (err) {
     console.error('Evaluation error:', err);
-    appState.display = 'ERROR';
+
+    // 1. В историю сессии отправляем исходное выражение и текстовый маркер 'ERROR'
+    // Компонент DisFraction.svelte отобразит это в истории как: 1÷0+5 = ERROR
+    appState.historySession.push({
+      type: 'fractionSteps',
+      steps: [fullExpr, 'ERROR']
+    });
+
+    // 2. КАК ДОЛЖНО БЫТЬ: переводим главный дисплей в режим ожидания (выводим "0")
+    appState.display = '0';
+
+    // 3. Очищаем верхнюю строку цепочки выражений
     appState.expression = '';
+
+    // 4. Выставляем флаг, что следующий ввод сотрет этот ноль и начнется заново
     appState.isNewInput = true;
   }
 }

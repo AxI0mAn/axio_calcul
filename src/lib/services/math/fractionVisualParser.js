@@ -16,12 +16,13 @@ const MARKERS = {
 };
 
 /**
- * Проверяет, является ли строка числом (целым или десятичным)
+ * Проверяет, является ли строка числом (целым, десятичным или незавершенным с точкой на конце)
  * @param {string} str
  * @returns {boolean}
  */
 function isNumber(str) {
-  return /^-?\d+(\.\d+)?$/.test(str);
+  // Добавлена поддержка незавершенного ввода вида "1."
+  return /^-?\d+\.?\d*$/.test(str);
 }
 
 /**
@@ -220,7 +221,7 @@ export function parseExpressionToTokens(expression) {
   for (let k = 0; k < tokens.length; k++) {
     const current = tokens[k];
     if (current.type === 'text' && merged.length && merged[merged.length - 1].type === 'text') {
-      merged[merged.length - 1].value += current.value;
+      merged[merged.length - 1] = { ...merged[merged.length - 1], value: merged[merged.length - 1].value + current.value };
     } else {
       merged.push(current); // Передаем ссылку напрямую, без деструктуризации {...}
     }

@@ -73,37 +73,42 @@
 		{#each tokenizedHistory as entry}
 			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
 				<div class="history-steps-block">
-					{#each entry.tokenizedSteps as stepTokens, idx}
+					{#each entry.steps as step, idx}
 						<div class="step-line">
 							{#if idx > 0}<span class="math-text"> = </span>{/if}
-							{#each stepTokens as token, tokenIdx (tokenIdx)}
-								{#if token.type === 'text'}
-									{#if token.value === '√'}
-										<div class="radical-wrapper">
-											<span class="radical-tick">√</span>
-										</div>
-									{:else}
-										<span class="math-text">{stripMarkers(token.value)}</span>
-									{/if}
-								{:else if token.type === 'superscript'}
-									<span class="super-exponent">{token.value}</span>
-								{:else if token.type === 'fraction'}
-									<div
-										class="fraction-block {stepTokens[tokenIdx - 1]?.value === '√'
-											? 'under-radical'
-											: ''}"
-									>
-										{#if token.whole && token.whole !== '0'}
-											<span class="whole-part">{token.whole}</span>
+
+							{#if step === 'ERROR'}
+								<span class="math-text notValid">ERROR</span>
+							{:else}
+								{#each entry.tokenizedSteps[idx] as token, tokenIdx (tokenIdx)}
+									{#if token.type === 'text'}
+										{#if token.value === '√'}
+											<div class="radical-wrapper">
+												<span class="radical-tick">√</span>
+											</div>
+										{:else}
+											<span class="math-text">{stripMarkers(token.value)}</span>
 										{/if}
-										<div class="fraction-container">
-											<span class="num-part">{token.num}</span>
-											<span class="fraction-line"></span>
-											<span class="den-part">{token.den}</span>
+									{:else if token.type === 'superscript'}
+										<span class="super-exponent">{token.value}</span>
+									{:else if token.type === 'fraction'}
+										<div
+											class="fraction-block {entry.tokenizedSteps[idx][tokenIdx - 1]?.value === '√'
+												? 'under-radical'
+												: ''}"
+										>
+											{#if token.whole && token.whole !== '0'}
+												<span class="whole-part">{token.whole}</span>
+											{/if}
+											<div class="fraction-container">
+												<span class="num-part">{token.num}</span>
+												<span class="fraction-line"></span>
+												<span class="den-part">{token.den}</span>
+											</div>
 										</div>
-									</div>
-								{/if}
-							{/each}
+									{/if}
+								{/each}
+							{/if}
 						</div>
 					{/each}
 				</div>

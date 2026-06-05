@@ -1,5 +1,5 @@
 /**
- * текущее состояние калькулятора appState.svelte.js
+ * src/lib/store/appState.svelte.js - текущее состояние калькулятора 
  */
 
 // import { appStore } from "./appStore.svelte";
@@ -22,7 +22,6 @@ class AppState {
   // Метод для переключения режима 
   setMode(mode) {
     this.now_mode = mode;
-    // this.isFractionMode = (mode === 'fractions');
   }
 
   // ========= ячейки памяти

@@ -3,6 +3,7 @@
  */
 
 import { appStore } from '$lib/store/appStore.svelte.js';
+import FractionJS from 'fraction.js';
 // @ts-ignore 
 
 // ----- Вспомогательные функции -----
@@ -108,7 +109,7 @@ export class Fraction {
       const resultAsDecimal = Math.sqrt(value);
       // Вместо жесткого округления до 6 знаков, отдаем число в fraction.js,
       // которая умеет распознавать периодические дроби через цепные дроби
-      const FractionJS = require('fraction.js'); // Убедись, что библиотека доступна
+      // FractionJS библиотека импортирована в начале файла
       const approx = new FractionJS(resultAsDecimal);
       return new Fraction(Number(approx.n), Number(approx.d));
       // eslint-disable-next-line no-unused-vars
@@ -224,7 +225,8 @@ function tokenizeFractionExpression(expr) {
     if (j > i) {
       const raw = expr.substring(i, j);
       if (raw === '-') {
-        i++;
+        tokens.push({ type: 'operator', value: '-' });
+        i = j; // Минус обработан как оператор, двигаем указатель
         continue;
       }
 
@@ -237,7 +239,7 @@ function tokenizeFractionExpression(expr) {
         const den = parseInt(mixedMatch[4], 10);
         const totalNum = sign * (whole * den + num);
         tokens.push({ type: 'fraction', value: new Fraction(totalNum, den) });
-        i = j;
+        i = j; // Успешный разбор, переносим указатель
         continue;
       }
 
@@ -248,7 +250,7 @@ function tokenizeFractionExpression(expr) {
         const num = parseInt(simpleMatch[2], 10);
         const den = parseInt(simpleMatch[3], 10);
         tokens.push({ type: 'fraction', value: new Fraction(sign * num, den) });
-        i = j;
+        i = j; // Успешный разбор, переносим указатель
         continue;
       }
 
@@ -256,9 +258,13 @@ function tokenizeFractionExpression(expr) {
       const numVal = parseFloat(raw);
       if (!isNaN(numVal)) {
         tokens.push({ type: 'number', value: numVal });
-        i = j;
+        i = j; // Успешный разбор, переносим указатель
         continue;
       }
+      // Предохранитель: если j > i, но строка не распозналась регулярками,
+      // сдвигаем указатель на 1 символ во избежание бесконечного цикла
+      i++;
+      continue;
     }
 
     // Если ни один шаблон не подошел, двигаем указатель
