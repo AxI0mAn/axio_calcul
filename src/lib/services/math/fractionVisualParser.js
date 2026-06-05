@@ -117,19 +117,19 @@ export function parseExpressionToTokens(expression) {
       }
     }
 
-    // 2. Числа и простые дроби (без целой части)
-    if (ch.match(/\d/) || ch === '-') {
-      if (ch === '-' && i > 0 && /[\d)⥏]/.test(expression[i - 1])) {
-        tokens.push({ type: 'text', value: '-' });
-        i++;
-        continue;
-      }
+    // 2. Числа и простые дроби (без целой части) 
+    // '-' обрабатывается как число, только если он не является оператором вычитания!
+    if (ch.match(/\d/) || (ch === '-' && (i === 0 || '+*/=([√÷'.includes(expression[i - 1])))) {
 
       let j = i;
-      while (j < len && (expression[j].match(/[\d\-.]/) || expression[j] === MARKERS.DIV)) {
+      // Внутри цикла то же самое: не даем зажевать минус, если он идет после цифры
+      while (j < len && (
+        expression[j].match(/[\d.]/) ||
+        expression[j] === MARKERS.DIV ||
+        (expression[j] === '-' && j === i) // Минус разрешен только на самой первой позиции токена
+      )) {
         j++;
       }
-
       if (j < len && expression[j] === MARKERS.WHOLE_START) {
         const endIdx = expression.indexOf(MARKERS.WHOLE_END, j);
         if (endIdx !== -1) {
