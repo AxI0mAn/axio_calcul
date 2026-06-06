@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /**
  * fractionCore.js – точная арифметика дробей + парсер выражений 
  */
@@ -177,6 +178,77 @@ function tokenizeFractionExpression(expr) {
     const ch = expr[i];
     if (ch === ' ') { i++; continue; }
 
+    // Натыкаемся на открывающую скобку 
+    if (ch === '(') {
+      if (tokens.length > 0 && tokens[tokens.length - 1].type === 'number') {
+
+        // --- КЕЙС ШАГА 6 / СЛУЧАЙ 4: Проверяем на паттерн двойных скобок NUMBER + (( ---
+        if (expr[i + 1] === '(') {
+          let k = i + 2;
+          let openBrackets = 2;
+          let hasMainDiv = false;
+
+          while (k < len) {
+            if (expr[k] === '(') openBrackets++;
+            if (expr[k] === ')') {
+              openBrackets--;
+              // Если внешние скобки числителя закрылись, проверяем символ за ними
+              if (openBrackets === 0 && expr[k + 1] === '÷') {
+                hasMainDiv = true;
+                break;
+              }
+            }
+            k++;
+          }
+
+          if (hasMainDiv) {
+            // Связываем целую часть с составным числителем через ПЛЮС
+            tokens.push({ type: 'operator', value: '+' });
+            console.log('[Ядро] Обнаружена составная дробь NUMBER + ((...)) ÷. Неявно подставлен "+"');
+
+            // Пушим первую скобку из пары и сдвигаем указатель на вторую скобку, 
+            // чтобы на следующем шаге цикла она обработалась как обычная одиночная скобка
+            tokens.push({ type: 'operator', value: '(' });
+            i++;
+            continue;
+          }
+        }
+
+        // --- СЛУЧАИ 1, 2, 3: Анализ одиночной скобки (или fallback для двойной без ÷) ---
+        let k = i + 1;
+        let bracketContent = '';
+        let openCount = 1;
+
+        while (k < len) {
+          if (expr[k] === '(') openCount++;
+          if (expr[k] === ')') {
+            openCount--;
+            if (openCount === 0) break;
+          }
+          bracketContent += expr[k];
+          k++;
+        }
+
+        const hasSingleDiv = (bracketContent.match(/÷/g) || []).length === 1;
+        const hasOtherOps = /[\+\-\*\/]/.test(bracketContent);
+
+        if (hasSingleDiv && !hasOtherOps) {
+          // Случай 1: Смешанная дробь
+          tokens.push({ type: 'operator', value: '+' });
+          console.log('[Ядро] Между целой частью и дробью неявно подставлен оператор "+"');
+        } else {
+          // Случай 2 и 3: Неявное умножение
+          tokens.push({ type: 'operator', value: '*' });
+          console.log('[Ядро] Перед скобкой неявно подставлен оператор "*" (умножение)');
+        }
+      }
+
+      // Пушим текущую открывающую скобку и идём дальше
+      tokens.push({ type: 'operator', value: '(' });
+      i++;
+      continue;
+    }
+
     // 1. Обрабатываем операторы и скобки (добавили '÷' и '^')
     if ('+*/()^√'.includes(ch) || ch === '÷') {
       tokens.push({ type: 'operator', value: ch });
@@ -299,7 +371,24 @@ export function evaluateFractionExpression(expression) {
   console.log('=== evaluateFractionExpression ===');
   console.log('Input expression:', expression);
 
-  const tokens = tokenizeFractionExpression(expression);
+  let tokens = tokenizeFractionExpression(expression);
+
+  // === МОДИФИКАЦИЯ ШАГА 7 (Виртуальное автозакрытие скобок) ===
+  let bracketBalance = 0;
+  for (const tok of tokens) {
+    if (tok.value === '(') bracketBalance++;
+    if (tok.value === ')') bracketBalance--;
+  }
+
+  // Если открытых скобок больше, чем закрытых, искусственно добавляем недостающие в конец
+  if (bracketBalance > 0) {
+    console.log(`[Ядро] Обнаружен дисбаланс скобок: +${bracketBalance}. Применяем автозакрытие.`);
+    for (let b = 0; b < bracketBalance; b++) {
+      tokens.push({ type: 'operator', value: ')' });
+    }
+  }
+  // === КОНЕЦ МОДИФИКАЦИИ ШАГА 7 ===
+
   const output = [];
   const ops = [];
 

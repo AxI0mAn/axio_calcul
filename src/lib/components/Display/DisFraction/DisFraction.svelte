@@ -7,6 +7,13 @@
 		stripMarkers
 	} from '$lib/services/math/fractionVisualParser.js';
 
+	console.log('Тест 13. Сразу после нажатия знака деления ÷');
+	console.log(parseExpressionToTokens('5((1÷2 + 1÷2))÷'));
+	console.log('Тест 14. Когда пользователь начал открывать скобки знаменателя ((');
+	console.log(parseExpressionToTokens('5((1÷2 + 1÷2))÷(('));
+	console.log('Тест 15. Как только вводится первая цифра знаменателя');
+	console.log(parseExpressionToTokens('5((1÷2 + 1÷2))÷((1'));
+
 	let expressionTokens = $derived(parseExpressionToTokens(appState.expression));
 	let displayTokens = $derived(parseExpressionToTokens(appState.display));
 
@@ -345,6 +352,7 @@
 		color: rgb(192, 235, 3);
 		font-size: $fontSizeFractionPart;
 		text-align: center;
+		white-space: nowrap; // <--- ЗАПРЕЩАЕМ ВЫВАЛИВАНИЕ СИМВОЛОВ НАВЕРХ
 	}
 	.fraction-line {
 		display: block;
@@ -361,6 +369,7 @@
 		color: $clr-coral;
 		font-size: $fontSizeFractionPart;
 		text-align: center;
+		white-space: nowrap; // <--- УДЕРЖИВАЕМ СИМВОЛЫ НА НИЖНЕМ УРОВНЕ
 	}
 
 	.expression-line,
