@@ -1,18 +1,12 @@
 <script>
 	// src/lib/components/Display/DisFraction/DisFraction.svelte
+	// Компонент для отображения вычислений калькулятора дробей
 
 	import { appState } from '$lib/store/appState.svelte.js';
 	import {
 		parseExpressionToTokens,
 		stripMarkers
 	} from '$lib/services/math/fractionVisualParser.js';
-
-	// console.log('Тест 13. Сразу после нажатия знака деления ÷');
-	// console.log(parseExpressionToTokens('5((1÷2 + 1÷2))÷'));
-	// console.log('Тест 14. Когда пользователь начал открывать скобки знаменателя ((');
-	// console.log(parseExpressionToTokens('5((1÷2 + 1÷2))÷(('));
-	// console.log('Тест 15. Как только вводится первая цифра знаменателя');
-	// console.log(parseExpressionToTokens('5((1÷2 + 1÷2))÷((1'));
 
 	let expressionTokens = $derived(parseExpressionToTokens(appState.expression));
 	let displayTokens = $derived(parseExpressionToTokens(appState.display));

@@ -8,8 +8,8 @@
 
 import { fromSuperscript } from "$lib/utils/toSuperscript";
 
-// Специальные символы (определены в ТЗ)
-const MARKERS = {
+// Специальные символы 
+export const MARKERS = {
   WHOLE_START: '\u2951', // ⥑
   WHOLE_END: '\u294F',   // ⥏
   COMPLEX_NUM_START: '\u297E', // ⥾

@@ -4,7 +4,9 @@
  */
 
 import { appStore } from '$lib/store/appStore.svelte.js';
+import { MARKERS } from './fractionVisualParser';
 import FractionJS from 'fraction.js';
+
 // @ts-ignore 
 
 // ----- Вспомогательные функции -----
@@ -23,12 +25,6 @@ function lcm(a, b) {
   if (a === 0 || b === 0) return 0;
   return Math.abs(a * b) / gcd(a, b);
 }
-
-const MARKERS = {
-  WHOLE_START: '\u2951',
-  WHOLE_END: '\u294F',
-  DIV: '÷'
-};
 
 // ----- Класс Fraction -----
 export class Fraction {
