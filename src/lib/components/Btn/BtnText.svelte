@@ -124,15 +124,13 @@
 		}
 	}
 
-	.btn.trigMode {
+	.btn.trigMode,
+	.btn.fractionSwitch {
 		padding: 2px 8px;
 		font-size: 1.2rem;
 		color: $clr-text-main;
 		border: transparent;
 		background: transparent;
-		box-shadow:
-			0 0 4px $clr-mint-soft,
-			0 0 8px $clr-coral;
 
 		@media (hover: hover) and (pointer: fine) {
 			&:hover {
@@ -150,7 +148,11 @@
 			font-size: 1rem;
 		}
 	}
-	.btn.trigMode.action {
+	.btn.trigMode.action,
+	.btn.fractionSwitch.action {
 		color: $clr-coral;
+		box-shadow:
+			0 0 4px $clr-mint-soft,
+			0 0 8px $clr-coral;
 	}
 </style>

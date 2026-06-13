@@ -4,6 +4,7 @@
 
 */
 	import BtnText from '../../BtnText.svelte';
+	import { appState } from '$lib/store/appState.svelte';
 	import { addE, addPi } from '$lib/services/math/opBtnBasic.js';
 	import { addSqrt2 } from '$lib/services/math/opBtnEngineer';
 	import { addOperator } from '$lib/services/math/mathActions.js';
@@ -19,6 +20,11 @@
 <div class="digBlock">
 	<div class="row">
 		<BtnText customClass="op btn__func constanta" onclick={fractionToDecimal} buttonText=":." />
+		<BtnText
+			customClass="op btn__func constanta fractionSwitch {appState.stepsFraction ? 'action' : ''}"
+			onclick={() => (appState.stepsFraction = !appState.stepsFraction)}
+			buttonText="steps"
+		/>
 		<BtnText customClass="op btn__func constanta" onclick={decimalToFraction} buttonText=".:" />
 	</div>
 	<div class="row">

@@ -13,7 +13,9 @@ class AppState {
   /** @type {boolean} */
   isNewInput = $state(true);// Флаг= $state() нужно ли заменить display при вводе цифры
   /** @type {string} */
-  corner = $state('deg'); // Флаг как работаем с тригонометрией
+  corner = $state('deg'); // Флаг как работаем с тригонометрией deg, rad, grad
+  /** @type {boolean} */
+  stepsFraction = $state(false); // флаг как работаем с дробями. Раскладываем на шаги вычислений или нет?
   /** @type {number} */
   // numToFix = $state(appStore.toFix); //Количество знаков после запятой для результата вычисления
   /** @type {string} */

@@ -1,3 +1,5 @@
+// src/lib/utils/toSuperscript.js
+
 // Функция toSuperscript(numStr) для превращения строки "123" в "¹²³"
 export function toSuperscript(numStr) {
   const superscripts = {

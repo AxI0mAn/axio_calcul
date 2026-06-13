@@ -10,6 +10,8 @@ import { Fraction, evaluateFractionExpression } from './fractionCore.js';
 import { toSuperscript, fromSuperscript } from "$lib/utils/toSuperscript";
 import FractionJS from 'fraction.js';
 
+
+
 function isError() {
   return appState.display === 'ERROR';
 }
