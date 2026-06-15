@@ -17,6 +17,57 @@ export const MARKERS = {
   DIV: '÷'
 };
 
+// ---- вспомогательные функции для работы с маркерами ----
+export function isWholeStartMarker(char) {
+  return char === MARKERS.WHOLE_START;
+}
+
+export function isWholeEndMarker(char) {
+  return char === MARKERS.WHOLE_END;
+}
+
+export function isComplexStartMarker(char) {
+  return char === MARKERS.COMPLEX_NUM_START;
+}
+
+export function isComplexEndMarker(char) {
+  return char === MARKERS.COMPLEX_END;
+}
+
+export function getMarkerType(char) {
+  if (char === MARKERS.WHOLE_START) return 'WHOLE_START';
+  if (char === MARKERS.WHOLE_END) return 'WHOLE_END';
+  if (char === MARKERS.COMPLEX_NUM_START) return 'COMPLEX_NUM_START';
+  if (char === MARKERS.COMPLEX_END) return 'COMPLEX_END';
+  return null;
+}
+
+/**
+ * Возвращает массив незакрытых маркеров сложных выражений (⥾) в порядке их открытия.
+ * Игнорирует маркеры целой части (⥑, ⥏).
+ * @param {string} expr - строка с маркерами
+ * @returns {string[]} массив незакрытых маркеров (например, ['⥾', '⥾'] или [])
+ */
+export function getUnclosedMarkersStack(expr) {
+  const stack = [];
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    // Открывающий маркер сложного выражения ⥾ — кладём в стек
+    if (ch === MARKERS.COMPLEX_NUM_START) {
+      stack.push(ch);
+    }
+    // Закрывающий маркер сложного выражения ⥿ — выталкиваем последний открытый, если он есть
+    else if (ch === MARKERS.COMPLEX_END) {
+      if (stack.length > 0 && stack[stack.length - 1] === MARKERS.COMPLEX_NUM_START) {
+        stack.pop();
+      }
+      // Если стек пуст или несоответствие — игнорируем (не добавляем ничего, сохраняем текущий стек)
+    }
+    // Маркеры целой части (⥑, ⥏) и любые другие символы игнорируем
+  }
+  return stack;
+}
+
 /**
  * Проверяет, является ли строка числом (целым, десятичным или незавершенным с точкой на конце)
  * @param {string} str
@@ -73,9 +124,8 @@ function parseSimpleFraction(str) {
  * @returns {string}
  */
 export function stripMarkers(str) {
-  return str
-    .replace(new RegExp(`[${MARKERS.WHOLE_START}${MARKERS.WHOLE_END}${MARKERS.COMPLEX_NUM_START}${MARKERS.COMPLEX_END}]`, 'g'), '')
-    ; //.replace(/÷/g, '/'); // если .replace(/÷/g, '/'); то вместо ÷ будет /
+  return str.replace(/[⥑⥾]/g, '(')
+    .replace(/[⥏⥿]/g, ')');
 }
 
 /**
@@ -94,6 +144,18 @@ export function parseExpressionToTokens(expression) {
 
   while (i < len) {
     const ch = expression[i];
+
+    // 0. ПЕРВООЧЕРЕДНАЯ ОБРАБОТКА МАРКЕРОВ – преобразуем их в обычные скобки для отображения
+    if (ch === MARKERS.WHOLE_START || ch === MARKERS.COMPLEX_NUM_START) {
+      tokens.push({ type: 'text', value: '(' });
+      i++;
+      continue;
+    }
+    if (ch === MARKERS.WHOLE_END || ch === MARKERS.COMPLEX_END) {
+      tokens.push({ type: 'text', value: ')' });
+      i++;
+      continue;
+    }
 
     // =========================================================================
     // ПРОВЕРКА НА СОСТАВНУЮ ДРОБЬ (С ЦЕЛОЙ ЧАСТЬЮ ИЛИ БЕЗ): паттерн (( числитель ))
@@ -384,6 +446,20 @@ export function parseExpressionToTokens(expression) {
         i = j;
         continue;
       }
+    }
+
+    // 2.5. Обработка маркеров целой части и сложных выражений как видимых скобок
+    if (ch === MARKERS.WHOLE_START || ch === MARKERS.COMPLEX_NUM_START) {
+      // Отображаем как открывающую скобку '('
+      tokens.push({ type: 'text', value: '(' });
+      i++;
+      continue;
+    }
+    if (ch === MARKERS.WHOLE_END || ch === MARKERS.COMPLEX_END) {
+      // Отображаем как закрывающую скобку ')'
+      tokens.push({ type: 'text', value: ')' });
+      i++;
+      continue;
     }
 
     // 3. ОБРАБОТКА СТЕПЕНИ (Изолированная и безопасная)

@@ -7,6 +7,7 @@
 /* eslint-disable no-unused-vars */
 import { appState } from '$lib/store/appState.svelte.js';
 import { Fraction, evaluateFractionExpression } from './fractionCore.js';
+import { MARKERS, getUnclosedMarkersStack } from './fractionVisualParser.js';
 import { toSuperscript, fromSuperscript } from "$lib/utils/toSuperscript";
 import FractionJS from 'fraction.js';
 
@@ -131,38 +132,75 @@ export function addOperatorFraction(op) {
 }
 
 // ---- скобки ----
+/**
+* Обработчик нажатия скобок ( и ) для дробного калькулятора.
+* Поддерживает маркеры целой части (⥑, ⥏) и сложных выражений (⥾, ⥿).
+* @param {string} bracket - '(' или ')'
+*/
 export function addBracketFraction(bracket) {
   clearErrorIfNeeded();
 
+  // ======================== ОТКРЫВАЮЩАЯ СКОБКА '(' ========================
   if (bracket === '(') {
-    // Если текущий дисплей равен '0' или включен флаг нового ввода, 
-    // скобка должна ПОЛНОСТЬЮ заменить ноль, а не приклеиться к нему!
-    if (appState.isNewInput || appState.display === '0') {
-      appState.display = '(';
+    let lastChar = '';
+    let shouldReplace = false;
+
+    if (appState.isNewInput || appState.display === '0' || appState.display === '') {
+      shouldReplace = true;
+      if (appState.expression && appState.expression.length > 0) {
+        lastChar = appState.expression.slice(-1);
+      } else {
+        lastChar = '';
+      }
     } else {
-      // Если пользователь ввел, например, "2" и нажал "(", это превратится в "2(" 
-      appState.display += '(';
+      lastChar = appState.display.slice(-1);
     }
+
+    const isLastCharDigitOrDot = /[\d.]/.test(lastChar);
+    const marker = isLastCharDigitOrDot ? MARKERS.WHOLE_START : MARKERS.COMPLEX_NUM_START;
+
+    if (shouldReplace) {
+      appState.display = marker;
+    } else {
+      appState.display += marker;
+    }
+
     appState.isNewInput = false;
-    return; // Не забываем return
+    return;
   }
-  else if (bracket === ')') {
-    const current = appState.display;
-    const mixedMatch = current.match(/^(-?\d+)\(([^()]+)\)$/);
-    if (mixedMatch) {
-      const whole = mixedMatch[1];
-      const inner = mixedMatch[2];
-      if (inner.includes('÷')) {
-        const parts = inner.split('÷');
-        if (parts.length === 2 && parts[0].match(/^\d+$/) && parts[1].match(/^\d+$/)) {
-          appState.display = `${whole}⥑${parts[0]}÷${parts[1]}⥏`;
-          appState.isNewInput = false;
-          return;
-        }
+
+  // ======================== ЗАКРЫВАЮЩАЯ СКОБКА ')' ========================
+  if (bracket === ')') {
+    const fullExpr = (appState.expression || '') + (appState.display || '');
+    const stack = getUnclosedMarkersStack(fullExpr); // только сложные маркеры
+
+    // Если есть незакрытые сложные маркеры – закрываем последний
+    if (stack.length > 0) {
+      appState.display += MARKERS.COMPLEX_END;
+      appState.isNewInput = false;
+      return;
+    }
+
+    // Если сложных нет, проверяем наличие незакрытой целой части (⥑ без ⥏)
+    const lastWholeStartIdx = fullExpr.lastIndexOf(MARKERS.WHOLE_START);
+    let hasUnclosedWhole = false;
+    if (lastWholeStartIdx !== -1) {
+      const afterWhole = fullExpr.substring(lastWholeStartIdx + 1);
+      if (!afterWhole.includes(MARKERS.WHOLE_END)) {
+        hasUnclosedWhole = true;
       }
     }
-    appState.display += ')';
-    appState.isNewInput = false;
+
+    if (hasUnclosedWhole) {
+      // Закрываем целую часть
+      appState.display += MARKERS.WHOLE_END;
+      appState.isNewInput = false;
+      return;
+    }
+
+    // Если стек пуст и нет незакрытой целой части – ничего не делаем (игнорируем лишнюю закрывающую скобку)
+    // Это предотвращает появление непарной ')' в выражениях типа 3+4)
+    return;
   }
 }
 
@@ -196,81 +234,6 @@ export function toggleSignFraction() {
     appState.isNewInput = false;
   }
 }
-
-/*
-// ---- преобразование десятичной -> обычная ( .: ) ---- 
-export function decimalToFraction() {
-  clearErrorIfNeeded();
-
-  // Если на экране уже дробь, то ничего делать не нужно
-  if (appState.display.includes('÷') || appState.display.includes('⥑')) {
-    return;
-  }
-
-  let value = parseFloat(appState.display);
-  if (isNaN(value)) {
-    appState.display = 'ERROR';
-    return;
-  }
-
-  if (value === 0) {
-    appState.display = '0';
-    appState.isNewInput = true;
-    return;
-  }
-
-  try {
-    const frac = new FractionJS(value);
-    const num = Math.abs(Number(frac.n));
-    const den = Math.abs(Number(frac.d));
-    const signStr = value < 0 ? '-' : '';
-
-    const whole = Math.floor(num / den);
-    const remainder = num % den;
-
-    let resultStr = '';
-    if (whole !== 0 && remainder !== 0) {
-      resultStr = `${signStr}${whole}⥑${remainder}÷${den}⥏`;
-    } else if (whole !== 0) {
-      resultStr = `${signStr}${whole}`;
-    } else {
-      resultStr = `${signStr}${remainder}÷${den}`;
-    }
-
-    appState.display = resultStr;
-
-    // Очищаем expression, чтобы дробь не дублировалась на экране!
-    if (appState.expression !== undefined) {
-      appState.expression = '';
-    }
-
-    // Ставим true, чтобы этот результат вел себя как готовое число,
-    // и ввод новых цифр начинался заново, а не приклеивался к дроби
-    appState.isNewInput = true;
-
-  } catch (e) {
-    console.error(e);
-    appState.display = 'ERROR';
-  }
-}
-
-
-// ---- преобразование обычной -> десятичная ( :. ) ----
-export function fractionToDecimal() {
-  clearErrorIfNeeded();
-  const expr = appState.display;
-  try {
-    let normalized = expr.replace(/⥑/g, ' ').replace(/÷/g, '/').replace(/⥏/g, '');
-    const frac = new FractionJS(normalized);
-    const decimal = frac.valueOf();
-    appState.display = String(decimal);
-    appState.isNewInput = false;
-  } catch (e) {
-    console.error(e);
-    appState.display = 'ERROR';
-  }
-}
-*/
 
 // ---- преобразование десятичной -> обычная ( .: ) ---- 
 export function decimalToFraction() {
@@ -336,7 +299,6 @@ export function decimalToFraction() {
     appState.display = 'ERROR';
   }
 }
-
 
 // ---- преобразование обычной -> десятичная ( :. ) ----
 export function fractionToDecimal() {

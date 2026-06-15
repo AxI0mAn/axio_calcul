@@ -130,3 +130,9 @@ class AppState {
 }
 
 export const appState = new AppState;
+
+// ВРЕМЕННО: делаем appState глобальным для тестирования (удалить после проверки)
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.testAppState = appState;
+}

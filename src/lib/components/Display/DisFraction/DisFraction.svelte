@@ -322,12 +322,18 @@
 			+ .super-exponent {
 				// Опускаем чуть ниже по сравнению со скобочной степенью
 				font-size: 0.75rem;
-				transform: translateX(-0.4rem) translateY(0.7em);
+				transform: translateX(-0.4rem) translateY(0.7rem);
 				margin-left: 1px;
 			}
 		}
 	}
 	$fontSizeFractionPart: 1rem;
+
+	// === -📝=TODO=📝- ===
+	.history-section .history-steps-block .step-line .math-text + .super-exponent {
+		color: red;
+		transform: translateX(-0.4rem) translateY(2rem);
+	}
 
 	.fraction-container {
 		max-width: fit-content;
