@@ -131,78 +131,6 @@ export function addOperatorFraction(op) {
   appState.isNewInput = true;
 }
 
-// ---- скобки ----
-/**
-* Обработчик нажатия скобок ( и ) для дробного калькулятора.
-* Поддерживает маркеры целой части (⥑, ⥏) и сложных выражений (⥾, ⥿).
-* @param {string} bracket - '(' или ')'
-*/
-export function addBracketFraction(bracket) {
-  clearErrorIfNeeded();
-
-  // ======================== ОТКРЫВАЮЩАЯ СКОБКА '(' ========================
-  if (bracket === '(') {
-    let lastChar = '';
-    let shouldReplace = false;
-
-    if (appState.isNewInput || appState.display === '0' || appState.display === '') {
-      shouldReplace = true;
-      if (appState.expression && appState.expression.length > 0) {
-        lastChar = appState.expression.slice(-1);
-      } else {
-        lastChar = '';
-      }
-    } else {
-      lastChar = appState.display.slice(-1);
-    }
-
-    const isLastCharDigitOrDot = /[\d.]/.test(lastChar);
-    const marker = isLastCharDigitOrDot ? MARKERS.WHOLE_START : MARKERS.COMPLEX_NUM_START;
-
-    if (shouldReplace) {
-      appState.display = marker;
-    } else {
-      appState.display += marker;
-    }
-
-    appState.isNewInput = false;
-    return;
-  }
-
-  // ======================== ЗАКРЫВАЮЩАЯ СКОБКА ')' ========================
-  if (bracket === ')') {
-    const fullExpr = (appState.expression || '') + (appState.display || '');
-    const stack = getUnclosedMarkersStack(fullExpr); // только сложные маркеры
-
-    // Если есть незакрытые сложные маркеры – закрываем последний
-    if (stack.length > 0) {
-      appState.display += MARKERS.COMPLEX_END;
-      appState.isNewInput = false;
-      return;
-    }
-
-    // Если сложных нет, проверяем наличие незакрытой целой части (⥑ без ⥏)
-    const lastWholeStartIdx = fullExpr.lastIndexOf(MARKERS.WHOLE_START);
-    let hasUnclosedWhole = false;
-    if (lastWholeStartIdx !== -1) {
-      const afterWhole = fullExpr.substring(lastWholeStartIdx + 1);
-      if (!afterWhole.includes(MARKERS.WHOLE_END)) {
-        hasUnclosedWhole = true;
-      }
-    }
-
-    if (hasUnclosedWhole) {
-      // Закрываем целую часть
-      appState.display += MARKERS.WHOLE_END;
-      appState.isNewInput = false;
-      return;
-    }
-
-    // Если стек пуст и нет незакрытой целой части – ничего не делаем (игнорируем лишнюю закрывающую скобку)
-    // Это предотвращает появление непарной ')' в выражениях типа 3+4)
-    return;
-  }
-}
 
 // ---- смена знака +/- ----
 export function toggleSignFraction() {
@@ -344,6 +272,230 @@ export function fractionToPower2() {
   appState.isNewInput = false;
 }
 
+// ---- скобки ----
+/**
+* Обработчик нажатия скобок ( и ) для дробного калькулятора.
+* Поддерживает маркеры целой части (⥑, ⥏) и сложных выражений (⥾, ⥿).
+* @param {string} bracket - '(' или ')'
+*/
+export function addBracketFraction(bracket) {
+  clearErrorIfNeeded();
+
+  // ======================== ОТКРЫВАЮЩАЯ СКОБКА '(' ========================
+  if (bracket === '(') {
+    let lastChar = '';
+    let shouldReplace = false;
+
+    if (appState.isNewInput || appState.display === '0' || appState.display === '') {
+      shouldReplace = true;
+      if (appState.expression && appState.expression.length > 0) {
+        lastChar = appState.expression.slice(-1);
+      } else {
+        lastChar = '';
+      }
+    } else {
+      lastChar = appState.display.slice(-1);
+    }
+
+    const isLastCharDigitOrDot = /[\d.]/.test(lastChar);
+    const marker = isLastCharDigitOrDot ? MARKERS.WHOLE_START : MARKERS.COMPLEX_NUM_START;
+
+    if (shouldReplace) {
+      appState.display = marker;
+    } else {
+      appState.display += marker;
+    }
+
+    appState.isNewInput = false;
+    return;
+  }
+
+  // ======================== ЗАКРЫВАЮЩАЯ СКОБКА ')' ========================
+  if (bracket === ')') {
+    const fullExpr = (appState.expression || '') + (appState.display || '');
+    const stack = getUnclosedMarkersStack(fullExpr); // только сложные маркеры
+
+    // Если есть незакрытые сложные маркеры – закрываем последний
+    if (stack.length > 0) {
+      appState.display += MARKERS.COMPLEX_END;
+      appState.isNewInput = false;
+      return;
+    }
+
+    // Если сложных нет, проверяем наличие незакрытой целой части (⥑ без ⥏)
+    const lastWholeStartIdx = fullExpr.lastIndexOf(MARKERS.WHOLE_START);
+    let hasUnclosedWhole = false;
+    if (lastWholeStartIdx !== -1) {
+      const afterWhole = fullExpr.substring(lastWholeStartIdx + 1);
+      if (!afterWhole.includes(MARKERS.WHOLE_END)) {
+        hasUnclosedWhole = true;
+      }
+    }
+
+    if (hasUnclosedWhole) {
+      // Закрываем целую часть
+      appState.display += MARKERS.WHOLE_END;
+      appState.isNewInput = false;
+      return;
+    }
+
+    // Если стек пуст и нет незакрытой целой части – ничего не делаем (игнорируем лишнюю закрывающую скобку)
+    // Это предотвращает появление непарной ')' в выражениях типа 3+4)
+    return;
+  }
+}
+
+/**
+ * Автодополнение пустых или незавершённых скобок в выражении.
+ * - Удаляет пары пустых скобок: "3()" → "3"
+ * - Удаляет конечный оператор (кроме ÷) внутри скобок: "(1÷2+)" → "(1÷2)"
+ * - Не трогает ошибочные конструкции вида "(1÷)" или "(÷2)" (оставляет для дальнейшей обработки)
+ *
+ * @param {string} expr - исходное выражение с круглыми скобками
+ * @returns {string} - выражение с исправленными скобками
+ */
+export function autoCompleteEmptyBrackets(expr) {
+  let result = expr;
+  let changed = false;
+
+  do {
+    changed = false;
+    result = result.replace(/\(([^()]*)\)/g, (match, content) => {
+      // Случай 1: пустое содержимое -> удаляем пару скобок
+      if (content === "") {
+        changed = true;
+        return "";
+      }
+
+      // Случай 2: содержимое состоит только из операторов (кроме ÷? разрешим любые, но ÷ сам по себе не оператор, а разделитель)
+      // Удаляем такие скобки полностью, так как внутри нет чисел
+      if (/^[\+\-\*\/÷]+$/.test(content)) {
+        changed = true;
+        return "";
+      }
+
+      // Случай 3: содержимое заканчивается на оператор + - * / (не на ÷)
+      // и после удаления этого оператора содержимое не пусто и не состоит только из операторов
+      if (/[\+\-\*\/]$/.test(content)) {
+        const trimmed = content.slice(0, -1);
+        if (trimmed !== "" && !/^[\+\-\*\/÷]+$/.test(trimmed)) {
+          changed = true;
+          return "(" + trimmed + ")";
+        }
+      }
+
+      // Все остальные случаи (в том числе (1÷), (÷2), (1÷2)) – без изменений
+      return match;
+    });
+  } while (changed);
+
+  return result;
+}
+
+/**
+ * Вставляет явный знак умножения '*' в местах неявного умножения.
+ * Поддерживает обычные скобки () и маркеры ⥑, ⥾ (открывающие) и ⥏, ⥿ (закрывающие).
+ * 
+ * Правила:
+ * - число( или число⥑/⥾ → число*(
+ * - )( или ⥏/⥿)( → )*(
+ * - )число или ⥏/⥿)число → )*число
+ * - )число( → )*число*(
+ * 
+ * Не вставляет, если после закрывающей скобки идёт '÷' (обрабатывается на шаге 10).
+ *
+ * @param {string} expr - исходное выражение (может содержать маркеры)
+ * @returns {string} - выражение с явными '*'
+ */
+function insertImplicitMultiplication(expr) {
+  if (!expr) return expr;
+
+  // Определяем группы символов для открывающих и закрывающих скобок (включая маркеры)
+  const openBrackets = `\\(${MARKERS.WHOLE_START}${MARKERS.COMPLEX_NUM_START}`;
+  const closeBrackets = `\\)${MARKERS.WHOLE_END}${MARKERS.COMPLEX_END}`;
+
+  let result = expr;
+
+  // 1. число или закрывающая скобка, за которыми идёт открывающая скобка -> вставляем *
+  const pattern1 = new RegExp(`(\\d|[${closeBrackets}])([${openBrackets}])`, 'g');
+  result = result.replace(pattern1, '$1*$2');
+
+  // 2. )число( — между ними вставляем * после числа и перед открывающей скобкой
+  const pattern2 = new RegExp(`([${closeBrackets}])(\\d+)([${openBrackets}])`, 'g');
+  result = result.replace(pattern2, '$1*$2*$3');
+
+  // 3. )число в конце или перед чем-то, кроме '÷' -> вставляем * после )
+  const pattern3 = new RegExp(`([${closeBrackets}])(\\d+)(?![÷])`, 'g');
+  result = result.replace(pattern3, '$1*$2');
+
+  return result;
+}
+
+/**
+ * Преобразует смешанные дроби вида [−]число(выражение)÷ в [−]число+(выражение)÷
+ * Поддерживает обычные скобки () и маркеры ⥑/⥾ (открывающие) и ⥏/⥿ (закрывающие).
+ * Ищет сбалансированные скобки, следующие сразу за целым числом (с опциональным минусом),
+ * и проверяет, что после закрывающей скобки идёт символ '÷'.
+ *
+ * @param {string} expr - выражение (может содержать маркеры)
+ * @returns {string} - преобразованное выражение
+ */
+function transformMixedFractionWithDivision(expr) {
+  if (!expr) return expr;
+
+  const openBrackets = ['(', MARKERS.WHOLE_START, MARKERS.COMPLEX_NUM_START];
+  const closeBrackets = [')', MARKERS.WHOLE_END, MARKERS.COMPLEX_END];
+
+  function findMatchingClose(str, startIdx) {
+    const openChar = str[startIdx];
+    const openIndex = openBrackets.indexOf(openChar);
+    if (openIndex === -1) return -1;
+    const closeChar = closeBrackets[openIndex];
+    let stack = 1;
+    let idx = startIdx + 1;
+    while (idx < str.length && stack > 0) {
+      const ch = str[idx];
+      if (ch === openChar) stack++;
+      else if (ch === closeChar) stack--;
+      idx++;
+    }
+    return stack === 0 ? idx - 1 : -1;
+  }
+
+  let result = expr;
+  let i = 0;
+  while (i < result.length) {
+    // Пропускаем возможный знак минуса перед числом
+    let sign = '';
+    if (result[i] === '-') {
+      sign = '-';
+      i++;
+    }
+    // Ищем цифры числа
+    if (i < result.length && /\d/.test(result[i])) {
+      let numStart = i;
+      while (i < result.length && /\d/.test(result[i])) i++;
+      let numEnd = i;
+      // Восстанавливаем полное число с учётом знака
+      const fullNum = sign + result.slice(numStart, numEnd);
+      // Проверяем, что после числа идёт открывающая скобка
+      if (numEnd < result.length && openBrackets.includes(result[numEnd])) {
+        let openPos = numEnd;
+        let closePos = findMatchingClose(result, openPos);
+        if (closePos !== -1 && closePos + 1 < result.length && result[closePos + 1] === '÷') {
+          const bracketPart = result.slice(openPos, closePos + 1);
+          const replacement = fullNum + '+' + bracketPart + '÷';
+          result = result.slice(0, numStart - (sign ? 1 : 0)) + replacement + result.slice(closePos + 2);
+          i = numStart - (sign ? 1 : 0) + replacement.length;
+          continue;
+        }
+      }
+    }
+    i++;
+  }
+  return result;
+}
+
 /**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
@@ -358,6 +510,12 @@ export function evaluateFraction() {
     return;
   }
 
+  // === АВТОДОПОЛНЕНИЕ ПУСТЫХ СКОБОК (только для display) ===
+  const fixedDisplay = autoCompleteEmptyBrackets(appState.display);
+  if (fixedDisplay !== appState.display) {
+    appState.display = fixedDisplay;
+  }
+
   // Собираем полное выражение: склеиваем накопленную цепочку (expression) и текущий ввод (display)
   let fullExpr = '';
   if (appState.expression === '') {
@@ -365,10 +523,22 @@ export function evaluateFraction() {
   } else {
     fullExpr = appState.expression + appState.display;
   }
+
+  // Дополнительное автодополнение для склеенного выражения
+  fullExpr = autoCompleteEmptyBrackets(fullExpr);
   fullExpr = fullExpr.trim();
 
   // Предохранитель: если выражение пустое или равно нулю, ничего не делаем
   if (fullExpr === '' || fullExpr === '0') return;
+
+  // === ТРАНСФОРМАЦИЯ СМЕШАННОЙ ДРОБИ (число(выражение)÷ → число+(выражение)÷) ===
+  fullExpr = transformMixedFractionWithDivision(fullExpr);
+
+  // === ВСТАВКА НЕЯВНОГО УМНОЖЕНИЯ ===
+  fullExpr = insertImplicitMultiplication(fullExpr);
+
+  // === ПОВТОРНАЯ ВСТАВКА НЕЯВНОГО УМНОЖЕНИЯ (на случай новых паттернов) ===
+  fullExpr = insertImplicitMultiplication(fullExpr);
 
   // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
   // Считаем количество открывающих и закрывающих скобок во всей строке
@@ -474,16 +644,48 @@ export function clearFraction() {
 }
 
 // ---- backspace ⌫ ----
+/**
+ * Обработчик кнопки backspace.
+ * Защищает структуру дроби: если expression заканчивается на '÷',
+ * удаление происходит только из display (знаменатель).
+ * Если display пуст, удаление блокируется.
+ * В остальных случаях – стандартное удаление из display.
+ */
 export function backspaceFraction() {
+  // Обработка состояния ошибки
   if (isError()) {
     appState.display = '0';
     appState.isNewInput = true;
     return;
   }
+
+  // === ЗАЩИТА СТРУКТУРЫ ДРОБИ ===
+  // Если expression оканчивается на '÷', значит мы находимся в режиме ввода знаменателя
+  if (appState.expression.endsWith('÷')) {
+    // Если display пуст (ничего не введено в знаменателе) – блокируем удаление
+    if (appState.display === '' || appState.display === '0') {
+      return; // ничего не делаем
+    }
+    // Удаляем символ из display (знаменатель)
+    if (appState.display.length > 1) {
+      appState.display = appState.display.slice(0, -1);
+    } else {
+      appState.display = ''; // знаменатель стал пустым, но не ставим '0', чтобы пользователь мог ввести цифры
+    }
+    return;
+  }
+
+  // === СТАНДАРТНОЕ УДАЛЕНИЕ (все остальные случаи) ===
   if (appState.display.length > 1) {
     appState.display = appState.display.slice(0, -1);
   } else {
-    appState.display = '0';
+    appState.display = '';
     appState.isNewInput = true;
   }
+}
+
+
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.testTransformMixed = transformMixedFractionWithDivision;
 }
