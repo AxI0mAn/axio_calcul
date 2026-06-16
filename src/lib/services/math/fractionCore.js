@@ -174,6 +174,18 @@ function tokenizeFractionExpression(expr) {
     const ch = expr[i];
     if (ch === ' ') { i++; continue; }
 
+    // Обработка маркеров сложных выражений (⥾ и ⥿) как обычных скобок
+    if (ch === MARKERS.COMPLEX_NUM_START) {
+      tokens.push({ type: 'operator', value: '(' });
+      i++;
+      continue;
+    }
+    if (ch === MARKERS.COMPLEX_END) {
+      tokens.push({ type: 'operator', value: ')' });
+      i++;
+      continue;
+    }
+
     // Натыкаемся на открывающую скобку 
     if (ch === '(') {
       if (tokens.length > 0 && tokens[tokens.length - 1].type === 'number') {
@@ -344,19 +356,29 @@ function tokenizeFractionExpression(expr) {
 }
 
 function applyOperator(op, a, b = null) {
-  const left = toFraction(a);
-
-  // Если унарный корень, b будет отсутствовать
   if (op === '√') {
+    const left = toFraction(a);
     return left.sqrt();
   }
 
+  const left = toFraction(a);
   const right = toFraction(b);
+
+  // Отдельная ветка для оператора '/' – десятичное деление
+  if (op === '/') {
+    const leftNum = left.toDecimal();
+    const rightNum = right.toDecimal();
+    if (rightNum === 0) throw new Error('Division by zero');
+    const result = leftNum / rightNum;
+    return Fraction.fromDecimal(result);
+  }
+
+  // Для всех остальных бинарных операторов (включая '÷') – дробная арифметика
   switch (op) {
     case '+': return left.add(right);
     case '-': return left.sub(right);
     case '*': return left.mul(right);
-    case '/': return left.div(right);
+    case '÷': return left.div(right);
     case '^': return left.pow(right);
     default: throw new Error(`Unknown operator ${op}`);
   }
@@ -466,9 +488,8 @@ export function evaluateFractionExpression(expression) {
         case '+': result = applyOperator('+', a, b); break;
         case '-': result = applyOperator('-', a, b); break;
         case '*': result = applyOperator('*', a, b); break;
-        case '/':
-        case '÷': result = applyOperator('/', a, b); break;
-
+        case '/': result = applyOperator('/', a, b); break;   // десятичное деление
+        case '÷': result = applyOperator('÷', a, b); break;   // дробное деление
         case '^': {
           // b.den === 1 означает, что степень целая (например, 8÷1, а не дробная)
           if (b.den === 1) {
@@ -500,4 +521,21 @@ export function evaluateFractionExpression(expression) {
 
   if (stack.length !== 1) throw new Error('Invalid expression: stack mismatch');
   return stack[0];
+}
+
+
+// === -📝=TODO=📝- ===
+// ВРЕМЕННО: для ручного тестирования (удалить после проверки)
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.testEvaluate = function (expr) {
+    try {
+      const result = evaluateFractionExpression(expr);
+      console.log('Результат для "' + expr + '":', result.toMixedString(), 'десятичное:', result.toDecimal());
+      return result;
+    } catch (e) {
+      console.error('Ошибка:', e.message);
+      return null;
+    }
+  };
 }

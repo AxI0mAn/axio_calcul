@@ -9,7 +9,7 @@ export function toSuperscript(numStr) {
   return numStr.split('').map(char => superscripts[char] || char).join('');
 }
 
-// Обратная функция для очистки математического выражения перед расчетом
+// Обратная функция для очистки математического выражения перед расчетом 
 export function fromSuperscript(superStr) {
   const map = {
     '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
