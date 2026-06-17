@@ -73,10 +73,12 @@
 	<div class="history-section" bind:this={historyContain}>
 		{#each tokenizedHistory as entry}
 			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
-				<div class="history-steps-block">
+				<div class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}">
 					{#each entry.steps as step, idx}
 						<div class="step-line">
-							{#if idx > 0}<span class="math-text"> = </span>{/if}
+							{#if idx > 0}
+								<span class="math-text equal-prefix"> = </span>
+							{/if}
 
 							{#if step === 'ERROR'}
 								<span class="math-text notValid">ERROR</span>
@@ -109,6 +111,10 @@
 										</div>
 									{/if}
 								{/each}
+							{/if}
+
+							{#if idx < entry.steps.length - 1}
+								<span class="math-text equal-postfix"> =</span>
 							{/if}
 						</div>
 					{/each}
@@ -441,6 +447,27 @@
 		transform: translateX(-0.4rem) translateY(-0.8em);
 		margin-left: 2px; /* Отступ от скобки, чтобы не липла */
 		margin-right: 2px; /* Отступ перед знаком равенства */
+	}
+
+	.history-steps-block.is-multistep {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px; /* Отступ между шагами решения */
+		padding: 10px 0;
+	}
+
+	.history-steps-block.is-multistep .step-line {
+		display: flex;
+		align-items: center;
+		width: 100%;
+	}
+
+	/* Красивое выравнивание знака равенства на новой строке */
+	.history-steps-block.is-multistep .equal-prefix {
+		margin-right: 8px;
+		color: #00ffca; /* Ваш неоновый цвет операторов, если применимо */
+		font-weight: bold;
 	}
 
 	.history-section::-webkit-scrollbar {

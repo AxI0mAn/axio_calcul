@@ -8,6 +8,7 @@
 import { appState } from '$lib/store/appState.svelte.js';
 import { Fraction, evaluateFractionExpression } from './fractionCore.js';
 import { MARKERS, getUnclosedMarkersStack } from './fractionVisualParser.js';
+import { generateSteps } from './fractionSteps.js';
 import { toSuperscript, fromSuperscript } from "$lib/utils/toSuperscript";
 import FractionJS from 'fraction.js';
 
@@ -604,10 +605,17 @@ export function evaluateFraction() {
     }
 
     // 5. ЗАПИСЬ В ИСТОРИЮ СЕССИИ
-    // Добавляем красивую строку с автоматически закрытыми скобками в массив истории
+    // Проверяем флаг подробных шагов из appState
+    let finalStepsArray = [fullExpr, displayStr];
+
+    if (appState.stepsFraction) {
+      // Генерируем подробную цепочку шагов, передавая подготовленное cleanExpr и готовый результат
+      finalStepsArray = generateSteps(cleanExpr, resultFraction);
+    }
+
     appState.historySession.push({
       type: 'fractionSteps',
-      steps: [fullExpr, displayStr]
+      steps: finalStepsArray
     });
 
     // Обновляем состояние дисплея для пользователя
@@ -618,11 +626,18 @@ export function evaluateFraction() {
   } catch (err) {
     console.error('Evaluation error:', err);
 
-    // 1. В историю сессии отправляем исходное выражение и текстовый маркер 'ERROR'
-    // Компонент DisFraction.svelte отобразит это в истории как: 1÷0+5 = ERROR
+    // В случае ошибки при включенных шагах — получаем шаги до места сбоя + "ERROR"
+    let errorStepsArray = [fullExpr, 'ERROR'];
+    if (appState.stepsFraction) {
+      errorStepsArray = generateSteps(fromSuperscript(fullExpr));
+      if (errorStepsArray[errorStepsArray.length - 1] !== 'ERROR') {
+        errorStepsArray.push('ERROR');
+      }
+    }
+
     appState.historySession.push({
       type: 'fractionSteps',
-      steps: [fullExpr, 'ERROR']
+      steps: errorStepsArray
     });
 
     // 2. КАК ДОЛЖНО БЫТЬ: переводим главный дисплей в режим ожидания (выводим "0")
@@ -685,7 +700,24 @@ export function backspaceFraction() {
 }
 
 
+// === -📝=TODO=📝- ===
 if (typeof window !== 'undefined') {
-  // @ts-ignore
-  window.testTransformMixed = transformMixedFractionWithDivision;
+  // Импортируем созданную функцию шагов динамически или через привязку к window в точке инициализации
+  // Для простоты теста в консоли, привяжем функцию шагов к window внутри fractionActions или прямо здесь
+  import('./fractionSteps.js').then(module => {
+    // @ts-ignore
+    window.testSteps = function (expr) {
+      try {
+        const result = module.generateSteps(expr);
+        console.log(`%c[STEPS TEST] для: "${expr}"`, 'color: #00ffca; font-weight: bold;');
+        result.forEach((step, index) => {
+          console.log(`  Шаг ${index + 1}: ${step}`);
+        });
+        return result;
+      } catch (e) {
+        console.error('Ошибка генератора шагов:', e.message);
+      }
+    };
+    console.log('%c[Хирургический Дебаггер] Тест window.testSteps() готов к работе.', 'color: #ff0055;');
+  });
 }

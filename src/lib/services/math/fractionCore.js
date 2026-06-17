@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 /**
- * fractionCore.js – точная арифметика дробей + парсер выражений 
+ * src/lib/services/math/fractionCore.js – точная арифметика дробей + парсер выражений 
  */
 
 import { appStore } from '$lib/store/appStore.svelte.js';
