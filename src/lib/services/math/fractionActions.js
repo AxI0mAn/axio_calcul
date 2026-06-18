@@ -483,8 +483,14 @@ function transformMixedFractionWithDivision(expr) {
         let openPos = numEnd;
         let closePos = findMatchingClose(result, openPos);
         if (closePos !== -1 && closePos + 1 < result.length && result[closePos + 1] === '÷') {
+          // Если число отрицательное – пропускаем, т.к. оно уже обработано в transformNegativeMixedNumber
+          if (fullNum.startsWith('-')) {
+            i++;
+            continue;
+          }
           const bracketPart = result.slice(openPos, closePos + 1);
-          const replacement = fullNum + '+' + bracketPart + '÷';
+          // const replacement = fullNum + '+' + bracketPart + '÷';
+          const replacement = '(' + fullNum + '+' + bracketPart + ')' + '÷';
           result = result.slice(0, numStart - (sign ? 1 : 0)) + replacement + result.slice(closePos + 2);
           i = numStart - (sign ? 1 : 0) + replacement.length;
           continue;
@@ -585,6 +591,72 @@ function transformMixedNumberWithoutDivision(expr) {
 }
 
 /**
+ * Преобразует -число(выражение)÷ в -(число+выражение)÷.
+ * Работает с маркерами ⥑ и ⥏.
+ * 
+ * Пример: "-3⥑1÷2⥏÷4" → "-(3+⥑1÷2⥏)÷4"
+ * 
+ * Проверяет, что внутри маркеров ровно одна операция '÷' и нет других операторов.
+ * Если условие не выполнено – оставляет строку без изменений.
+ *
+ * @param {string} expr - выражение с маркерами
+ * @returns {string} - преобразованное выражение
+ */
+function transformNegativeMixedNumber(expr) {
+  if (!expr) return expr;
+
+  const OPEN = MARKERS.WHOLE_START;   // '⥑'
+  const CLOSE = MARKERS.WHOLE_END;    // '⥏'
+
+  function findMatchingCloseMarker(str, startIdx) {
+    if (str[startIdx] !== OPEN) return -1;
+    let stack = 1;
+    let i = startIdx + 1;
+    while (i < str.length && stack > 0) {
+      if (str[i] === OPEN) stack++;
+      else if (str[i] === CLOSE) stack--;
+      i++;
+    }
+    return stack === 0 ? i - 1 : -1;
+  }
+
+  let result = expr;
+  let i = 0;
+
+  while (i < result.length) {
+    const match = result.slice(i).match(/^-(\d+)⥑/);
+    if (match) {
+      const fullMatch = match[0];
+      const numberPart = match[1];
+      const numStart = i;
+      const openPos = i + fullMatch.length - 1;
+      const closePos = findMatchingCloseMarker(result, openPos);
+      if (closePos !== -1) {
+        const content = result.slice(openPos + 1, closePos);
+        const hasDiv = content.includes('÷');
+        const hasOtherOps = /[\+\-\*]/.test(content);
+        const isSimpleFraction = hasDiv && !hasOtherOps;
+        const nextChar = (closePos + 1 < result.length) ? result[closePos + 1] : '';
+        const followedByDiv = (nextChar === '÷');
+
+        if (isSimpleFraction && followedByDiv) {
+          const bracketPart = result.slice(openPos, closePos + 1);
+          const restAfterDiv = result.slice(closePos + 1); // начинается с ÷ и далее
+          const replacement = `-1(${numberPart}+${bracketPart})${restAfterDiv}`;
+          result = result.slice(0, numStart) + replacement;
+          i = numStart + replacement.length;
+          continue;
+        }
+      }
+      i += fullMatch.length;
+    } else {
+      i++;
+    }
+  }
+  return result;
+}
+
+/**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
  * передает выражение в математическое ядро и управляет выводом результата или ERROR.
@@ -598,40 +670,30 @@ export function evaluateFraction() {
     return;
   }
 
-  // === АВТОДОПОЛНЕНИЕ ПУСТЫХ СКОБОК (только для display) ===
+  // === АВТОДОПОЛНЕНИЕ ПУСТЫХ СКОБОК ===
   const fixedDisplay = autoCompleteEmptyBrackets(appState.display);
   if (fixedDisplay !== appState.display) {
     appState.display = fixedDisplay;
   }
 
-  // Собираем полное выражение: склеиваем накопленную цепочку (expression) и текущий ввод (display)
-  let fullExpr = '';
-  if (appState.expression === '') {
-    fullExpr = appState.display;
-  } else {
-    fullExpr = appState.expression + appState.display;
-  }
-
-  // Дополнительное автодополнение для склеенного выражения
+  // Собираем полное выражение
+  let fullExpr = (appState.expression || '') + (appState.display || '');
   fullExpr = autoCompleteEmptyBrackets(fullExpr);
-  fullExpr = fullExpr.trim();
 
-  // Предохранитель: если выражение пустое или равно нулю, ничего не делаем
-  if (fullExpr === '' || fullExpr === '0') return;
-
-  // === ТРАНСФОРМАЦИЯ СМЕШАННОЙ ДРОБИ (число(выражение)÷ → число+(выражение)÷) ===
-  fullExpr = transformMixedFractionWithDivision(fullExpr);
-
-  // === ТРАНСФОРМАЦИЯ СМЕШАННОГО ЧИСЛА БЕЗ ЗНАМЕНАТЕЛЯ (число⥑дробь⥏ → число+⥑дробь⥏) ===
+  // === ШАГ 10.5: трансформация смешанных чисел без знаменателя ===
   fullExpr = transformMixedNumberWithoutDivision(fullExpr);
 
-  // === ВСТАВКА НЕЯВНОГО УМНОЖЕНИЯ ===
+  // === ОБРАБОТКА ОТРИЦАТЕЛЬНЫХ СМЕШАННЫХ ЧИСЕЛ С ДЕЛЕНИЕМ (шаг 10.6) ===
+  fullExpr = transformNegativeMixedNumber(fullExpr);
+
+  // === ШАГ 10: трансформация дробей с целой частью и знаменателем ===
+  fullExpr = transformMixedFractionWithDivision(fullExpr);
+
+  // === ШАГ 8: вставка неявного умножения (дважды) ===
+  fullExpr = insertImplicitMultiplication(fullExpr);
   fullExpr = insertImplicitMultiplication(fullExpr);
 
-  // === ПОВТОРНАЯ ВСТАВКА НЕЯВНОГО УМНОЖЕНИЯ (на случай новых паттернов) ===
-  fullExpr = insertImplicitMultiplication(fullExpr);
-
-  // === ПРЕОБРАЗОВАНИЕ МАРКЕРОВ В ОБЫЧНЫЕ СКОБКИ ДЛЯ ЯДРА ===
+  // === ПРЕОБРАЗОВАНИЕ МАРКЕРОВ В ОБЫЧНЫЕ СКОБКИ ===
   fullExpr = stripMarkers(fullExpr);
 
   // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
@@ -688,13 +750,14 @@ export function evaluateFraction() {
 
     if (mixed.whole !== 0 && mixed.num !== 0) {
       // Смешанная дробь с маркерами начала и конца дробной части (целое⥑числитель÷знаменатель⥏)
-      displayStr = `${mixed.whole}⥑${mixed.num}÷${mixed.den}⥏`;
+      displayStr = `${mixed.whole}⥑${Math.abs(mixed.num)}÷${mixed.den}⥏`;
     } else if (mixed.whole !== 0) {
       // Только целое число
       displayStr = `${mixed.whole}`;
     } else {
-      // Простая дробь без целой части
-      displayStr = `${mixed.num}÷${mixed.den}`;
+      // Для отрицательной чистой дроби знак определяется числителем resultFraction
+      const sign = resultFraction.num < 0 ? '-' : '';
+      displayStr = `${sign}${Math.abs(mixed.num)}÷${mixed.den}`;
     }
 
     // 5. ЗАПИСЬ В ИСТОРИЮ СЕССИИ
