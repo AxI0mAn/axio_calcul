@@ -26,6 +26,70 @@ function clearErrorIfNeeded() {
   }
 }
 
+// ---- вспомогательные функции для проверки готовности маркеров к закрытию ----
+// ---- вспомогательные функции для проверки готовности маркеров к закрытию ----
+/**
+ * Проверяет, есть ли незакрытая сложная скобка (⥾) в выражении.
+ */
+function hasUnclosedComplexMarker(expr) {
+  const stack = getUnclosedMarkersStack(expr);
+  return stack.length > 0;
+}
+
+/**
+ * Проверяет, есть ли незакрытая целая часть (⥑ без ⥏).
+ */
+function hasUnclosedWholePart(expr) {
+  const open = (expr.match(/⥑/g) || []).length;
+  const close = (expr.match(/⥏/g) || []).length;
+  return open > close;
+}
+
+/**
+ * Проверяет, завершён ли ввод числителя (внутри последней открытой ⥾).
+ * Условия: нет незакрытых круглых скобок внутри и последний символ display — цифра или ')'.
+ */
+function isNumeratorReadyToClose(expr, display) {
+  const lastOpen = expr.lastIndexOf(MARKERS.COMPLEX_NUM_START);
+  if (lastOpen === -1) return false;
+  const inside = expr.substring(lastOpen + 1);
+  // Если внутри нет знака ÷, значит, пользователь не вводил дробь — числитель ещё не готов к закрытию
+  if (!inside.includes(MARKERS.DIV)) return false;
+  // Проверяем баланс скобок
+  let openParens = 0, closeParens = 0;
+  for (const ch of inside) {
+    if (ch === '(') openParens++;
+    if (ch === ')') closeParens++;
+    if (ch === MARKERS.COMPLEX_END) return false; // уже закрыт
+  }
+  if (openParens > closeParens) return false;
+  // Проверяем, что после последнего ÷ есть завершённый операнд
+  const lastChar = display.slice(-1);
+  return /[\d)]/.test(lastChar);
+}
+
+/**
+ * Проверяет, завершена ли целая часть (внутри последней открытой ⥑).
+ * Аналогично, но для маркера ⥑.
+ */
+function isWholePartReadyToClose(expr, display) {
+  const lastOpen = expr.lastIndexOf(MARKERS.WHOLE_START);
+  if (lastOpen === -1) return false;
+
+  const inside = expr.substring(lastOpen + 1);
+  let openParens = 0, closeParens = 0;
+  for (const ch of inside) {
+    if (ch === '(') openParens++;
+    if (ch === ')') closeParens++;
+    if (ch === MARKERS.WHOLE_END) return false;
+  }
+  if (openParens > closeParens) return false;
+
+  const lastChar = display.slice(-1);
+  return /[\d)]/.test(lastChar);
+}
+// --------------------------------------------
+
 // ---- цифры и точка ----
 export function addDigitFraction(digit) {
   clearErrorIfNeeded();
@@ -71,6 +135,8 @@ export function addDigitFraction(digit) {
 // ---- операторы + - * / ÷ √ ^ ---- 
 export function addOperatorFraction(op) {
   clearErrorIfNeeded();
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG] addOperatorFraction called with op =', op, 'display =', appState.display, 'expression =', appState.expression);
 
   const lastChar = appState.display.slice(-1);
 
@@ -102,9 +168,12 @@ export function addOperatorFraction(op) {
   // 3. Защита для знака деления ÷
   if (op === '÷') {
     if (appState.display === '0' && appState.expression === '') return;
-    // Запрещаем ставить деление после любого оператора, точки или открывающей скобки
     if (/[\+\-\*\/÷\^\.\(√]$/.test(appState.display)) return;
 
+    const fullExpr = (appState.expression || '') + (appState.display || '');
+    if (hasUnclosedComplexMarker(fullExpr) && isNumeratorReadyToClose(fullExpr, appState.display)) {
+      appState.display += MARKERS.COMPLEX_END; // ⥿
+    }
     appState.display += '÷';
     appState.isNewInput = false;
     return;
@@ -112,7 +181,6 @@ export function addOperatorFraction(op) {
 
   // 4. Обычные операторы (+ - * /)
   if ((appState.display === '0' || appState.display === '') && appState.expression === '') {
-    // Разрешаем унарный минус в начале ввода
     if (op === '-') {
       appState.display = op;
       appState.isNewInput = false;
@@ -120,8 +188,20 @@ export function addOperatorFraction(op) {
     return;
   }
 
-  // Запрещаем ставить бинарный оператор после другого оператора или точки
   if (/[\+\-\*\/÷\^\.√]$/.test(appState.display) && !appState.isNewInput) return;
+
+  const fullExpr = (appState.expression || '') + (appState.display || '');
+  // === -📝=TODO=📝- ===
+  console.log('[LOG-20.2] Проверка закрытия целой части: fullExpr=', fullExpr, 'display=', appState.display);
+  console.log('[LOG-20.2] !hasUnclosedComplexMarker=', !hasUnclosedComplexMarker(fullExpr));
+  console.log('[LOG-20.2] hasUnclosedWholePart=', hasUnclosedWholePart(fullExpr));
+  console.log('[LOG-20.2] isWholePartReadyToClose=', isWholePartReadyToClose(fullExpr, appState.display));
+  // Закрываем целую часть, если знаменатель закрыт, целая часть открыта и завершена
+  if (!hasUnclosedComplexMarker(fullExpr) &&
+    hasUnclosedWholePart(fullExpr) &&
+    isWholePartReadyToClose(fullExpr, appState.display)) {
+    appState.display += MARKERS.WHOLE_END; // ⥏
+  }
 
   if (appState.isNewInput && appState.expression !== '') {
     appState.expression = appState.expression.slice(0, -1) + op;
@@ -297,8 +377,9 @@ export function addBracketFraction(bracket) {
       lastChar = appState.display.slice(-1);
     }
 
-    const isLastCharDigitOrDot = /[\d.]/.test(lastChar);
-    const marker = isLastCharDigitOrDot ? MARKERS.WHOLE_START : MARKERS.COMPLEX_NUM_START;
+    // ВСЕГДА создаём сложную скобку (⥾) для группировки числителя/знаменателя.
+    // Целая часть (⥑) не должна создаваться через обычную скобку.
+    const marker = MARKERS.COMPLEX_NUM_START;
 
     if (shouldReplace) {
       appState.display = marker;
@@ -657,6 +738,68 @@ function transformNegativeMixedNumber(expr) {
 }
 
 /**
+ * Преобразует смешанные числа с маркерами ⥾...⥿ в число+дробь.
+ * Ищет паттерн: -?(\d+)⥾(дробь)⥿, где внутри ⥾...⥿ ровно одна операция '÷' и нет других операторов.
+ * Заменяет на: -?(\d+)+⥾(дробь)⥿ (т.е. добавляет '+' между числом и открывающей скобкой).
+ * Если после ⥿ идёт '÷', преобразование не выполняется (это обрабатывается отдельно).
+ * @param {string} expr - выражение с маркерами
+ * @returns {string} - преобразованное выражение
+ */
+function transformMixedNumberWithComplexBrackets(expr) {
+  if (!expr) return expr;
+
+  const OPEN = MARKERS.COMPLEX_NUM_START;   // '⥾'
+  const CLOSE = MARKERS.COMPLEX_END;        // '⥿'
+
+  function findMatchingClose(str, startIdx) {
+    if (str[startIdx] !== OPEN) return -1;
+    let stack = 1;
+    let i = startIdx + 1;
+    while (i < str.length && stack > 0) {
+      if (str[i] === OPEN) stack++;
+      else if (str[i] === CLOSE) stack--;
+      i++;
+    }
+    return stack === 0 ? i - 1 : -1;
+  }
+
+  let result = expr;
+  let i = 0;
+
+  while (i < result.length) {
+    // Ищем паттерн: необязательный минус, затем цифры, затем OPEN
+    let match = result.slice(i).match(/^(-?\d+)⥾/);
+    if (match) {
+      const fullMatch = match[0];
+      const numberPart = match[1];
+      const numStart = i;
+      const openPos = i + fullMatch.length - 1;
+      const closePos = findMatchingClose(result, openPos);
+      if (closePos !== -1) {
+        const content = result.slice(openPos + 1, closePos);
+        const hasDiv = content.includes('÷');
+        const hasOtherOps = /[\+\-\*]/.test(content);
+        const isSimpleFraction = hasDiv && !hasOtherOps;
+        const nextChar = (closePos + 1 < result.length) ? result[closePos + 1] : '';
+        const followedByDiv = (nextChar === '÷');
+
+        if (isSimpleFraction && !followedByDiv) {
+          // Заменяем "число⥾" на "число+⥾"
+          const replacement = numberPart + '+' + OPEN;
+          result = result.slice(0, numStart) + replacement + result.slice(numStart + fullMatch.length);
+          i = numStart + replacement.length;
+          continue;
+        }
+      }
+      i += fullMatch.length;
+    } else {
+      i++;
+    }
+  }
+  return result;
+}
+
+/**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
  * передает выражение в математическое ядро и управляет выводом результата или ERROR.
@@ -680,14 +823,35 @@ export function evaluateFraction() {
   let fullExpr = (appState.expression || '') + (appState.display || '');
   fullExpr = autoCompleteEmptyBrackets(fullExpr);
 
+  // === АВТОЗАКРЫТИЕ НЕЗАКРЫТЫХ МАРКЕРОВ (⥾/⥿ и ⥑/⥏) ===
+  // 1. Закрываем все незакрытые сложные скобки (числители)
+  let stack = getUnclosedMarkersStack(fullExpr);
+  while (stack.length > 0) {
+    fullExpr += MARKERS.COMPLEX_END;
+    stack.pop();
+  }
+
+  // 2. Закрываем все незакрытые целые части
+  let openWhole = (fullExpr.match(/⥑/g) || []).length;
+  let closeWhole = (fullExpr.match(/⥏/g) || []).length;
+  while (openWhole > closeWhole) {
+    fullExpr += MARKERS.WHOLE_END;
+    closeWhole++;
+  }
+
   // === ШАГ 10.5: трансформация смешанных чисел без знаменателя ===
   fullExpr = transformMixedNumberWithoutDivision(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('[LOG-EVAL] После автозакрытия fullExpr =', fullExpr);
 
   // === ОБРАБОТКА ОТРИЦАТЕЛЬНЫХ СМЕШАННЫХ ЧИСЕЛ С ДЕЛЕНИЕМ (шаг 10.6) ===
   fullExpr = transformNegativeMixedNumber(fullExpr);
 
   // === ШАГ 10: трансформация дробей с целой частью и знаменателем ===
   fullExpr = transformMixedFractionWithDivision(fullExpr);
+
+  // === ПРЕОБРАЗОВАНИЕ СМЕШАННЫХ ДРОБЕЙ С МАРКЕРАМИ ⥾...⥿ ===
+  fullExpr = transformMixedNumberWithComplexBrackets(fullExpr);
 
   // === ШАГ 8: вставка неявного умножения (дважды) ===
   fullExpr = insertImplicitMultiplication(fullExpr);
