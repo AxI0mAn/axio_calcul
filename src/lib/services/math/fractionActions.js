@@ -7,7 +7,7 @@
 /* eslint-disable no-unused-vars */
 import { appState } from '$lib/store/appState.svelte.js';
 import { Fraction, evaluateFractionExpression } from './fractionCore.js';
-import { MARKERS, getUnclosedMarkersStack } from './fractionVisualParser.js';
+import { MARKERS, getUnclosedMarkersStack, stripMarkers } from './fractionVisualParser.js';
 import { generateSteps } from './fractionSteps.js';
 import { toSuperscript, fromSuperscript } from "$lib/utils/toSuperscript";
 import FractionJS from 'fraction.js';
@@ -131,7 +131,6 @@ export function addOperatorFraction(op) {
   appState.display = '0';
   appState.isNewInput = true;
 }
-
 
 // ---- смена знака +/- ----
 export function toggleSignFraction() {
@@ -498,6 +497,94 @@ function transformMixedFractionWithDivision(expr) {
 }
 
 /**
+ * Преобразует смешанные числа без знаменателя вида число⥑дробь⥏ в число+⥑дробь⥏.
+ * Работает с маркерами целой части ⥑ и ⥏.
+ * 
+ * Паттерн: -?(\d+)⥑ ... ⥏ , где внутри между ⥑ и ⥏ ровно одна операция '÷' и нет других операторов.
+ * 
+ * Пример: "2⥑1÷2⥏+3⥑1÷3⥏" → "2+⥑1÷2⥏+3+⥑1÷3⥏"
+ *         "-2⥑1÷2⥏+3⥑1÷3⥏" → "-(2+⥑1÷2⥏)+3+⥑1÷3⥏"
+ * 
+ * Если внутри есть другие операторы, или после ⥏ идёт ÷, или нет ÷ внутри – преобразование не выполняется.
+ *
+ * @param {string} expr - выражение с маркерами ⥑ и ⥏
+ * @returns {string} - преобразованное выражение
+ */
+function transformMixedNumberWithoutDivision(expr) {
+  if (!expr) return expr;
+
+  const OPEN = MARKERS.WHOLE_START;   // '⥑'
+  const CLOSE = MARKERS.WHOLE_END;    // '⥏'
+
+  // Вспомогательная функция для поиска парного закрывающего маркера
+  function findMatchingCloseMarker(str, startIdx) {
+    if (str[startIdx] !== OPEN) return -1;
+    let stack = 1;
+    let i = startIdx + 1;
+    while (i < str.length && stack > 0) {
+      if (str[i] === OPEN) stack++;
+      else if (str[i] === CLOSE) stack--;
+      i++;
+    }
+    return stack === 0 ? i - 1 : -1;
+  }
+
+  let result = expr;
+  let i = 0;
+
+  while (i < result.length) {
+    // Ищем паттерн: необязательный минус, затем цифры, затем OPEN
+    let match = result.slice(i).match(/^(-?\d+)⥑/);
+    if (match) {
+      const fullMatch = match[0];
+      const numberPart = match[1]; // может содержать минус
+      const numStart = i;
+      const openPos = i + fullMatch.length - 1; // позиция символа ⥑
+      const closePos = findMatchingCloseMarker(result, openPos);
+      if (closePos !== -1) {
+        // Содержимое между ⥑ и ⥏
+        const content = result.slice(openPos + 1, closePos);
+        // Проверяем условия: ровно один ÷, нет других операторов + - *
+        const hasDiv = content.includes('÷');
+        const hasOtherOps = /[\+\-\*]/.test(content);
+        const isSimpleFraction = hasDiv && !hasOtherOps;
+        // Проверяем, не идёт ли после закрывающего маркера символ ÷ (случай шага 10)
+        const nextChar = (closePos + 1 < result.length) ? result[closePos + 1] : '';
+        const followedByDiv = (nextChar === '÷');
+
+        if (isSimpleFraction && !followedByDiv) {
+          // Формируем замену
+          const numberWithoutSign = numberPart.startsWith('-') ? numberPart.slice(1) : numberPart;
+          const sign = numberPart.startsWith('-') ? '-' : '';
+          const bracketPart = result.slice(openPos, closePos + 1); // включает ⥑...⥏
+
+          let replacement;
+          if (sign === '-') {
+            // Отрицательное: -(число+дробь)
+            replacement = `-1(${numberWithoutSign}+${content})`;
+          } else {
+            // Положительное: число+(дробь)
+            replacement = `${numberPart}+${bracketPart}`;
+          }
+
+          // Заменяем в строке
+          result = result.slice(0, numStart) + replacement + result.slice(closePos + 1);
+          // Сдвигаем указатель на конец замены
+          i = numStart + replacement.length;
+          continue;
+        }
+      }
+      // Если не подошло, пропускаем этот фрагмент
+      i += fullMatch.length;
+    } else {
+      i++;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
  * передает выражение в математическое ядро и управляет выводом результата или ERROR.
@@ -535,11 +622,17 @@ export function evaluateFraction() {
   // === ТРАНСФОРМАЦИЯ СМЕШАННОЙ ДРОБИ (число(выражение)÷ → число+(выражение)÷) ===
   fullExpr = transformMixedFractionWithDivision(fullExpr);
 
+  // === ТРАНСФОРМАЦИЯ СМЕШАННОГО ЧИСЛА БЕЗ ЗНАМЕНАТЕЛЯ (число⥑дробь⥏ → число+⥑дробь⥏) ===
+  fullExpr = transformMixedNumberWithoutDivision(fullExpr);
+
   // === ВСТАВКА НЕЯВНОГО УМНОЖЕНИЯ ===
   fullExpr = insertImplicitMultiplication(fullExpr);
 
   // === ПОВТОРНАЯ ВСТАВКА НЕЯВНОГО УМНОЖЕНИЯ (на случай новых паттернов) ===
   fullExpr = insertImplicitMultiplication(fullExpr);
+
+  // === ПРЕОБРАЗОВАНИЕ МАРКЕРОВ В ОБЫЧНЫЕ СКОБКИ ДЛЯ ЯДРА ===
+  fullExpr = stripMarkers(fullExpr);
 
   // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
   // Считаем количество открывающих и закрывающих скобок во всей строке
@@ -700,24 +793,12 @@ export function backspaceFraction() {
 }
 
 
-// === -📝=TODO=📝- ===
 if (typeof window !== 'undefined') {
-  // Импортируем созданную функцию шагов динамически или через привязку к window в точке инициализации
-  // Для простоты теста в консоли, привяжем функцию шагов к window внутри fractionActions или прямо здесь
-  import('./fractionSteps.js').then(module => {
-    // @ts-ignore
-    window.testSteps = function (expr) {
-      try {
-        const result = module.generateSteps(expr);
-        console.log(`%c[STEPS TEST] для: "${expr}"`, 'color: #00ffca; font-weight: bold;');
-        result.forEach((step, index) => {
-          console.log(`  Шаг ${index + 1}: ${step}`);
-        });
-        return result;
-      } catch (e) {
-        console.error('Ошибка генератора шагов:', e.message);
-      }
-    };
-    console.log('%c[Хирургический Дебаггер] Тест window.testSteps() готов к работе.', 'color: #ff0055;');
-  });
+  // @ts-ignore
+  window.testTransformMixed = function (expr) {
+    const result = transformMixedNumberWithoutDivision(expr);
+    console.log('Вход:  ', expr);
+    console.log('Выход: ', result);
+    return result;
+  };
 }

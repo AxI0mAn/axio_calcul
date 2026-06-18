@@ -15,7 +15,7 @@ class AppState {
   /** @type {string} */
   corner = $state('deg'); // Флаг как работаем с тригонометрией deg, rad, grad
   /** @type {boolean} */
-  stepsFraction = $state(true); // === -📝=TODO=📝- === $state(false); // флаг как работаем с дробями. Раскладываем на шаги вычислений или нет?
+  stepsFraction = $state(false); // флаг как работаем с дробями. Раскладываем на шаги вычислений или нет?
   /** @type {number} */
   // numToFix = $state(appStore.toFix); //Количество знаков после запятой для результата вычисления
   /** @type {string} */
