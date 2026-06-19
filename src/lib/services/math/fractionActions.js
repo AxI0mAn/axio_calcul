@@ -53,19 +53,16 @@ function isNumeratorReadyToClose(expr, display) {
   const lastOpen = expr.lastIndexOf(MARKERS.COMPLEX_NUM_START);
   if (lastOpen === -1) return false;
   const inside = expr.substring(lastOpen + 1);
-  // Если внутри нет знака ÷, значит, пользователь не вводил дробь — числитель ещё не готов к закрытию
-  if (!inside.includes(MARKERS.DIV)) return false;
-  // Проверяем баланс скобок
   let openParens = 0, closeParens = 0;
   for (const ch of inside) {
     if (ch === '(') openParens++;
     if (ch === ')') closeParens++;
     if (ch === MARKERS.COMPLEX_END) return false; // уже закрыт
   }
-  if (openParens > closeParens) return false;
-  // Проверяем, что после последнего ÷ есть завершённый операнд
+  if (openParens > closeParens) return false; // есть незакрытые скобки внутри
+  // Дополнительное условие: последний символ display — ')' (явное закрытие)
   const lastChar = display.slice(-1);
-  return /[\d)]/.test(lastChar);
+  return lastChar === ')';
 }
 
 /**
@@ -75,7 +72,6 @@ function isNumeratorReadyToClose(expr, display) {
 function isWholePartReadyToClose(expr, display) {
   const lastOpen = expr.lastIndexOf(MARKERS.WHOLE_START);
   if (lastOpen === -1) return false;
-
   const inside = expr.substring(lastOpen + 1);
   let openParens = 0, closeParens = 0;
   for (const ch of inside) {
@@ -84,9 +80,8 @@ function isWholePartReadyToClose(expr, display) {
     if (ch === MARKERS.WHOLE_END) return false;
   }
   if (openParens > closeParens) return false;
-
   const lastChar = display.slice(-1);
-  return /[\d)]/.test(lastChar);
+  return lastChar === ')';
 }
 // --------------------------------------------
 
@@ -800,6 +795,65 @@ function transformMixedNumberWithComplexBrackets(expr) {
 }
 
 /**
+ * Форматирует выражение для отображения в истории.
+ * Вставляет '*' между числом и скобкой, если внутри скобок не простая дробь.
+ * Заменяет маркеры ⥾/⥿ и ⥑/⥏ на обычные скобки.
+ * @param {string} expr - выражение с маркерами (после автозакрытия)
+ * @returns {string} - отформатированное выражение для истории
+ */
+function formatHistoryExpr(expr) {
+  if (!expr) return expr;
+
+  const OPEN = MARKERS.COMPLEX_NUM_START;   // '⥾'
+  const CLOSE = MARKERS.COMPLEX_END;        // '⥿'
+
+  function findMatchingClose(str, startIdx) {
+    if (str[startIdx] !== OPEN) return -1;
+    let stack = 1;
+    let i = startIdx + 1;
+    while (i < str.length && stack > 0) {
+      if (str[i] === OPEN) stack++;
+      else if (str[i] === CLOSE) stack--;
+      i++;
+    }
+    return stack === 0 ? i - 1 : -1;
+  }
+
+  let result = '';
+  let i = 0;
+  while (i < expr.length) {
+    const match = expr.slice(i).match(/^(\d+)⥾/);
+    if (match) {
+      const number = match[1];
+      const openPos = i + match[0].length - 1;
+      const closePos = findMatchingClose(expr, openPos);
+      if (closePos !== -1) {
+        const content = expr.slice(openPos + 1, closePos);
+        const divCount = (content.match(/÷/g) || []).length;
+        const hasOtherOps = /[\+\-\*]/.test(content);
+        const isSimpleFraction = divCount === 1 && !hasOtherOps;
+
+        if (!isSimpleFraction) {
+          // Вставляем '*' между числом и открывающей скобкой
+          result += number + '*' + OPEN;
+          i += number.length + 1; // пропускаем число и OPEN
+          continue;
+        }
+      }
+    }
+    result += expr[i];
+    i++;
+  }
+
+  // Заменяем маркеры на обычные скобки
+  return result
+    .replace(/⥾/g, '(')
+    .replace(/⥿/g, ')')
+    .replace(/⥑/g, '(')
+    .replace(/⥏/g, ')');
+}
+
+/**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
  * передает выражение в математическое ядро и управляет выводом результата или ERROR.
@@ -838,6 +892,9 @@ export function evaluateFraction() {
     fullExpr += MARKERS.WHOLE_END;
     closeWhole++;
   }
+  // --- СОХРАНЯЕМ ВЕРСИЮ ДЛЯ ИСТОРИИ (БЕЗ ДОБАВЛЕННЫХ ПЛЮСОВ) ---
+  const historyExpr = fullExpr;
+  const historyDisplayExpr = formatHistoryExpr(historyExpr);
 
   // === ШАГ 10.5: трансформация смешанных чисел без знаменателя ===
   fullExpr = transformMixedNumberWithoutDivision(fullExpr);
@@ -926,7 +983,7 @@ export function evaluateFraction() {
 
     // 5. ЗАПИСЬ В ИСТОРИЮ СЕССИИ
     // Проверяем флаг подробных шагов из appState
-    let finalStepsArray = [fullExpr, displayStr];
+    let finalStepsArray = [historyDisplayExpr, displayStr];
 
     if (appState.stepsFraction) {
       // Генерируем подробную цепочку шагов, передавая подготовленное cleanExpr и готовый результат
@@ -947,7 +1004,7 @@ export function evaluateFraction() {
     console.error('Evaluation error:', err);
 
     // В случае ошибки при включенных шагах — получаем шаги до места сбоя + "ERROR"
-    let errorStepsArray = [fullExpr, 'ERROR'];
+    let errorStepsArray = [historyDisplayExpr, 'ERROR'];
     if (appState.stepsFraction) {
       errorStepsArray = generateSteps(fromSuperscript(fullExpr));
       if (errorStepsArray[errorStepsArray.length - 1] !== 'ERROR') {
