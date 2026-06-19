@@ -57,6 +57,20 @@
 			? Object.values(menuMaps).find((group) => group.some((item) => pathPage.endsWith(item.href)))
 			: null
 	);
+
+	// отображение истории из других режимов
+	/**
+	 * Возвращает строковое представление записи истории для отображения в дробном режиме,
+	 * если это обычная строка (не объект fractionSteps).
+	 * Для объектов fractionSteps используется существующая логика токенизации.
+	 */
+	function getStringEntry(entry) {
+		if (typeof entry === 'string') return entry;
+		if (entry && entry.type === 'fractionSteps' && Array.isArray(entry.steps)) {
+			return entry.steps[entry.steps.length - 1] || '';
+		}
+		return String(entry);
+	}
 </script>
 
 <div class="display-box">
@@ -73,6 +87,7 @@
 	<div class="history-section" bind:this={historyContain}>
 		{#each tokenizedHistory as entry}
 			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
+				<!-- Рендеринг дробного пошагового решения (без изменений) -->
 				<div class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}">
 					{#each entry.steps as step, idx}
 						<div class="step-line">
@@ -119,7 +134,12 @@
 						</div>
 					{/each}
 				</div>
-			{:else}{/if}
+			{:else}
+				<!-- Отображение обычной строки -->
+				<p class="history-text-entry">
+					{getStringEntry(entry)}
+				</p>
+			{/if}
 		{/each}
 	</div>
 	<!-- Блок вычислений -->

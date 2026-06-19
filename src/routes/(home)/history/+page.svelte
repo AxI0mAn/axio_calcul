@@ -1,8 +1,17 @@
 <script>
+	// src/routes/(home)/history/+page.svelte - страница с историей предыдущих вычислений
 	// @ts-ignore
 	import { base } from '$app/paths';
-	import Catalog from '$lib/assets/svgIcon/catalog.svg?raw';
 	import { historyStore } from '$lib/store/historyStore.svelte';
+
+	// функция, которая извлекает строку из записи:
+	function getDisplayValue(item) {
+		if (typeof item === 'string') return item;
+		if (item && item.type === 'fractionSteps' && Array.isArray(item.steps)) {
+			return item.steps[item.steps.length - 1] || '';
+		}
+		return String(item);
+	}
 </script>
 
 <h1 class="header">history of calculated</h1>
@@ -20,7 +29,7 @@
 
 				<ul class="history-lines">
 					{#each record.items as line}
-						<li>{line}</li>
+						<li>{getDisplayValue(line)}</li>
 					{/each}
 				</ul>
 			</div>
