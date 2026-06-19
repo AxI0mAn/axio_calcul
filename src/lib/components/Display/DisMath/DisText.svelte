@@ -10,8 +10,6 @@
 	import { longpress } from '$lib/actions/longpress';
 	import { btnMemo } from '$lib/utils/btnMemo';
 
-	import { tick } from 'svelte';
-
 	// history
 	let historyContain = $state(); // В Svelte 5 ссылки на элементы тоже можно инициализировать через $state
 
@@ -51,6 +49,23 @@
 			? Object.values(menuMaps).find((group) => group.some((item) => pathPage.endsWith(item.href)))
 			: null
 	);
+
+	/**
+	 * Преобразует запись истории в строку для отображения в не-дробном режиме.
+	 * Если запись — объект типа fractionSteps, возвращает последний шаг (результат вычисления).
+	 * @param {string|Object} entry - элемент массива appState.historySession
+	 * @returns {string} - строка для отображения
+	 */
+	function getHistoryDisplay(entry) {
+		if (typeof entry === 'string') return entry;
+		if (entry && entry.type === 'fractionSteps' && Array.isArray(entry.steps)) {
+			// Берём последний элемент — это результат вычисления
+			const lastStep = entry.steps[entry.steps.length - 1];
+			return lastStep || '';
+		}
+		// Страховка для других типов объектов
+		return String(entry);
+	}
 </script>
 
 <div class="display-box">
@@ -65,12 +80,9 @@
 	{/if}
 	<!-- Блок истории вычислений -->
 	<div bind:this={historyContain} class="history-section">
-		<!-- {#each appState.historySession as entry}
-			<p>{entry}</p>
-		{/each} -->
 		{#each appState.historySession as entry}
-			<p use:longpress onlongpress={() => btnMemo(null, true, entry)}>
-				{entry}
+			<p use:longpress onlongpress={() => btnMemo(null, true, getHistoryDisplay(entry))}>
+				{getHistoryDisplay(entry)}
 			</p>
 		{/each}
 	</div>

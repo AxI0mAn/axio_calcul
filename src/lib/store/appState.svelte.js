@@ -4,6 +4,7 @@
 
 // import { appStore } from "./appStore.svelte";
 import { historyStore } from "./historyStore.svelte";
+import { convertFractionToDecimalIfNeeded } from '$lib/utils/convertFractionToDecimalIfNeeded';
 
 class AppState {
   /** @type {string} */
@@ -24,6 +25,7 @@ class AppState {
   // Метод для переключения режима 
   setMode(mode) {
     this.now_mode = mode;
+    ensureDisplayIsDecimalIfNeeded(); // добавить после смены режима
   }
 
   // ========= ячейки памяти
@@ -131,8 +133,26 @@ class AppState {
 
 export const appState = new AppState;
 
-// ВРЕМЕННО: делаем appState глобальным для тестирования (удалить после проверки)
-if (typeof window !== 'undefined') {
-  // @ts-ignore
-  window.testAppState = appState;
+// если произошёл переход из режима дробей в другой режим, то число в appState.display  преобразуем в десятичную дробь
+
+/**
+* Проверяет, находится ли калькулятор в не-дробном режиме и содержит ли дисплей дробь.
+* Если оба условия истинны – преобразует display в десятичное число.
+* 
+* Использование:
+* - вызывать при переключении режима (setMode) для актуализации отображения;
+* - вызывать при загрузке сохранённого состояния, если режим изменился;
+* - может быть использована в других местах, где требуется гарантировать, что display
+*   представлен в десятичном виде для не-дробного режима.
+*/
+function ensureDisplayIsDecimalIfNeeded() {
+  // Если режим дробный – оставляем как есть
+  if (appState.now_mode === 'FRACTION') return;
+
+  const displayStr = String(appState.display);
+  // Если на дисплее нет символов дроби – преобразование не требуется
+  if (!displayStr.includes('÷') && !displayStr.includes('⥑')) return;
+
+  // Преобразуем дробь в десятичное число
+  appState.display = convertFractionToDecimalIfNeeded(displayStr);
 }

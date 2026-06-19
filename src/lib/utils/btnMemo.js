@@ -1,5 +1,8 @@
 // src/lib/utils/btnMemo.js
 import { appState } from '../store/appState.svelte.js';
+import { convertFractionToDecimalIfNeeded } from './convertFractionToDecimalIfNeeded.js';
+
+
 
 /**
  * Логика работы кнопок памяти M1-M4
@@ -31,7 +34,8 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
   // --- СЦЕНАРИЙ 1: Двойной клик (Извлечение копии без удаления) ---
   if (isDoubleClick && slot && !sourceData) {
     if (currentValueInMemo !== null) {
-      let val = String(currentValueInMemo);
+      // Преобразуем дробь в десятичную, если нужно
+      let val = String(convertFractionToDecimalIfNeeded(currentValueInMemo));
       // Сначала очищаем от пробелов
       let cleanVal = val.trim();
       // Если в конце конструкция с "M", извлекаем само число
@@ -87,7 +91,8 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
     appState.isNewInput = true;
   } else {
     // ВЫДАЧА (ИЗВЛЕЧЕНИЕ)
-    let val = String(currentValueInMemo);
+    // Преобразуем дробь в десятичную, если нужно
+    let val = String(convertFractionToDecimalIfNeeded(currentValueInMemo));
     const lastChar = String(appState.display).slice(-1);
     // const preLastChar = val.slice(-1);
     const isOperator = ['+', '-', '*', '/'].includes(lastChar);
@@ -128,4 +133,5 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
       appState.memoryUpdate(slot, null);
     }
   }
-} 
+}
+

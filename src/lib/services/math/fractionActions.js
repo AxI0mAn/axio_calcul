@@ -242,6 +242,17 @@ export function toggleSignFraction() {
 export function decimalToFraction() {
   clearErrorIfNeeded();
 
+  // Убираем внешние скобки, если они есть вокруг десятичного числа
+  function extractNumberFromDisplay(str) {
+    const trimmed = str.trim();
+    // Поддерживает: (0.5), (-0.5), (.5), (-.5), (5), (-5)
+    const match = trimmed.match(/^\((-?\d*\.?\d+)\)$/);
+    if (match) {
+      return match[1];
+    }
+    return trimmed;
+  }
+
   // Если на экране уже дробь, то ничего делать не нужно
   if (appState.display.includes('÷') || appState.display.includes('⥑')) {
     return;
@@ -250,7 +261,8 @@ export function decimalToFraction() {
   // Фиксируем исходное значение для записи в историю сессии
   const originalDisplay = appState.display;
 
-  let value = parseFloat(appState.display);
+  const numberStr = extractNumberFromDisplay(appState.display);
+  let value = parseFloat(numberStr);
   if (isNaN(value)) {
     appState.display = 'ERROR';
     return;
@@ -733,9 +745,9 @@ function transformNegativeMixedNumber(expr) {
 }
 
 /**
- * Преобразует смешанные числа с маркерами ⥾...⥿ в число+дробь.
+ * Преобразует смешанные числа с маркерами ⥾...⥿ в (число+дробь).
  * Ищет паттерн: -?(\d+)⥾(дробь)⥿, где внутри ⥾...⥿ ровно одна операция '÷' и нет других операторов.
- * Заменяет на: -?(\d+)+⥾(дробь)⥿ (т.е. добавляет '+' между числом и открывающей скобкой).
+ * Заменяет на: (число+дробь) (т.е. добавляет внешние скобки и '+' между числом и дробью).
  * Если после ⥿ идёт '÷', преобразование не выполняется (это обрабатывается отдельно).
  * @param {string} expr - выражение с маркерами
  * @returns {string} - преобразованное выражение
@@ -779,9 +791,10 @@ function transformMixedNumberWithComplexBrackets(expr) {
         const followedByDiv = (nextChar === '÷');
 
         if (isSimpleFraction && !followedByDiv) {
-          // Заменяем "число⥾" на "число+⥾"
-          const replacement = numberPart + '+' + OPEN;
-          result = result.slice(0, numStart) + replacement + result.slice(numStart + fullMatch.length);
+          // Заменяем "число⥾дробь⥿" на "(число+⥾дробь⥿)"
+          const bracketPart = result.slice(openPos, closePos + 1); // включает ⥾...⥿
+          const replacement = '(' + numberPart + '+' + bracketPart + ')';
+          result = result.slice(0, numStart) + replacement + result.slice(closePos + 1);
           i = numStart + replacement.length;
           continue;
         }
@@ -898,8 +911,6 @@ export function evaluateFraction() {
 
   // === ШАГ 10.5: трансформация смешанных чисел без знаменателя ===
   fullExpr = transformMixedNumberWithoutDivision(fullExpr);
-  // === -📝=TODO=📝- ===
-  console.log('[LOG-EVAL] После автозакрытия fullExpr =', fullExpr);
 
   // === ОБРАБОТКА ОТРИЦАТЕЛЬНЫХ СМЕШАННЫХ ЧИСЕЛ С ДЕЛЕНИЕМ (шаг 10.6) ===
   fullExpr = transformNegativeMixedNumber(fullExpr);
