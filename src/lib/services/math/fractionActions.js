@@ -368,6 +368,8 @@ export function fractionToPower2() {
 export function addBracketFraction(bracket) {
   clearErrorIfNeeded();
 
+  console.log('appState.historySession' + appState.historySession)
+
   // ======================== ОТКРЫВАЮЩАЯ СКОБКА '(' ========================
   if (bracket === '(') {
     let lastChar = '';

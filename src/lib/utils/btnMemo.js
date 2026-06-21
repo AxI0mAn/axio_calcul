@@ -3,7 +3,6 @@ import { appState } from '../store/appState.svelte.js';
 import { convertFractionToDecimalIfNeeded } from './convertFractionToDecimalIfNeeded.js';
 
 
-
 /**
  * Логика работы кнопок памяти M1-M4
  * @param {string} slot - Имя ячейки ('M1', 'M2', 'M3', 'M4')
