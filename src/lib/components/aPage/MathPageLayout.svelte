@@ -4,7 +4,7 @@
 	 * src/lib/components/aPage/MathPageLayout.svelte
 	 */
 
-	let { buttons, ads, nowMode = 'amoca' } = $props();
+	let { buttons, ads, nowMode = 'amoca', display, btnDigit, btnBaseOp } = $props();
 
 	// ------------- ссылки с учётом локализации в будущем
 	// @ts-ignore
@@ -13,9 +13,6 @@
 
 	import { appState } from '$lib/store/appState.svelte';
 
-	import BtnBlockDigit from '$lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte';
-	import BtnBlockOp from '$lib/components/Btn/BtnBlockBase/BtnBlockOp.svelte';
-	import DisText from '$lib/components/Display/DisMath/DisText.svelte';
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
 	import LinkBlockNav from '$lib/components/Links/LinkBlockNav.svelte';
 
@@ -26,9 +23,9 @@
 
 	import { onMount } from 'svelte';
 	import { handleCalculatorKey } from '$lib/utils/keyboardHandler.js';
-	import { addDigit, addOperator, performCalculation } from '$lib/services/math/mathActions.svelte';
-	import { addDecimal, backspace, clear } from '$lib/services/math/mathBaseBtn';
-	import { percentage, toPower, bigFactorial } from '$lib/services/math/opBtnBasic';
+	import { addDigit, addOperator, performCalculation } from '$lib/services/math/mathActions.js';
+	import { addDecimal, backspace, clear } from '$lib/services/math/mathBaseBtn.js';
+	import { percentage, toPower, bigFactorial } from '$lib/services/math/opBtnBasic.js';
 
 	// поддержка ввода с клавиатуры на ПК
 	onMount(() => {
@@ -58,7 +55,7 @@
 	<aside class="field_left"></aside>
 	<main class="field_main basic">
 		<div class="field_displayPad">
-			<DisText />
+			{@render display()}
 		</div>
 		<div class="fieldBtn_page withScroll">
 			<div class="fieldBtn_basic">
@@ -69,10 +66,10 @@
 			<BtnBlockMemo />
 		</div>
 		<div class="fieldBtn_digitPad">
-			<BtnBlockDigit />
+			{@render btnDigit()}
 		</div>
 		<div class="fieldBtn_basicOperators">
-			<BtnBlockOp />
+			{@render btnBaseOp()}
 		</div>
 		<div class="fieldBtn_nav">
 			<LinkBlockNav />
@@ -118,6 +115,9 @@
 			justify-content: flex-start;
 			align-items: center;
 			overflow-x: scroll;
+			.fieldBtn_basic {
+				min-width: 100%;
+			}
 		}
 
 		.fieldBtn_memory {

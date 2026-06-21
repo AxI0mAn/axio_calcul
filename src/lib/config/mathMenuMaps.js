@@ -11,8 +11,8 @@ import mathEngineerWebp from '$lib/assets/iconPic/64/png_math_engineer.webp';
 import mathEngineerJpeg from '$lib/assets/iconPic/64/png_math_engineer.jpeg';
 import mathTrigonometryWebp from '$lib/assets/iconPic/64/png_math_trigonometry.webp';
 import mathTrigonometryJpeg from '$lib/assets/iconPic/64/png_math_trigonometry.jpeg';
-// import srcFraction_jpeg from '$lib/assets/iconPic/64/png_Fraction.jpeg';
-// import srcFraction_webp from '$lib/assets/iconPic/64/png_Fraction.webp';
+import srcFraction_jpeg from '$lib/assets/iconPic/64/png_Fraction.jpeg';
+import srcFraction_webp from '$lib/assets/iconPic/64/png_Fraction.webp';
 
 
 export const menuMaps = {
@@ -41,14 +41,14 @@ export const menuMaps = {
         jpeg: mathTrigonometryJpeg
       }
     },
-    // {
-    //   name: 'FRACTION',
-    //   href: '/fraction',
-    //   img: {
-    //     webp: srcFraction_jpeg,
-    //     jpeg: srcFraction_webp
-    //   }
-    // },
+    {
+      name: 'FRACTION',
+      href: '/fraction',
+      img: {
+        webp: srcFraction_jpeg,
+        jpeg: srcFraction_webp
+      }
+    },
   ],
   geometry: []
 };

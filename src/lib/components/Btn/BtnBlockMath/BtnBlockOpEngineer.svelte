@@ -33,7 +33,7 @@
 		allDivisors
 	} from '$lib/services/math/opBtnEngineer.js';
 	import { addSqrtY } from '$lib/services/math/opBtnBasic.js';
-	import { addOperator } from '$lib/services/math/mathActions.svelte.js';
+	import { addOperator } from '$lib/services/math/mathActions.js';
 </script>
 
 <div class="digBlock">
