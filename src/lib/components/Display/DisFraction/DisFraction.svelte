@@ -258,12 +258,14 @@
 	// ===================НОВЫЕ СТИЛИ
 
 	.fraction-input-area {
+		// ********************
 		display: flex;
 		flex-flow: row wrap;
 		justify-content: flex-start;
 		align-items: center;
 
-		padding-top: 0.4rem;
+		// padding-top: 0.4rem;
+		// padding-bottom: 0.4rem;
 		padding-left: 1.2rem;
 		border-top: 4px groove rgba($clr-mint-soft-rgb, 0.4);
 	}
@@ -276,6 +278,7 @@
 		align-items: center; // Центрирует операторы (+, -, *, =) строго по центру дроби
 		gap: 4px;
 		font-family: inherit;
+		height: 4rem;
 	}
 
 	.history-section {

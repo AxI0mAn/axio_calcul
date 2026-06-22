@@ -78,65 +78,72 @@ $grad-btn-main: linear-gradient(215deg, $clr-blue-light 0%, $clr-bg-darker 50%, 
 		--shd-coral-glow: rgba(255, 127, 80, 0.5);
 		--shd-blue-glow: rgba(100, 170, 255, 0.7);
 		--shadow-card-val: 2px 2px 2px 2px #586466;
+
+		--shadow-inset: inset 4px 4px 8px rgba(1, 217, 195, 0.33),
+			inset -4px -4px 8px rgba(1, 217, 195, 0.33);
 	}
 
 	&[data-theme='light'] {
 		// Базовые фоны - уходим в "стерильный" чистый интерфейс
-		--clr-bg: #f1f5f9;
-		--clr-bg-rgb: 241, 245, 249;
+		--clr-bg: #e0e0e0;
+		--clr-bg-rgb: 224, 224, 224;
 
-		--clr-bg-darker: #e2e8f0;
-		--clr-bg-darker-rgb: 226, 232, 240;
+		--clr-bg-darker: #fff2c8;
+		--clr-bg-darker-rgb: 255, 242, 200;
 
-		--clr-bg-card: #c2e0fc;
-		--clr-bg-card-rgb: 194, 224, 252;
+		--clr-bg-card: #f0e8d5;
+		--clr-bg-card-rgb: 240, 232, 213;
 
-		--clr-text-main: #1e293b;
-		--clr-text-main-rgb: 30, 41, 59;
+		--clr-text-main: #000000;
+		--clr-text-main-rgb: 0, 0, 0;
 
-		--clr-slate: #353e4b;
-		--clr-slate-rgb: 53, 62, 75;
+		--clr-slate: #9b8b74;
+		--clr-slate-rgb: 155, 139, 116;
 
 		// Акценты - делаем их более насыщенными, т.к. нет свечения
-		--clr-mint: #0a7770;
-		--clr-mint-rgb: 10, 119, 112;
+		--clr-mint: #6b502d;
+		--clr-mint-rgb: 254, 38, 60;
 
-		--clr-mint-soft: #0e463e;
-		--clr-mint-soft-rgb: 14, 70, 62;
+		--clr-mint-soft: #412200;
+		--clr-mint-soft-rgb: 121, 18, 13;
 
-		--clr-sky: #0284c7;
-		--clr-sky-rgb: 2, 132, 199;
+		--clr-sky: #ffae00;
+		--clr-sky-rgb: 255, 46, 0;
 
 
 		// ЗАМЕНА КОРАЛЛОВОГО: Переходим к Indigo, чтобы сочетаться с PNG иконками
-		--clr-coral: #726beb;
-		--clr-coral-rgb: 114, 107, 235;
+		--clr-coral: #0080af;
+		--clr-coral-rgb: 0, 128, 175;
 
 
 		// Синяя палитра (инвертированная, для мягких подложек)
-		--clr-blue-light: #f8fafc;
-		--clr-blue-light-rgb: 248, 250, 252;
+		--clr-blue-light: #fdbd81;
+		--clr-blue-light-rgb: 253, 189, 129;
 
-		--clr-blue-mid: #cbd5e1;
-		--clr-blue-mid-rgb: 203, 213, 225;
+		--clr-blue-mid: #fdd8c1;
+		--clr-blue-mid-rgb: 253, 216, 193;
 
-		--clr-blue-hover: #e2e8f0;
-		--clr-blue-hover-rgb: 226, 232, 240;
+		--clr-blue-hover: #cbb199;
+		--clr-blue-hover-rgb: 203, 177, 153;
 
-		--clr-blue-deep: #dee2e6;
-		--clr-blue-deep-rgb: 222, 226, 230;
-
+		--clr-blue-deep: #fffabe;
+		--clr-blue-deep-rgb: 255, 250, 190;
 
 		// Тени - вместо свечения используем объем
-		--shd-mint-glow: rgba(13, 148, 136, 0.15);
-		--shd-coral-glow: rgba(79, 70, 229, 0.15);
-		--shd-blue-glow: rgba(2, 132, 199, 0.1);
+		--shd-mint-glow: rgba(254, 38, 60, 0.5);
+		--shd-coral-glow: rgba(175, 6, 0, 0.5);
+		--shd-blue-glow: rgba(155, 85, 0, 0.7);
+		--shadow-card-val: 2px 2px 2px 2px #a79b99;
 
 		// Карточки должны "лежать" на поверхности
-		--shadow-card-val: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		--shadow-card-val: 0 4px 6px -1px rgba(255, 255, 255, 0.1),
+			0 2px 4px -1px rgba(255, 255, 255, 0.06);
 
 		// Инсет для светлой темы делаем серым/мягким
-		--shadow-inset-val: inset 2px 2px 5px rgba(0, 0, 0, 0.05);
+		--shadow-inset-val: inset 2px 2px 5px rgba(255, 0, 0, 0.05);
+
+		--shadow-inset: inset 4px 4px 8px rgba(211, 120, 0, 0.33),
+			inset -4px -4px 8px rgba(211, 120, 0, 0.33);
 	}
 }
 
@@ -211,7 +218,5 @@ $shd-blue-glow: var(--shd-blue-glow);
 $shadow-card: var(--shadow-card-val);
 $shadow-deep: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 
-// Внутреннее неоновое свечение (Используем статический Mint для примера, 
-// либо переведи в var() если оно должно тускнеть в светлой теме)
-$shadow-inset: inset 4px 4px 8px rgba(1, 217, 195, 0.33),
-	inset -4px -4px 8px rgba(1, 217, 195, 0.33);
+// Внутреннее неоновое свечение   
+$shadow-inset: var(--shadow-inset);

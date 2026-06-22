@@ -60,8 +60,8 @@
 	<main class="field_main catalog" id="catalogAllFeatures">
 		<div class="headerWrapper" id="top-anchor"><HomeHeader /></div>
 		<h1 class="slogan font-digits">
-			<span class="allFunc">44 functions</span> <span>in</span>
-			<span class="allCalc">3 calculators</span>
+			<span class="allFunc">50 functions</span> <span>in</span>
+			<span class="allCalc">4 calculators</span>
 		</h1>
 		<div class="groupCalcAll">
 			<details class="groupCalc" name="my-accordion">
@@ -120,7 +120,9 @@
 								// width={512}
 								// height={512}
 							/>
-							<h3 class="catalog__card--title"><span>trigonometry</span></h3>
+							<h3 class="catalog__card--title catalog__card--titleLong">
+								<span>trigonometry</span>
+							</h3>
 						</a>
 					</div>
 					<div class="catalog__post">
@@ -328,7 +330,7 @@
 
 		margin-bottom: 2rem;
 
-		font-size: 2.4rem;
+		font-size: calc(2vh + 1rem); // 2.4rem;
 		text-align: center;
 		color: $clr-coral;
 		.allCalc {
@@ -443,10 +445,10 @@
 		justify-content: center;
 		align-items: center;
 
-		font-size: 1.2rem;
 		font-weight: 800;
 		color: $clr-mint-soft;
 		text-align: center;
+		// font-size: 1.2rem;
 
 		backdrop-filter: blur(10px);
 		background: rgba($clr-bg-darker-rgb, 0.3);
@@ -462,7 +464,7 @@
 	.groupCalc__title {
 		min-height: 3rem;
 		width: 90%;
-		font-size: 1.5rem;
+		font-size: calc(1vh + 1rem);
 		cursor: pointer;
 
 		border: 1px solid $clr-mint-soft;
@@ -510,7 +512,8 @@
 			min-width: 100%;
 			width: fit-content;
 			min-height: 4rem;
-			font-size: 2rem;
+			// font-size: 2rem;
+			font-size: calc(1vh + 1rem);
 
 			padding: 2px 4px;
 			text-shadow: -2px 2px 2px rgba($clr-mint-rgb, 0.9);
@@ -576,7 +579,8 @@
 		min-width: 100%;
 		width: fit-content;
 		min-height: 4rem;
-		font-size: 2rem;
+		// font-size: 2rem;
+		font-size: calc(1vh + 1rem);
 
 		padding: 2px 4px;
 		text-shadow: -2px 2px 2px rgba($clr-mint-rgb, 0.9);
