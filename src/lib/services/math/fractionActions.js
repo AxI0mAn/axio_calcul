@@ -1126,6 +1126,46 @@ export function backspaceFraction() {
     return;
   }
 
+  // ---- Если активен режим степени, обрабатываем удаление специально ----
+  if (isPowerMode) {
+    // Удаляем последний символ из display
+    if (appState.display.length > 1) {
+      appState.display = appState.display.slice(0, -1);
+    } else {
+      appState.display = '';
+    }
+
+    // Пересчитываем powerDepth на основе оставшегося показателя
+    const lastIndex = appState.display.lastIndexOf('^');
+    if (lastIndex === -1) {
+      // Если '^' удалён — сбрасываем режим
+      isPowerMode = false;
+      powerDepth = 0;
+      return;
+    }
+
+    const afterPower = appState.display.substring(lastIndex + 1);
+    // Считаем баланс скобок в показателе
+    let depth = 0;
+    for (const ch of afterPower) {
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      if (depth < 0) depth = 0; // защита от отрицательной глубины
+    }
+    powerDepth = depth;
+
+    // Если показатель пуст (после '^' ничего нет) — сбрасываем режим
+    if (afterPower === '') {
+      isPowerMode = false;
+      powerDepth = 0;
+    } else {
+      // Иначе режим остаётся активным
+      isPowerMode = true;
+    }
+    return;
+  }
+
+
   // === ЗАЩИТА СТРУКТУРЫ ДРОБИ ===
   // Если expression оканчивается на '÷', значит мы находимся в режиме ввода знаменателя
   if (appState.expression.endsWith('÷')) {
