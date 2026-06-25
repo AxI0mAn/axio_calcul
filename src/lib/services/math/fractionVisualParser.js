@@ -525,9 +525,3 @@ export function parseExpressionToTokens(expression) {
   }
   return merged;
 }
-
-
-
-
-// Экспортируем алиас для совместимости с DisFraction (ожидает parseExpressionToHtml)
-export const parseExpressionToHtml = parseExpressionToTokens;

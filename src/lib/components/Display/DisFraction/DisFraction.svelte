@@ -327,7 +327,8 @@
 	}
 
 	// Стили для обычных знаков (+, -, *, =, пробелы) и десятичных дробей
-	.math-text {
+	.math-text,
+	.radical-wrapper {
 		font-size: 2rem;
 		padding: 0 4px;
 		display: inline-flex;
@@ -411,16 +412,24 @@
 	// Контейнер для самой галочки корня
 	.radical-wrapper {
 		display: inline-flex;
+		flex-flow: column;
+		justify-content: center;
 		align-items: flex-start;
 		height: 100%;
-		padding-top: 2px;
 		margin-right: -2px; // Прижимаем контент вплотную к галочке
+	}
+	.step-line {
+		.radical-wrapper {
+			height: 4rem; // чтоб отцентрировать по вертикали десятичные дроби
+			line-height: 1;
+		}
 	}
 
 	.radical-tick {
-		font-size: 1.45em; // Делаем галочку чуть выше контента
-		line-height: 0.9;
-		color: $clr-white;
+		font-size: 3rem; // Делаем галочку чуть выше контента
+		font-weight: 100;
+		line-height: 100%; // 0.9;
+		color: $clr-mint;
 		user-select: none;
 	}
 

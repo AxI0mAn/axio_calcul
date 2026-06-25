@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"serv": "npm run dev -- --open --port 5176",
+		"serv": "npm run dev -- --open --port 5174",
 		"clean": "rimraf build .svelte-kit",
 		"sync": "svelte-kit sync",
 		"build": "npm run clean && npm run sync && vite build",

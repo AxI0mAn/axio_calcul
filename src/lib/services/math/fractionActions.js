@@ -186,11 +186,7 @@ export function addOperatorFraction(op) {
   if (/[\+\-\*\/÷\^\.√]$/.test(appState.display) && !appState.isNewInput) return;
 
   const fullExpr = (appState.expression || '') + (appState.display || '');
-  // === -📝=TODO=📝- ===
-  console.log('[LOG-20.2] Проверка закрытия целой части: fullExpr=', fullExpr, 'display=', appState.display);
-  console.log('[LOG-20.2] !hasUnclosedComplexMarker=', !hasUnclosedComplexMarker(fullExpr));
-  console.log('[LOG-20.2] hasUnclosedWholePart=', hasUnclosedWholePart(fullExpr));
-  console.log('[LOG-20.2] isWholePartReadyToClose=', isWholePartReadyToClose(fullExpr, appState.display));
+
   // Закрываем целую часть, если знаменатель закрыт, целая часть открыта и завершена
   if (!hasUnclosedComplexMarker(fullExpr) &&
     hasUnclosedWholePart(fullExpr) &&
