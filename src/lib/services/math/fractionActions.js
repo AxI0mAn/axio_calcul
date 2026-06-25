@@ -12,7 +12,9 @@ import { generateSteps } from './fractionSteps.js';
 import { toSuperscript, fromSuperscript } from "$lib/utils/toSuperscript";
 import FractionJS from 'fraction.js';
 
-
+// ---- Локальное состояние для режима степени ----
+let isPowerMode = false; // флаг, активен ли ввод показателя степени.
+let powerDepth = 0; // счётчик незакрытых скобок внутри показателя степени.
 
 function isError() {
   return appState.display === 'ERROR';
@@ -104,19 +106,36 @@ export function addDigitFraction(digit) {
     const lastPart = currentParts[currentParts.length - 1];
     if (lastPart.includes('.')) return;
 
-    appState.display += '.';
+    // Если мы в режиме степени, точку добавляем как обычный символ (она будет переведена в верхний индекс?)
+    // Пока оставим как есть, но в будущем можно разрешить точки в показателе.
+    if (isPowerMode) {
+      // Добавляем точку в показатель, но она не должна преобразовываться в superscript
+      // Пока просто добавляем как есть, но это может нарушить отображение. Лучше пока запретить точку в степени?
+      // В рамках Шага 1 просто добавляем как есть, чтобы не усложнять.
+      appState.display += '.';
+    } else {
+      appState.display += '.';
+    }
     return;
   }
 
-  // КРИТИЧЕСКИЙ МОМЕНТ ДЛЯ СТЕПЕНИ: 
-  // Если на дисплее уже есть знак '^', то ВСЕ последующие цифры 
-  // мы принудительно переводим в верхний индекс (superscript)!
-  if (appState.display.includes('^')) {
+
+  //  ДЛЯ СТЕПЕНИ 
+  // ---- Используем локальный флаг isPowerMode ----
+  if (isPowerMode) {
     const parts = appState.display.split('^');
-    // Гарантируем, что parts[1] существует и является строкой, даже если split дал сбой
-    if (parts[1] === undefined) parts[1] = '';
-    parts[1] += toSuperscript(digit);
-    appState.display = parts[0] + '^' + parts[1];
+    // В показателе может быть несколько частей, если были вложенные степени – пока упрощаем,
+    // добавляем в конец последней части после '^'.
+    // Но лучше использовать более простой подход: если display заканчивается на '^', то просто добавляем цифру в конец.
+    // Или более универсально: разбиваем по '^', последний элемент – текущий показатель.
+    const lastIndex = appState.display.lastIndexOf('^');
+    const beforePower = appState.display.substring(0, lastIndex + 1); // включая '^'
+    const afterPower = appState.display.substring(lastIndex + 1);
+    // Добавляем цифру в верхнем индексе к afterPower
+    appState.display = beforePower + toSuperscript(afterPower + digit);
+    // Учтем, что если показатель был пуст, то после добавления первой цифры он станет непустым.
+    // Флаг isPowerMode остаётся true.
+
   } else {
     // Обычный ввод числа
     if (appState.display === '0') {
@@ -157,6 +176,9 @@ export function addOperatorFraction(op) {
 
     appState.display += '^';
     appState.isNewInput = false;
+    // ---- Включаем режим степени ----
+    isPowerMode = true;
+    powerDepth = 0;
     return;
   }
 
@@ -192,6 +214,17 @@ export function addOperatorFraction(op) {
     hasUnclosedWholePart(fullExpr) &&
     isWholePartReadyToClose(fullExpr, appState.display)) {
     appState.display += MARKERS.WHOLE_END; // ⥏
+  }
+
+  // ---- ВАЖНО: перед добавлением оператора проверяем, не активен ли режим степени ----
+  // Если мы в режиме степени и нет незакрытых скобок (powerDepth === 0),
+  // то оператор должен завершить степень и быть добавлен после неё.
+  // Это будет реализовано в Шаге 3, пока просто сбрасываем режим, если оператор вводится
+  // и powerDepth === 0 (временно, чтобы не было артефактов).
+  if (isPowerMode && powerDepth === 0) {
+    // Завершаем степень: сбрасываем режим, но пока не знаем, как правильно добавить оператор.
+    // Это будет доработано позже. Пока просто сбрасываем.
+    isPowerMode = false;
   }
 
   if (appState.isNewInput && appState.expression !== '') {
@@ -875,8 +908,14 @@ export function evaluateFraction() {
     appState.display = '0';
     appState.expression = '';
     appState.isNewInput = true;
+    isPowerMode = false;
+    powerDepth = 0;
     return;
   }
+
+  // ---- Сбрасываем режим степени перед вычислением ----
+  isPowerMode = false;
+  powerDepth = 0;
 
   // === АВТОДОПОЛНЕНИЕ ПУСТЫХ СКОБОК ===
   const fixedDisplay = autoCompleteEmptyBrackets(appState.display);
@@ -1042,6 +1081,8 @@ export function clearFraction() {
   appState.display = '0';
   appState.expression = '';
   appState.isNewInput = true;
+  isPowerMode = false;
+  powerDepth = 0;
 }
 
 // ---- backspace ⌫ ----
