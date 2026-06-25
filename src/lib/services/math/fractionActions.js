@@ -135,16 +135,6 @@ export function addDigitFraction(digit) {
 export function addOperatorFraction(op) {
   clearErrorIfNeeded();
 
-  // ---- Общая проверка для всех бинарных операторов (кроме ^ и √) ----
-  // Если активен режим степени и нет незакрытых скобок, завершаем степень и добавляем оператор в expression.
-  if (isPowerMode && powerDepth === 0 && op !== '^' && op !== '√') {
-    appState.expression += appState.display + op;
-    appState.display = '0';
-    appState.isNewInput = true;
-    isPowerMode = false;
-    return;
-  }
-
   // ---- Если активен режим степени и есть незакрытые скобки, оператор добавляется внутрь показателя ----
   if (isPowerMode && powerDepth > 0) {
     appState.display += op;
@@ -176,6 +166,12 @@ export function addOperatorFraction(op) {
 
   // 2. Защита для знака степени ^
   if (op === '^') {
+    // Если дисплей равен '0' и expression не пуст, значит мы только что завершили операцию
+    // и пытаемся начать новую степень без скобок – запрещаем, чтобы избежать неоднозначных конструкций типа 2^3^4. 
+    // Теперь пользователь должен использовать скобки для вложенных степеней (например, 2^(3^4))
+    if (appState.display === '0' && appState.expression !== '') {
+      return;
+    }
     if (appState.display === '0' && appState.expression === '') return;
     // Запрещаем ставить степень после операторов, точек, открывающих скобок или если степень уже есть
     if (/[\+\-\*\/÷\^\.\(√]$/.test(appState.display)) return;
@@ -207,6 +203,15 @@ export function addOperatorFraction(op) {
   // 3. Защита для знака деления ÷
   if (op === '÷') {
 
+    // Проверяем, содержит ли display признаки степени (верхние индексы или '^')
+    const hasPower = /[⁰¹²³⁴⁵⁶⁷⁸⁹]/.test(appState.display) || appState.display.includes('^');
+    if (hasPower) {
+      // Если числитель содержит степень, оставляем всё в display, добавляем ÷ и не переносим в expression
+      appState.display += '÷';
+      appState.isNewInput = false;
+      return;
+    }
+
     if (appState.display === '0' && appState.expression === '') return;
     if (/[\+\-\*\/÷\^\.\(√]$/.test(appState.display)) return;
 
@@ -219,7 +224,7 @@ export function addOperatorFraction(op) {
     return;
   }
 
-  // 4. Обычные операторы (+ - * /)
+  // 4. Обработка обычных операторов (+ - * /) с завершением степени
   if ((appState.display === '0' || appState.display === '') && appState.expression === '') {
     if (op === '-') {
       appState.display = op;
@@ -227,6 +232,16 @@ export function addOperatorFraction(op) {
     }
     return;
   }
+
+  // Если активен режим степени и нет незакрытых скобок, завершаем степень
+  if (isPowerMode && powerDepth === 0) {
+    appState.expression += appState.display + op;
+    appState.display = '0';
+    appState.isNewInput = true;
+    isPowerMode = false;
+    return;
+  }
+
 
   if (/[\+\-\*\/÷\^\.√]$/.test(appState.display) && !appState.isNewInput) return;
 

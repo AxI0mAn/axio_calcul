@@ -6,7 +6,7 @@
  * Преобразует строку с математическими выражениями и спецсимволами в массив токенов для рендеринга двухэтажных дробей и плоских выражений.
  */
 
-// import { fromSuperscript } from "$lib/utils/toSuperscript";
+import { toSuperscript } from "$lib/utils/toSuperscript";
 
 // Специальные символы 
 export const MARKERS = {
@@ -401,6 +401,38 @@ export function parseExpressionToTokens(expression) {
       }
 
       const candidate = expression.substring(i, j);
+
+      // ---- Проверка на дробь, где числитель содержит степень (например, 4^2÷20) ----
+      if (j < len && expression[j] === '^') {
+        let k = j + 1;
+        let exponent = '';
+        while (k < len && /[\d.]/.test(expression[k])) {
+          exponent += expression[k];
+          k++;
+        }
+        if (k < len && expression[k] === '÷') {
+          // Собираем знаменатель (цифры)
+          let denStart = k + 1;
+          let denEnd = denStart;
+          while (denEnd < len && /[\d.]/.test(expression[denEnd])) {
+            denEnd++;
+          }
+          const denom = expression.substring(denStart, denEnd);
+          const base = candidate; // число до '^'
+          const numerator = base + toSuperscript(exponent);
+          tokens.push({
+            type: 'fraction',
+            whole: undefined,
+            num: numerator,
+            den: denom
+          });
+          i = denEnd;
+          continue;
+        }
+        // Если после показателя нет '÷', то не создаём дробь, идём дальше
+      }
+
+
 
       if (candidate.includes(MARKERS.DIV) &&
         !candidate.includes(MARKERS.WHOLE_START) &&
