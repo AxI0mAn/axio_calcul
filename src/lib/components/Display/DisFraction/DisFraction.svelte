@@ -358,12 +358,6 @@
 	}
 	$fontSizeFractionPart: 1rem;
 
-	// === -📝=TODO=📝- ===
-	.history-section .history-steps-block .step-line .math-text + .super-exponent {
-		color: red;
-		transform: translateX(-0.4rem) translateY(2rem);
-	}
-
 	.fraction-container {
 		max-width: fit-content;
 		display: flex;
