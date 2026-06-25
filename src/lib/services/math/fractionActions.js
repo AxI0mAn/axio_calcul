@@ -149,13 +149,27 @@ export function addDigitFraction(digit) {
 // ---- операторы + - * / ÷ √ ^ ---- 
 export function addOperatorFraction(op) {
   clearErrorIfNeeded();
-  // === -📝=TODO=📝- ===
-  console.log('[DEBUG] addOperatorFraction called with op =', op, 'display =', appState.display, 'expression =', appState.expression);
+
+  // ---- Общая проверка для всех бинарных операторов (кроме ^ и √) ----
+  // Если активен режим степени и нет незакрытых скобок, завершаем степень и добавляем оператор в expression.
+  if (isPowerMode && powerDepth === 0 && op !== '^' && op !== '√') {
+    appState.expression += appState.display + op;
+    appState.display = '0';
+    appState.isNewInput = true;
+    isPowerMode = false;
+    return;
+  }
 
   const lastChar = appState.display.slice(-1);
 
   // 1. Защита для корня √
   if (op === '√') {
+    // Если мы в режиме степени, добавляем корень внутрь показателя
+    if (isPowerMode) {
+      appState.display += '√';
+      appState.isNewInput = false;
+      return true;
+    }
     // Единственная защита — от точки прямо перед корнем
     if (lastChar === '.') return false;
 
@@ -182,8 +196,25 @@ export function addOperatorFraction(op) {
     return;
   }
 
+  // 2.5. ЛОГИКА для бинарных операторов при активном режиме степени ----
+  const isBinaryOp = ['+', '-', '*', '/', '÷'].includes(op);
+  if (isPowerMode && isBinaryOp) {
+    if (powerDepth > 0) {
+      // Есть незакрытые скобки внутри показателя → оператор добавляется внутрь
+      appState.display += op;
+      appState.isNewInput = false;
+      return;
+    } else {
+      // powerDepth === 0 → завершаем степень
+      isPowerMode = false;
+      // После завершения степени продолжаем выполнение, чтобы добавить оператор в expression
+      // (код ниже обработает оператор как обычно)
+    }
+  }
+
   // 3. Защита для знака деления ÷
   if (op === '÷') {
+
     if (appState.display === '0' && appState.expression === '') return;
     if (/[\+\-\*\/÷\^\.\(√]$/.test(appState.display)) return;
 
@@ -214,17 +245,6 @@ export function addOperatorFraction(op) {
     hasUnclosedWholePart(fullExpr) &&
     isWholePartReadyToClose(fullExpr, appState.display)) {
     appState.display += MARKERS.WHOLE_END; // ⥏
-  }
-
-  // ---- ВАЖНО: перед добавлением оператора проверяем, не активен ли режим степени ----
-  // Если мы в режиме степени и нет незакрытых скобок (powerDepth === 0),
-  // то оператор должен завершить степень и быть добавлен после неё.
-  // Это будет реализовано в Шаге 3, пока просто сбрасываем режим, если оператор вводится
-  // и powerDepth === 0 (временно, чтобы не было артефактов).
-  if (isPowerMode && powerDepth === 0) {
-    // Завершаем степень: сбрасываем режим, но пока не знаем, как правильно добавить оператор.
-    // Это будет доработано позже. Пока просто сбрасываем.
-    isPowerMode = false;
   }
 
   if (appState.isNewInput && appState.expression !== '') {
@@ -396,11 +416,20 @@ export function fractionToPower2() {
 */
 export function addBracketFraction(bracket) {
   clearErrorIfNeeded();
-
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG bracket] isPowerMode=', isPowerMode, 'powerDepth=', powerDepth, 'bracket=', bracket);
   console.log('appState.historySession' + appState.historySession)
 
   // ======================== ОТКРЫВАЮЩАЯ СКОБКА '(' ========================
   if (bracket === '(') {
+    // ---- Если активен режим степени, добавляем обычную скобку в показатель ----
+    if (isPowerMode) {
+      appState.display += '(';
+      powerDepth++;
+      appState.isNewInput = false;
+      return;
+    }
+
     let lastChar = '';
     let shouldReplace = false;
 
@@ -431,6 +460,19 @@ export function addBracketFraction(bracket) {
 
   // ======================== ЗАКРЫВАЮЩАЯ СКОБКА ')' ========================
   if (bracket === ')') {
+
+    // ---- Если активен режим степени, обрабатываем скобку внутри показателя ----
+    if (isPowerMode) {
+      appState.display += ')';
+      powerDepth--;
+      if (powerDepth < 0) powerDepth = 0; // защита от отрицательной глубины
+      if (powerDepth === 0) {
+        isPowerMode = false; // завершаем степень после закрытия всех скобок
+      }
+      appState.isNewInput = false;
+      return;
+    }
+
     const fullExpr = (appState.expression || '') + (appState.display || '');
     const stack = getUnclosedMarkersStack(fullExpr); // только сложные маркеры
 
@@ -990,15 +1032,6 @@ export function evaluateFraction() {
     // Если пользователь ввел "1÷4^2", ядро без скобок посчитает это как (1÷4)^2.
     // Чтобы этого не происходило, мы заменяем конструкции "число÷число^степень" 
     // или "число÷(выражение)^степень" на изолированные скобки.
-
-    // Случай А: Число ÷ Число ^ Любое выражение (включая дробные степени вроде 2÷3)
-    if (cleanExpr.includes('÷') && cleanExpr.includes('^')) {
-      // Сначала изолируем сам показатель степени, если там идет деление без скобок: "5^2÷3" -> "5^(2÷3)"
-      cleanExpr = cleanExpr.replace(/\^([\d.÷]+)/g, '^($1)');
-
-      // Теперь изолируем всю правую часть деления (основание вместе со степенью): "1÷5^(2÷3)" -> "1÷(5^(2÷3))"
-      cleanExpr = cleanExpr.replace(/(\d+)÷(\d+)\^([(\d.÷)]+)/g, '$1÷($2^$3)');
-    }
 
     // Убираем возможные дубликаты двойных скобок вокруг степеней, если они случайно возникли
     cleanExpr = cleanExpr.replace(/\^\(\(([^)]+)\)\)/g, '^($1)');

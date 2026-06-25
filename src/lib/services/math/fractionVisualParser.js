@@ -466,13 +466,28 @@ export function parseExpressionToTokens(expression) {
     if (ch === '^') {
       let j = i + 1;
       let exponentBuf = '';
+      let parenDepth = 0; // счётчик вложенности скобок внутри показателя
 
-      while (j < len && (
-        /[\d.()÷]/.test(expression[j]) ||
-        '⁰¹²³⁴⁵⁶⁷⁸⁹⁻˙'.includes(expression[j])
-      )) {
-        exponentBuf += expression[j];
-        j++;
+      while (j < len) {
+        const currentChar = expression[j];
+        // Обновляем глубину скобок
+        if (currentChar === '(') parenDepth++;
+        else if (currentChar === ')') parenDepth--;
+
+        // Разрешаем символы: цифры, точка, скобки, а также '÷' только если parenDepth > 0
+        const isDigitOrDot = /[\d.]/.test(currentChar);
+        const isParen = (currentChar === '(' || currentChar === ')');
+        const isDivAllowed = (currentChar === '÷' && parenDepth > 0);
+        const isSuperscriptSymbol = '⁰¹²³⁴⁵⁶⁷⁸⁹⁻˙'.includes(currentChar);
+
+        if (isDigitOrDot || isParen || isDivAllowed || isSuperscriptSymbol) {
+          exponentBuf += currentChar;
+          j++;
+        } else {
+          // Любой другой символ (включая '÷' на нулевом уровне) останавливает сбор показателя
+          break;
+        }
+
       }
 
       if (exponentBuf.length > 0) {
