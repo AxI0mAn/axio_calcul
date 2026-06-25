@@ -199,6 +199,10 @@ $clr-blue-hover-rgb: var(--clr-blue-hover-rgb);
 $clr-blue-deep: var(--clr-blue-deep);
 $clr-blue-deep-rgb: var(--clr-blue-deep-rgb);
 
+$shd-mint-glow: var(--shd-mint-glow);
+$shd-coral-glow: var(--shd-coral-glow);
+$shd-blue-glow: var(--shd-blue-glow);
+
 // =============================================================================
 // 4. КОМПЛЕКСНЫЕ СТИЛИ (Градиенты и Тени)
 // Используем интерполяцию #{}, чтобы Sass корректно передал var() в CSS

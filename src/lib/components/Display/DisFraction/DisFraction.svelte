@@ -337,26 +337,65 @@
 		height: 4rem; // чтоб отцентрировать по вертикали десятичные дроби
 		line-height: 1;
 	}
+
+	// Контекстная корректировка для дробей, чтобы степень не падала на числитель!
 	.expression-line,
 	.display-line,
 	.step-line {
-		// Контекстная корректировка для дробей, чтобы степень не падала на числитель!
 		.fraction-block {
 			display: inline-flex;
 			align-items: center;
 			vertical-align: middle;
 			position: relative;
 			margin: 0 4px;
+		}
 
-			// Если степень идет сразу за блоком дроби без скобок (как 1/5 в квадрате)
-			+ .super-exponent {
-				// Опускаем чуть ниже по сравнению со скобочной степенью
-				font-size: 0.75rem;
-				transform: translateX(-0.4rem) translateY(0.7rem);
-				margin-left: 1px;
-			}
+		// указатель степени в надстрочном шрифте
+		.super-exponent {
+			display: inline-block;
+			font-size: 0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
+			font-weight: 500;
+			line-height: 1;
+			color: $clr-white;
+			// Базовый подъем для степени после скобок или обычных чисел
+			// transform: translateX(-0.4rem) translateY(-0.8em);
+			margin-left: 2px; /* Отступ от скобки, чтобы не липла */
+			margin-right: 2px; /* Отступ перед знаком равенства */
+		}
+
+		// Если степень идет сразу за блоком дроби без скобок (как 1/5 , где 5 в квадрате)
+		.fraction-block + .super-exponent {
+			// Опускаем чуть ниже по сравнению со скобочной степенью
+			transform: translateX(-0.35rem) translateY(0.5rem);
+			margin-left: 1px;
 		}
 	}
+
+	// степень после скобки или целого числа в строке ввода
+	.expression-line,
+	.display-line {
+		.math-text + .super-exponent {
+			transform: translateX(-0.5rem) translateY(-0.95rem);
+		}
+	}
+
+	// степень после скобки или целого числа в истории
+	.step-line {
+		.math-text + .super-exponent {
+			transform: translateX(-0.5rem) translateY(0.95rem);
+		}
+	}
+
+	// степень для знаменателя в истории
+	.step-line {
+		// Если степень идет сразу за блоком дроби без скобок (как 1/5 в квадрате)
+		.fraction-block + .super-exponent {
+			// Опускаем чуть ниже по сравнению со скобочной степенью
+			transform: translateX(-0.35rem) translateY(2.25rem);
+			margin-left: 1px;
+		}
+	}
+
 	$fontSizeFractionPart: 1rem;
 
 	.fraction-container {
@@ -460,19 +499,6 @@
 		.whole-part {
 			padding-top: 0; // Коррекция шрифта целой части под линией
 		}
-	}
-
-	// указатель степени в надстрочном шрифте
-	.super-exponent {
-		display: inline-block;
-		font-size: 0.95rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
-		font-weight: bold;
-		line-height: 1;
-		color: $clr-mint-soft;
-		// Базовый подъем для степени после скобок или обычных чисел
-		transform: translateX(-0.4rem) translateY(-0.8em);
-		margin-left: 2px; /* Отступ от скобки, чтобы не липла */
-		margin-right: 2px; /* Отступ перед знаком равенства */
 	}
 
 	.history-steps-block.is-multistep {
