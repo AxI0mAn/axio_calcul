@@ -6,7 +6,7 @@
  * Преобразует строку с математическими выражениями и спецсимволами в массив токенов для рендеринга двухэтажных дробей и плоских выражений.
  */
 
-import { fromSuperscript } from "$lib/utils/toSuperscript";
+// import { fromSuperscript } from "$lib/utils/toSuperscript";
 
 // Специальные символы 
 export const MARKERS = {
@@ -466,34 +466,49 @@ export function parseExpressionToTokens(expression) {
     if (ch === '^') {
       let j = i + 1;
       let exponentBuf = '';
-      let parenDepth = 0; // счётчик вложенности скобок внутри показателя
+      let parenDepth = 0;
 
       while (j < len) {
         const currentChar = expression[j];
-        // Обновляем глубину скобок
-        if (currentChar === '(') parenDepth++;
-        else if (currentChar === ')') parenDepth--;
 
-        // Разрешаем символы: цифры, точка, скобки, а также '÷' только если parenDepth > 0
-        const isDigitOrDot = /[\d.]/.test(currentChar);
-        const isParen = (currentChar === '(' || currentChar === ')');
-        const isDivAllowed = (currentChar === '÷' && parenDepth > 0);
-        const isSuperscriptSymbol = '⁰¹²³⁴⁵⁶⁷⁸⁹⁻˙'.includes(currentChar);
-
-        if (isDigitOrDot || isParen || isDivAllowed || isSuperscriptSymbol) {
+        // Обработка открывающей скобки
+        if (currentChar === '(') {
+          parenDepth++;
           exponentBuf += currentChar;
           j++;
-        } else {
-          // Любой другой символ (включая '÷' на нулевом уровне) останавливает сбор показателя
-          break;
+          continue;
         }
-
+        // Обработка закрывающей скобки
+        if (currentChar === ')') {
+          parenDepth--;
+          exponentBuf += currentChar;
+          j++;
+          if (parenDepth === 0) {
+            // Закрывающая скобка завершила показатель – выходим из цикла
+            break;
+          }
+          continue;
+        }
+        // Если мы внутри скобок (parenDepth > 0), разрешаем любые символы
+        if (parenDepth > 0) {
+          exponentBuf += currentChar;
+          j++;
+          continue;
+        }
+        // На нулевом уровне (вне скобок) разрешаем только цифры, точку и суперскрипт-символы
+        if (/[\d.]/.test(currentChar) || '⁰¹²³⁴⁵⁶⁷⁸⁹⁻˙'.includes(currentChar)) {
+          exponentBuf += currentChar;
+          j++;
+          continue;
+        }
+        // Любой другой символ на нулевом уровне – останавливаем сбор
+        break;
       }
 
       if (exponentBuf.length > 0) {
         tokens.push({
           type: 'superscript',
-          value: fromSuperscript(exponentBuf)
+          value: exponentBuf  // оставляем как есть (суперскрипт-символы уже присутствуют)
         });
       } else {
         tokens.push({
@@ -505,7 +520,6 @@ export function parseExpressionToTokens(expression) {
       i = j;
       continue;
     }
-
     // 4. Обычные операторы и скобки
     if ('+-*/=()√÷'.includes(ch)) {
       tokens.push({ type: 'text', value: ch });

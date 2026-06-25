@@ -106,45 +106,30 @@ export function addDigitFraction(digit) {
     const lastPart = currentParts[currentParts.length - 1];
     if (lastPart.includes('.')) return;
 
-    // Если мы в режиме степени, точку добавляем как обычный символ (она будет переведена в верхний индекс?)
-    // Пока оставим как есть, но в будущем можно разрешить точки в показателе.
+
+    // В режиме степени точка добавляется как обычный символ (без суперскрипта)
     if (isPowerMode) {
-      // Добавляем точку в показатель, но она не должна преобразовываться в superscript
-      // Пока просто добавляем как есть, но это может нарушить отображение. Лучше пока запретить точку в степени?
-      // В рамках Шага 1 просто добавляем как есть, чтобы не усложнять.
       appState.display += '.';
-    } else {
-      appState.display += '.';
+      return;
     }
+    appState.display += '.';
     return;
   }
 
-
-  //  ДЛЯ СТЕПЕНИ 
-  // ---- Используем локальный флаг isPowerMode ----
+  // ---- В режиме степени все цифры добавляются как обычные символы ----
   if (isPowerMode) {
-    const parts = appState.display.split('^');
-    // В показателе может быть несколько частей, если были вложенные степени – пока упрощаем,
-    // добавляем в конец последней части после '^'.
-    // Но лучше использовать более простой подход: если display заканчивается на '^', то просто добавляем цифру в конец.
-    // Или более универсально: разбиваем по '^', последний элемент – текущий показатель.
-    const lastIndex = appState.display.lastIndexOf('^');
-    const beforePower = appState.display.substring(0, lastIndex + 1); // включая '^'
-    const afterPower = appState.display.substring(lastIndex + 1);
-    // Добавляем цифру в верхнем индексе к afterPower
-    appState.display = beforePower + toSuperscript(afterPower + digit);
-    // Учтем, что если показатель был пуст, то после добавления первой цифры он станет непустым.
-    // Флаг isPowerMode остаётся true.
+    appState.display += digit;
+    return;
+  }
 
+  if (appState.display === '0') {
+    appState.display = digit;
   } else {
-    // Обычный ввод числа
-    if (appState.display === '0') {
-      appState.display = digit;
-    } else {
-      appState.display += digit;
-    }
+    appState.display += digit;
   }
 }
+
+
 
 // ---- операторы + - * / ÷ √ ^ ---- 
 export function addOperatorFraction(op) {
@@ -157,6 +142,13 @@ export function addOperatorFraction(op) {
     appState.display = '0';
     appState.isNewInput = true;
     isPowerMode = false;
+    return;
+  }
+
+  // ---- Если активен режим степени и есть незакрытые скобки, оператор добавляется внутрь показателя ----
+  if (isPowerMode && powerDepth > 0) {
+    appState.display += op;
+    appState.isNewInput = false;
     return;
   }
 
