@@ -43,6 +43,15 @@ export function getMarkerType(char) {
 }
 
 /**
+ * Преобразует все вхождения '^цифры' в строке в верхний индекс (юникод).
+ * Например, "4^7" -> "4⁷", "3^5" -> "3⁵".
+ */
+function convertPowerToSuperscript(str) {
+  if (!str) return str;
+  return str.replace(/\^(\d+)/g, (match, p1) => toSuperscript(p1));
+}
+
+/**
  * Возвращает массив незакрытых маркеров сложных выражений (⥾) в порядке их открытия.
  * Игнорирует маркеры целой части (⥑, ⥏).
  * @param {string} expr - строка с маркерами
@@ -98,8 +107,8 @@ function parseMixedFraction(str) {
 
   return {
     whole: wholePart,
-    num: numPart,
-    den: denPart
+    num: convertPowerToSuperscript(numPart),
+    den: convertPowerToSuperscript(denPart)
   };
 }
 
@@ -111,10 +120,12 @@ function parseMixedFraction(str) {
 function parseSimpleFraction(str) {
   const divIndex = str.indexOf(MARKERS.DIV);
   if (divIndex === -1) return null;
-  const numPart = str.substring(0, divIndex);
-  const denPart = str.substring(divIndex + 1);
-  // Не должно быть вложенных маркеров внутри
+  let numPart = str.substring(0, divIndex);
+  let denPart = str.substring(divIndex + 1);
   if (numPart.includes(MARKERS.DIV) || denPart.includes(MARKERS.DIV)) return null;
+  // Преобразуем степени в верхние индексы
+  numPart = convertPowerToSuperscript(numPart);
+  denPart = convertPowerToSuperscript(denPart);
   return { num: numPart, den: denPart };
 }
 
@@ -402,7 +413,7 @@ export function parseExpressionToTokens(expression) {
 
       const candidate = expression.substring(i, j);
 
-      // ---- Проверка на дробь, где числитель содержит степень (например, 4^2÷20) ----
+      // ---- Проверка на дробь, где числитель содержит степень (например, 4^7÷3^5) ----
       if (j < len && expression[j] === '^') {
         let k = j + 1;
         let exponent = '';
@@ -411,13 +422,26 @@ export function parseExpressionToTokens(expression) {
           k++;
         }
         if (k < len && expression[k] === '÷') {
-          // Собираем знаменатель (цифры)
+          // Собираем знаменатель (может содержать степень)
           let denStart = k + 1;
           let denEnd = denStart;
+          // Сначала собираем число (цифры и точка)
           while (denEnd < len && /[\d.]/.test(expression[denEnd])) {
             denEnd++;
           }
-          const denom = expression.substring(denStart, denEnd);
+          let denom = expression.substring(denStart, denEnd);
+          // Проверяем, не идёт ли после числа знак '^' (степень знаменателя)
+          if (denEnd < len && expression[denEnd] === '^') {
+            let expStart = denEnd + 1;
+            let expEnd = expStart;
+            while (expEnd < len && /[\d.]/.test(expression[expEnd])) {
+              expEnd++;
+            }
+            const expDen = expression.substring(expStart, expEnd);
+            // Добавляем степень к знаменателю
+            denom += toSuperscript(expDen);
+            denEnd = expEnd;
+          }
           const base = candidate; // число до '^'
           const numerator = base + toSuperscript(exponent);
           tokens.push({
