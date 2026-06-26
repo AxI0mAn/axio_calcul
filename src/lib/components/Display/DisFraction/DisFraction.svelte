@@ -339,37 +339,37 @@
 	}
 
 	// Контекстная корректировка для дробей, чтобы степень не падала на числитель!
-	.expression-line,
-	.display-line,
-	.step-line {
-		.fraction-block {
-			display: inline-flex;
-			align-items: center;
-			vertical-align: middle;
-			position: relative;
-			margin: 0 4px;
-		}
+	// .expression-line,
+	// .display-line,
+	// .step-line {
+	// .fraction-block {
+	// 	display: inline-flex;
+	// 	align-items: center;
+	// 	vertical-align: middle;
+	// 	position: relative;
+	// 	margin: 0 4px;
+	// }
 
-		// указатель степени в надстрочном шрифте
-		.super-exponent {
-			display: inline-block;
-			font-size: 0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
-			font-weight: 500;
-			line-height: 1;
-			color: $clr-white;
-			// Базовый подъем для степени после скобок или обычных чисел
-			// transform: translateX(-0.4rem) translateY(-0.8em);
-			margin-left: 2px; /* Отступ от скобки, чтобы не липла */
-			margin-right: 2px; /* Отступ перед знаком равенства */
-		}
+	// указатель степени в надстрочном шрифте
+	// .super-exponent {
+	// 	display: inline-block;
+	// 	font-size: 0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
+	// 	font-weight: 500;
+	// 	line-height: 1;
+	// 	color: $clr-white;
+	// 	// Базовый подъем для степени после скобок или обычных чисел
+	// 	// transform: translateX(-0.4rem) translateY(-0.8em);
+	// 	margin-left: 2px; /* Отступ от скобки, чтобы не липла */
+	// 	margin-right: 2px; /* Отступ перед знаком равенства */
+	// }
 
-		// Если степень идет сразу за блоком дроби без скобок (как 1/5 , где 5 в квадрате)
-		.fraction-block + .super-exponent {
-			// Опускаем чуть ниже по сравнению со скобочной степенью
-			transform: translateX(-0.35rem) translateY(0.5rem);
-			margin-left: 1px;
-		}
-	}
+	// Если степень идет сразу за блоком дроби без скобок (как 1/5 , где 5 в квадрате)
+	// .fraction-block + .super-exponent {
+	// 	// Опускаем чуть ниже по сравнению со скобочной степенью
+	// 	transform: translateX(-0.35rem) translateY(0.5rem);
+	// 	margin-left: 1px;
+	// }
+	// }
 
 	// степень после скобки или целого числа в строке ввода
 	.expression-line,
@@ -387,12 +387,22 @@
 	}
 
 	// степень для знаменателя в истории
-	.step-line {
-		// Если степень идет сразу за блоком дроби без скобок (как 1/5 в квадрате)
-		.fraction-block + .super-exponent {
-			// Опускаем чуть ниже по сравнению со скобочной степенью
-			transform: translateX(-0.35rem) translateY(2.25rem);
-			margin-left: 1px;
+	// .step-line {
+	// 	// Если степень идет сразу за блоком дроби без скобок (как 1/5 в квадрате)
+	// 	.fraction-block + .super-exponent {
+	// 		// Опускаем чуть ниже по сравнению со скобочной степенью
+	// 		transform: translateX(-0.35rem) translateY(2.25rem);
+	// 		margin-left: 1px;
+	// 	}
+	// }
+
+	// стили к контейнеру .num-part и .den-part, для решения Проблема: юникодные символы верхнего индекса ¹²³ отображаются корректно, а ⁴⁵⁶⁷⁸⁹⁰ – ниже и менее жирно.
+
+	.fraction-block {
+		.num-part,
+		.den-part {
+			font-family: inherit; //system-ui, sans-serif; // или любой другой шрифт с хорошей поддержкой юникода
+			font-weight: 300; // подберите под основной текст
 		}
 	}
 
