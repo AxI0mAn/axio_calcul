@@ -17,8 +17,6 @@ class AppState {
   corner = $state('deg'); // Флаг как работаем с тригонометрией deg, rad, grad
   /** @type {boolean} */
   stepsFraction = $state(false); // флаг как работаем с дробями. Раскладываем на шаги вычислений или нет?
-  /** @type {number} */
-  // numToFix = $state(appStore.toFix); //Количество знаков после запятой для результата вычисления
   /** @type {string} */
   now_mode = $state('amoca'); // Режим калькулятора - отображается в окне div class="now_mode"
 
