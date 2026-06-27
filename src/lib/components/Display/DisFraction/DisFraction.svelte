@@ -7,6 +7,8 @@
 		parseExpressionToTokens,
 		stripMarkers
 	} from '$lib/services/math/fractionVisualParser.js';
+	import { btnMemo } from '$lib/utils/btnMemo.js';
+	import { longpress } from '$lib/actions/longpress.js';
 
 	let expressionTokens = $derived(parseExpressionToTokens(appState.expression));
 	let displayTokens = $derived(parseExpressionToTokens(appState.display));
@@ -88,7 +90,11 @@
 		{#each tokenizedHistory as entry}
 			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
 				<!-- Рендеринг дробного пошагового решения (без изменений) -->
-				<div class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}">
+				<div
+					class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}"
+					use:longpress
+					onlongpress={() => btnMemo(null, true, entry.steps[entry.steps.length - 1])}
+				>
 					{#each entry.steps as step, idx}
 						<div class="step-line">
 							{#if idx > 0}
@@ -136,7 +142,11 @@
 				</div>
 			{:else}
 				<!-- Отображение обычной строки -->
-				<p class="history-text-entry">
+				<p
+					class="history-text-entry"
+					use:longpress
+					onlongpress={() => btnMemo(null, true, getStringEntry(entry))}
+				>
 					{getStringEntry(entry)}
 				</p>
 			{/if}
@@ -339,37 +349,37 @@
 	}
 
 	// Контекстная корректировка для дробей, чтобы степень не падала на числитель!
-	// .expression-line,
-	// .display-line,
-	// .step-line {
-	// .fraction-block {
-	// 	display: inline-flex;
-	// 	align-items: center;
-	// 	vertical-align: middle;
-	// 	position: relative;
-	// 	margin: 0 4px;
-	// }
+	.expression-line,
+	.display-line,
+	.step-line {
+		.fraction-block {
+			display: inline-flex;
+			align-items: center;
+			vertical-align: middle;
+			position: relative;
+			margin: 0 4px;
+		}
 
-	// указатель степени в надстрочном шрифте
-	// .super-exponent {
-	// 	display: inline-block;
-	// 	font-size: 0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
-	// 	font-weight: 500;
-	// 	line-height: 1;
-	// 	color: $clr-white;
-	// 	// Базовый подъем для степени после скобок или обычных чисел
-	// 	// transform: translateX(-0.4rem) translateY(-0.8em);
-	// 	margin-left: 2px; /* Отступ от скобки, чтобы не липла */
-	// 	margin-right: 2px; /* Отступ перед знаком равенства */
-	// }
+		// указатель степени в надстрочном шрифте
+		.super-exponent {
+			display: inline-block;
+			font-size: 0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
+			font-weight: 500;
+			line-height: 1;
+			color: $clr-white;
+			// Базовый подъем для степени после скобок или обычных чисел
+			// transform: translateX(-0.4rem) translateY(-0.8em);
+			margin-left: 2px; /* Отступ от скобки, чтобы не липла */
+			margin-right: 2px; /* Отступ перед знаком равенства */
+		}
 
-	// Если степень идет сразу за блоком дроби без скобок (как 1/5 , где 5 в квадрате)
-	// .fraction-block + .super-exponent {
-	// 	// Опускаем чуть ниже по сравнению со скобочной степенью
-	// 	transform: translateX(-0.35rem) translateY(0.5rem);
-	// 	margin-left: 1px;
-	// }
-	// }
+		// Если степень идет сразу за блоком дроби без скобок (как 1/5 , где 5 в квадрате)
+		// .fraction-block + .super-exponent {
+		// 	// Опускаем чуть ниже по сравнению со скобочной степенью
+		// 	transform: translateX(-0.35rem) translateY(0.5rem);
+		// 	margin-left: 1px;
+		// }
+	}
 
 	// степень после скобки или целого числа в строке ввода
 	.expression-line,
