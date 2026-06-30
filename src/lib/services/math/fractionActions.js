@@ -575,7 +575,7 @@ export function autoCompleteEmptyBrackets(expr) {
  * @param {string} expr - исходное выражение (может содержать маркеры)
  * @returns {string} - выражение с явными '*'
  */
-function insertImplicitMultiplication(expr) {
+export function insertImplicitMultiplication(expr) {
   if (!expr) return expr;
 
   // Определяем группы символов для открывающих и закрывающих скобок (включая маркеры)
@@ -608,7 +608,7 @@ function insertImplicitMultiplication(expr) {
  * @param {string} expr - выражение (может содержать маркеры)
  * @returns {string} - преобразованное выражение
  */
-function transformMixedFractionWithDivision(expr) {
+export function transformMixedFractionWithDivision(expr) {
   if (!expr) return expr;
 
   const openBrackets = ['(', MARKERS.WHOLE_START, MARKERS.COMPLEX_NUM_START];
@@ -684,7 +684,7 @@ function transformMixedFractionWithDivision(expr) {
  * @param {string} expr - выражение с маркерами ⥑ и ⥏
  * @returns {string} - преобразованное выражение
  */
-function transformMixedNumberWithoutDivision(expr) {
+export function transformMixedNumberWithoutDivision(expr) {
   if (!expr) return expr;
 
   const OPEN = MARKERS.WHOLE_START;   // '⥑'
@@ -770,7 +770,7 @@ function transformMixedNumberWithoutDivision(expr) {
  * @param {string} expr - выражение с маркерами
  * @returns {string} - преобразованное выражение
  */
-function transformNegativeMixedNumber(expr) {
+export function transformNegativeMixedNumber(expr) {
   if (!expr) return expr;
 
   const OPEN = MARKERS.WHOLE_START;   // '⥑'
@@ -832,7 +832,7 @@ function transformNegativeMixedNumber(expr) {
  * @param {string} expr - выражение с маркерами
  * @returns {string} - преобразованное выражение
  */
-function transformMixedNumberWithComplexBrackets(expr) {
+export function transformMixedNumberWithComplexBrackets(expr) {
   if (!expr) return expr;
 
   const OPEN = MARKERS.COMPLEX_NUM_START;   // '⥾'
