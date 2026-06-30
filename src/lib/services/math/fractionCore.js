@@ -366,13 +366,16 @@ function applyOperator(op, a, b = null) {
 
   // Отдельная ветка для оператора '/' – десятичное деление
   if (op === '/') {
-    const leftNum = left.toDecimal();
-    const rightNum = right.toDecimal();
-    if (rightNum === 0) throw new Error('Division by zero');
-    const result = leftNum / rightNum;
-    return Fraction.fromDecimal(result);
+    return left.div(right); // внутри уже есть проверка на 0
   }
-
+  /* if (op === '/') {
+     const leftNum = left.toDecimal();
+     const rightNum = right.toDecimal();
+     if (rightNum === 0) throw new Error('Division by zero');
+     const result = leftNum / rightNum;
+     return Fraction.fromDecimal(result);
+   }
+ */
   // Для всех остальных бинарных операторов (включая '÷') – дробная арифметика
   switch (op) {
     case '+': return left.add(right);
