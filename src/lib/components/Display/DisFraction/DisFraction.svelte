@@ -134,8 +134,8 @@
 								{/each}
 							{/if}
 
-							{#if idx < entry.steps.length - 1}
-								<span class="math-text equal-postfix"> =</span>
+							{#if idx >= 0 && idx < entry.steps.length - 1}
+								<span class="math-text equal-prefix"> = </span>
 							{/if}
 						</div>
 					{/each}
