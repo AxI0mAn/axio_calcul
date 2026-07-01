@@ -296,8 +296,8 @@
 		min-height: 0;
 		overflow-y: scroll;
 		overflow-x: hidden;
-		font-size: 1.25rem;
-		line-height: 1.75rem;
+		font-size: 1rem; //1.25rem;
+		line-height: 1.25rem; //1.75rem;
 		color: $clr-slate;
 		margin-bottom: 0.5rem;
 		// padding-left: 2px;

@@ -1,4 +1,19 @@
-import { evaluateFractionExpression } from './fractionCore.js';
+/*
+Алгоритм для пояснения вычислений. Любой из шагов алгоритма может отсутствовать, если он не нужен.
+Шаг 1. Условие - вводим дробь.
+Шаг 1.1. Вычисление степеней и корня квадратного.
+Шаг 2. Если в числителе или знаменателе есть выражение, то вычисляем то что в скобках числителя и/или знаменателя для каждой дроби, если там есть выражения.
+Шаг 3. Целые части переносим в числитель, если они есть у дробей.
+Шаг 4. Если есть операции деления для дробей, то перевернуть дробь (в соответствии с математическими правилам) и заменить деление на произведение.
+Шаг 5. Делаем все произведения дробей, если такие есть. Если есть * то перемножить числители и перемножить знаменатели.
+Шаг 6. Приводим все дроби к общему знаменателю, если дробей несколько.
+Шаг 7. Сложение и вычитание дробей с общим знаменателем.  Если оператор + или - то знаменатель общий, а в числителе показываем строку, которую будем вычислять.
+Шаг 8. Полученная дробь. Проверяем возможность сокращения дроби и выделяем целую часть из дроби если это возможно.
+Шаг 9. Показываем Результат.
+*/
+
+
+import { evaluateFractionExpression, Fraction } from './fractionCore.js';
 import { MARKERS, parseExpressionToTokens } from './fractionVisualParser.js';
 import {
   transformMixedFractionWithDivision,
@@ -8,8 +23,15 @@ import {
   transformMixedNumberWithComplexBrackets
 } from './fractionActions.js';
 
+
 // ---- Вспомогательные функции (не дублируем, только необходимое) ----
 
+/**
+ * Вычисляет наименьшее общее кратное двух чисел.
+ * @param {number} a - первое число
+ * @param {number} b - второе число
+ * @returns {number} НОК
+ */
 function stepLcm(a, b) {
   const gcd = (x, y) => {
     x = Math.abs(x); y = Math.abs(y);
@@ -19,7 +41,11 @@ function stepLcm(a, b) {
   if (a === 0 || b === 0) return 0;
   return Math.abs(a * b) / gcd(a, b);
 }
-
+/**
+ * Преобразует массив токенов обратно в строку выражения.
+ * @param {Array} tokens - массив токенов (формат из parseExpressionToTokens)
+ * @returns {string} строковое представление выражения
+ */
 function tokensToExpr(tokens) {
   return tokens.map(t => {
     if (t.type === 'fraction') {
@@ -29,7 +55,11 @@ function tokensToExpr(tokens) {
     return t.value;
   }).join('');
 }
-
+/**
+ * Вычисляет подвыражение и возвращает строку "числитель÷знаменатель" или "ERROR".
+ * @param {string} expr - математическое выражение
+ * @returns {string} результат или 'ERROR'
+ */
 function evaluateSubExpression(expr) {
   if (!expr || expr.trim() === '') return 'ERROR';
   try {
@@ -40,7 +70,11 @@ function evaluateSubExpression(expr) {
     return 'ERROR';
   }
 }
-
+/**
+ * Удаляет избыточные внешние скобки вокруг одиночных токенов.
+ * @param {string} expr - выражение
+ * @returns {string} нормализованное выражение
+ */
 function normalizeParentheses(expr) {
   if (!expr || expr.trim() === '') return expr;
   let result = expr;
@@ -73,7 +107,11 @@ function normalizeParentheses(expr) {
 }
 
 // ---- Функции проверки необходимости шагов (оставлены) ----
-
+/**
+ * Проверяет наличие операторов на верхнем уровне (вне скобок).
+ * @param {string} str - строка для проверки
+ * @returns {boolean} true, если есть оператор
+ */
 function hasTopLevelOperator(str) {
   let balance = 0;
   for (const ch of str) {
@@ -83,7 +121,11 @@ function hasTopLevelOperator(str) {
   }
   return false;
 }
-
+/**
+ * Определяет, нужно ли вычислять подвыражения в скобках (ШАГ 2).
+ * @param {string} expr - выражение
+ * @returns {boolean}
+ */
 function needStep2(expr) {
   if (!expr) return false;
   let balance = 0;
@@ -94,11 +136,19 @@ function needStep2(expr) {
   }
   return false;
 }
-
+/**
+ * Определяет, есть ли смешанные дроби (ШАГ 3).
+ * @param {string} expr - выражение
+ * @returns {boolean}
+ */
 function needStep3(expr) {
   return expr ? expr.includes(MARKERS.WHOLE_START) : false;
 }
-
+/**
+ * Определяет, есть ли деление дробей через '/' (ШАГ 4).
+ * @param {string} expr - выражение
+ * @returns {boolean}
+ */
 function needStep4(expr) {
   if (!expr) return false;
   let balance = 0;
@@ -117,7 +167,11 @@ function needStep4(expr) {
   }
   return false;
 }
-
+/**
+ * Определяет, есть ли умножение дробей '*' (ШАГ 5).
+ * @param {string} expr - выражение
+ * @returns {boolean}
+ */
 function needStep5(expr) {
   if (!expr) return false;
   let balance = 0;
@@ -134,7 +188,11 @@ function needStep5(expr) {
   }
   return false;
 }
-
+/**
+ * Определяет, нужно ли приводить к общему знаменателю (ШАГ 6).
+ * @param {string} expr - выражение
+ * @returns {boolean}
+ */
 function needStep6(expr) {
   if (!expr) return false;
   const terms = splitByPlusMinus(expr);
@@ -143,7 +201,11 @@ function needStep6(expr) {
   const first = dens[0];
   return dens.some(d => d !== first);
 }
-
+/**
+ * Определяет, нужно ли объединять числители (ШАГ 7).
+ * @param {string} expr - выражение
+ * @returns {boolean}
+ */
 function needStep7(expr) {
   if (!expr) return false;
   const terms = splitByPlusMinus(expr);
@@ -153,7 +215,11 @@ function needStep7(expr) {
   }
   return false;
 }
-
+/**
+ * Определяет, можно ли сократить дробь (ШАГ 8).
+ * @param {string} expr - выражение вида "числитель÷знаменатель"
+ * @returns {boolean}
+ */
 function needStep8(expr) {
   if (!expr) return false;
   const parts = expr.split('÷');
@@ -167,6 +233,13 @@ function needStep8(expr) {
 
 // ---- Вспомогательные для извлечения операндов (используются в needStep) ----
 
+/**
+ * Извлекает операнд вокруг оператора, учитывая скобки.
+ * @param {string} expr - выражение
+ * @param {number} opIdx - индекс оператора
+ * @param {'left'|'right'} side - сторона операнда
+ * @returns {string} выделенный операнд
+ */
 function extractOperand(expr, opIdx, side) {
   if (side === 'left') {
     let start = opIdx - 1;
@@ -180,7 +253,8 @@ function extractOperand(expr, opIdx, side) {
       }
       start = pos + 1;
     } else {
-      while (start >= 0 && !'+-*/^√('.includes(expr[start])) start--;
+      // Добавлен '÷' в список разделителей
+      while (start >= 0 && !'+-*/^√÷('.includes(expr[start])) start--;
       start++;
     }
     return expr.slice(start, opIdx).trim();
@@ -196,12 +270,17 @@ function extractOperand(expr, opIdx, side) {
       }
       end = pos;
     } else {
-      while (end < expr.length && !'+-*/^√)('.includes(expr[end])) end++;
+      // Добавлен '÷' в список разделителей
+      while (end < expr.length && !'+-*/^√÷)('.includes(expr[end])) end++;
     }
     return expr.slice(opIdx + 1, end).trim();
   }
 }
-
+/**
+ * Разбивает выражение на слагаемые по бинарным + и - на верхнем уровне.
+ * @param {string} expr - выражение
+ * @returns {string[]} массив слагаемых
+ */
 function splitByPlusMinus(expr) {
   const terms = [];
   let current = '';
@@ -223,7 +302,11 @@ function splitByPlusMinus(expr) {
   if (current.trim()) terms.push(current.trim());
   return terms;
 }
-
+/**
+ * Извлекает знаменатель из терма (слагаемого).
+ * @param {string} term - слагаемое (может содержать ÷)
+ * @returns {number} знаменатель (1, если нет дроби)
+ */
 function extractDenominator(term) {
   const parts = term.split('÷');
   if (parts.length === 2) {
@@ -232,7 +315,12 @@ function extractDenominator(term) {
   }
   return 1;
 }
-
+/**
+ * Вычисляет наибольший общий делитель двух чисел.
+ * @param {number} a
+ * @param {number} b
+ * @returns {number}
+ */
 function gcd(a, b) {
   a = Math.abs(a); b = Math.abs(b);
   while (b) { const t = b; b = a % b; a = t; }
@@ -241,6 +329,11 @@ function gcd(a, b) {
 
 // ---- Функции преобразований (используют импортированные из fractionActions) ----
 
+/**
+ * Преобразует смешанные дроби в неправильные.
+ * @param {string} expr - выражение с маркерами ⥑ и ⥏
+ * @returns {string} выражение без смешанных дробей
+ */
 function convertMixedToImproper(expr) {
   // Используем готовые трансформации из fractionActions
   let result = expr;
@@ -252,11 +345,12 @@ function convertMixedToImproper(expr) {
   result = transformMixedFractionWithDivision(result);
   return result;
 }
-
+/**
+ * Заменяет деление дробей '/' на умножение с переворотом второй дроби.
+ * @param {string} expr - выражение
+ * @returns {string} преобразованное выражение
+ */
 function replaceDivisionWithMultiply(expr) {
-  // Здесь мы можем просто вызвать функцию из fractionActions? 
-  // В fractionActions есть transformMixedFractionWithDivision, но не отдельная для /
-  // Оставим свою простую замену
   let result = '';
   let i = 0;
   let balance = 0;
@@ -282,7 +376,11 @@ function replaceDivisionWithMultiply(expr) {
   }
   return result;
 }
-
+/**
+ * Сворачивает последовательные умножения дробей в одну дробь.
+ * @param {string} expr - выражение
+ * @returns {string} выражение с одной дробью
+ */
 function collapseMultiplications(expr) {
   let result = '';
   let i = 0;
@@ -312,7 +410,11 @@ function collapseMultiplications(expr) {
   }
   return result;
 }
-
+/**
+ * Приводит все дроби к общему знаменателю.
+ * @param {string} expr - выражение с дробями, соединёнными + или -
+ * @returns {string} выражение с одинаковыми знаменателями
+ */
 function commonDenominator(expr) {
   const terms = splitByPlusMinus(expr);
   if (terms.length < 2) return expr;
@@ -350,7 +452,11 @@ function commonDenominator(expr) {
   }
   return result;
 }
-
+/**
+ * Объединяет числители дробей с одинаковым знаменателем в одну дробь.
+ * @param {string} expr - выражение с дробями, имеющими общий знаменатель
+ * @returns {string} одна дробь (числитель÷знаменатель)
+ */
 function combineNumerators(expr) {
   const terms = splitByPlusMinus(expr);
   if (terms.length < 2) return expr;
@@ -381,7 +487,11 @@ function combineNumerators(expr) {
   }
   return `(${total})÷${common}`;
 }
-
+/**
+ * Сокращает дробь, если это возможно.
+ * @param {string} expr - выражение вида "числитель÷знаменатель"
+ * @returns {string} сокращённая дробь
+ */
 function reduceFraction(expr) {
   const parts = expr.split('÷');
   if (parts.length !== 2) return expr;
@@ -397,8 +507,79 @@ function reduceFraction(expr) {
   return expr;
 }
 
-// ---- Основная функция generateSteps ----
+/**
+ * Вычисляет все степени и корни на верхнем уровне (вне скобок).
+ * @param {string} expr - выражение
+ * @returns {string|'ERROR'} - выражение с заменёнными степенями и корнями
+ */
+function evaluatePowersAndRoots(expr) {
+  let result = expr;
+  let changed = false;
 
+  let balance = 0;
+  for (let i = 0; i < result.length; i++) {
+    const ch = result[i];
+    if (ch === '(') balance++;
+    else if (ch === ')') balance--;
+    else if ((ch === '^' || ch === '√') && balance === 0) {
+      if (ch === '^') {
+        const leftOp = extractOperand(result, i, 'left');
+        const rightOp = extractOperand(result, i, 'right');
+        if (leftOp && rightOp) {
+          const leftFrac = evaluateFractionExpression(leftOp);
+          const rightFrac = evaluateFractionExpression(rightOp);
+          let resultFrac;
+          // Если степень целая, возводим точно
+          if (rightFrac.den === 1) {
+            const power = rightFrac.num;
+            const newNum = Math.pow(leftFrac.num, power);
+            const newDen = Math.pow(leftFrac.den, power);
+            resultFrac = new Fraction(newNum, newDen);
+          } else {
+            // Дробная степень — используем десятичное приближение
+            resultFrac = leftFrac.pow(rightFrac);
+          }
+          const resultStr = resultFrac.den === 1 ? String(resultFrac.num) : resultFrac.num + '÷' + resultFrac.den;
+          const leftStart = result.indexOf(leftOp, i - leftOp.length);
+          if (leftStart !== -1) {
+            const rightEnd = i + 1 + rightOp.length;
+            result = result.slice(0, leftStart) + resultStr + result.slice(rightEnd);
+            changed = true;
+            i = leftStart;
+            balance = 0;
+            continue;
+          }
+        }
+      } else if (ch === '√') {
+        const rightOp = extractOperand(result, i, 'right');
+        if (rightOp) {
+          const rightVal = evaluateSubExpression(rightOp);
+          if (rightVal === 'ERROR') return 'ERROR';
+          const value = evaluateFractionExpression(`√(${rightVal})`).toMixedString();
+          if (value === 'ERROR') return 'ERROR';
+          const rightStart = result.indexOf(rightOp, i + 1);
+          if (rightStart !== -1) {
+            const rightEnd = rightStart + rightOp.length;
+            result = result.slice(0, i) + value + result.slice(rightEnd);
+            changed = true;
+            i = i - 1;
+            balance = 0;
+            continue;
+          }
+        }
+      }
+    }
+  }
+  return changed ? result : expr;
+}
+
+// ---- Основная функция generateSteps ----
+/**
+ * Генерирует пошаговое решение дробного выражения.
+ * @param {string} expression - исходное выражение
+ * @param {Fraction} [resultFraction] - заранее вычисленный результат (опционально)
+ * @returns {string[]} массив шагов
+ */
 export function generateSteps(expression, resultFraction) {
   if (!expression || expression.trim() === '' || expression === '0') {
     return ['0'];
@@ -408,6 +589,21 @@ export function generateSteps(expression, resultFraction) {
   const steps = [currentExpr];
 
   try {
+    // ШАГ 1.1: Вычисление степеней и корней
+    let powerRootChanged = true;
+    let powerRootGuard = 0;
+    while (powerRootChanged && powerRootGuard < 10) {
+      powerRootChanged = false;
+      powerRootGuard++;
+      const newExpr = evaluatePowersAndRoots(currentExpr);
+      if (newExpr === 'ERROR') { steps.push('ERROR'); return steps; }
+      if (newExpr !== currentExpr) {
+        currentExpr = normalizeParentheses(newExpr);
+        currentExpr = insertImplicitMultiplication(currentExpr);
+        steps.push(currentExpr);
+        powerRootChanged = true;
+      }
+    }
     // ШАГ 2: Вычисление скобок
     if (needStep2(currentExpr)) {
       let changed = true;
@@ -498,38 +694,14 @@ export function generateSteps(expression, resultFraction) {
       }
     }
 
-    // ---- Обработка степеней (добавлена как отдельный проход, если не были обработаны) ----
-    // Но мы также добавим итеративный цикл для обработки оставшихся операций, как в старой версии,
-    // чтобы гарантировать все шаги. Включим его после всех needStep, чтобы не пропустить операции.
+    // --- Итеративный расчёт бинарных операций (умножение, деление, сложение, вычитание) ---
     let calcGuard = 0;
     while (calcGuard < 20) {
       let tokens = parseExpressionToTokens(currentExpr);
-      let changed = false;
 
-      // Сначала степени
-      let powerIdx = tokens.findIndex(t => t.value === '^');
-      if (powerIdx !== -1) {
-        const left = tokens[powerIdx - 1];
-        const right = tokens[powerIdx + 1];
-        if (left && right) {
-          let leftStr = left.type === 'fraction' ? `${left.num}÷${left.den}` : left.value;
-          let rightStr = right.type === 'fraction' ? `${right.num}÷${right.den}` : right.value;
-          const powerExpr = `${leftStr}^${rightStr}`;
-          const result = evaluateSubExpression(powerExpr);
-          if (result === 'ERROR') { steps.push('ERROR'); return steps; }
-          tokens.splice(powerIdx - 1, 3, { type: 'text', value: result });
-          currentExpr = tokensToExpr(tokens);
-          currentExpr = normalizeParentheses(currentExpr);
-          currentExpr = insertImplicitMultiplication(currentExpr);
-          steps.push(currentExpr);
-          changed = true;
-          continue;
-        }
-      }
-
-      // Затем умножение/деление
       const hasMulDiv = tokens.some(t => t.value === '*' || t.value === '÷');
       const hasPlusMinus = tokens.some(t => t.value === '+' || t.value === '-');
+
       if (!hasMulDiv && !hasPlusMinus) break;
 
       let targetOpIdx = -1;
@@ -538,6 +710,7 @@ export function generateSteps(expression, resultFraction) {
       } else {
         targetOpIdx = tokens.findIndex(t => t.value === '+' || t.value === '-');
       }
+
       if (targetOpIdx <= 0 || targetOpIdx >= tokens.length - 1) break;
 
       const left = tokens[targetOpIdx - 1];
@@ -546,15 +719,30 @@ export function generateSteps(expression, resultFraction) {
 
       if (left.type === 'fraction' && right.type === 'fraction') {
         if (op === '÷') {
+          // Переворот второй дроби
           let reverseExpr = `${left.num}÷${left.den}*${right.den}÷${right.num}`;
           tokens.splice(targetOpIdx - 1, 3, { type: 'text', value: reverseExpr });
           currentExpr = tokensToExpr(tokens);
           currentExpr = normalizeParentheses(currentExpr);
           currentExpr = insertImplicitMultiplication(currentExpr);
           steps.push(currentExpr);
-          changed = true;
+
+          // Сразу сворачиваем умножение
+          let freshTokens = parseExpressionToTokens(currentExpr);
+          let starIdx = freshTokens.findIndex(t => t.value === '*');
+          if (starIdx !== -1) {
+            const lF = freshTokens[starIdx - 1];
+            const rF = freshTokens[starIdx + 1];
+            const calcFrac = evaluateFractionExpression(`${lF.num}÷${lF.den}*${rF.num}÷${rF.den}`);
+            freshTokens.splice(starIdx - 1, 3, { type: 'fraction', num: String(calcFrac.num), den: String(calcFrac.den) });
+            currentExpr = tokensToExpr(freshTokens);
+            currentExpr = normalizeParentheses(currentExpr);
+            currentExpr = insertImplicitMultiplication(currentExpr);
+            steps.push(currentExpr);
+          }
           continue;
         }
+
         if (op === '*') {
           const calcFrac = evaluateFractionExpression(`${left.num}÷${left.den}*${right.num}÷${right.den}`);
           tokens.splice(targetOpIdx - 1, 3, { type: 'fraction', num: String(calcFrac.num), den: String(calcFrac.den) });
@@ -562,16 +750,20 @@ export function generateSteps(expression, resultFraction) {
           currentExpr = normalizeParentheses(currentExpr);
           currentExpr = insertImplicitMultiplication(currentExpr);
           steps.push(currentExpr);
-          changed = true;
           continue;
         }
+
         if (op === '+' || op === '-') {
           const d1 = parseInt(left.den, 10);
           const d2 = parseInt(right.den, 10);
+
           if (d1 !== d2) {
+            // Приводим к общему знаменателю (НОК)
             const commonDen = stepLcm(d1, d2);
             const n1 = parseInt(left.num, 10) * (commonDen / d1);
             const n2 = parseInt(right.num, 10) * (commonDen / d2);
+
+            // Шаг: показываем дроби с общим знаменателем
             let commonParts = [...tokens];
             commonParts[targetOpIdx - 1] = { type: 'fraction', num: String(n1), den: String(commonDen) };
             commonParts[targetOpIdx + 1] = { type: 'fraction', num: String(n2), den: String(commonDen) };
@@ -579,12 +771,15 @@ export function generateSteps(expression, resultFraction) {
             currentExpr = normalizeParentheses(currentExpr);
             currentExpr = insertImplicitMultiplication(currentExpr);
             steps.push(currentExpr);
+
+            // Шаг: объединяем числители
             commonParts.splice(targetOpIdx - 1, 3, { type: 'text', value: `(${n1}${op}${n2})÷${commonDen}` });
             currentExpr = tokensToExpr(commonParts);
             currentExpr = normalizeParentheses(currentExpr);
             currentExpr = insertImplicitMultiplication(currentExpr);
             steps.push(currentExpr);
           } else {
+            // Знаменатели уже одинаковые
             let commonParts = [...tokens];
             commonParts.splice(targetOpIdx - 1, 3, { type: 'text', value: `(${left.num}${op}${right.num})÷${left.den}` });
             currentExpr = tokensToExpr(commonParts);
@@ -592,18 +787,18 @@ export function generateSteps(expression, resultFraction) {
             currentExpr = insertImplicitMultiplication(currentExpr);
             steps.push(currentExpr);
           }
+
+          // Финальный расчёт этой пары
           const calcFrac = evaluateFractionExpression(`${left.num}÷${left.den}${op}${right.num}÷${right.den}`);
           tokens.splice(targetOpIdx - 1, 3, { type: 'fraction', num: String(calcFrac.num), den: String(calcFrac.den) });
           currentExpr = tokensToExpr(tokens);
           currentExpr = normalizeParentheses(currentExpr);
           currentExpr = insertImplicitMultiplication(currentExpr);
           steps.push(currentExpr);
-          changed = true;
           continue;
         }
       }
       calcGuard++;
-      if (!changed) break;
     }
 
     // ФИНАЛ: результат

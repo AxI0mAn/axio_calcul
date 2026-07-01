@@ -1263,6 +1263,12 @@ export function evaluateFraction() {
       finalStepsArray = generateSteps(cleanExpr, resultFraction);
     }
 
+    // === -📝=TODO=📝- ===
+    // ===== ВРЕМЕННАЯ ОТЛАДКА =====
+    console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
+    console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
+    // =============================
+
     appState.historySession.push({
       type: 'fractionSteps',
       steps: finalStepsArray
