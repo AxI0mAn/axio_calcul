@@ -456,8 +456,6 @@ export function parseExpressionToTokens(expression) {
         // Если после показателя нет '÷', то не создаём дробь, идём дальше
       }
 
-
-
       if (candidate.includes(MARKERS.DIV) &&
         !candidate.includes(MARKERS.WHOLE_START) &&
         !candidate.includes(MARKERS.COMPLEX_NUM_START)) {

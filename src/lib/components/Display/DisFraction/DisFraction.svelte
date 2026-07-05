@@ -97,7 +97,7 @@
 				>
 					{#each entry.steps as step, idx}
 						<div class="step-line">
-							{#if idx > 0}
+							{#if idx > 1}
 								<span class="math-text equal-prefix"> = </span>
 							{/if}
 
@@ -296,8 +296,10 @@
 		min-height: 0;
 		overflow-y: scroll;
 		overflow-x: hidden;
-		font-size: 1rem; //1.25rem;
-		line-height: 1.25rem; //1.75rem;
+		// === -📝=TODO=📝- ===
+		// уменьшить шрифт, чтоб больше помещалось в одну строку
+		font-size: 1.25rem;
+		line-height: 1.75rem;
 		color: $clr-slate;
 		margin-bottom: 0.5rem;
 		// padding-left: 2px;
