@@ -325,6 +325,27 @@ export function parseExpressionToTokens(expression) {
         j++;
       }
 
+      // =====   Блокируем сбор дроби, если после ÷ идет ( =====
+      // Проверяем, не является ли это оператором деления со скобками
+      let candidate = expression.substring(i, j);
+      const divIndex = candidate.indexOf(MARKERS.DIV);
+
+      // Если найден ÷, проверяем, что за ним следует в выражении
+      if (divIndex !== -1) {
+        const afterDiv = candidate.substring(divIndex + 1);
+        // Если после ÷ пусто или только цифры, проверяем следующий символ
+        if (afterDiv === '' || /^\d*\.?\d*$/.test(afterDiv)) {
+          const nextChar = j < len ? expression[j] : '';
+          // Если следующий символ — '(', значит это оператор деления, а не дробь
+          if (nextChar === '(' || nextChar === MARKERS.COMPLEX_NUM_START) {
+            // Не даем собрать дробь — оставляем как текст
+            tokens.push({ type: 'text', value: candidate });
+            i = j;
+            continue;
+          }
+        }
+      }
+
       // === LOOKAHEAD ОКНО ДЛЯ СЛУЧАЯ 1 (Незакрытые скобки) ===
       // Если сразу за числом идёт открывающая скобка '('
       if (j < len && expression[j] === '(') {
@@ -411,7 +432,7 @@ export function parseExpressionToTokens(expression) {
         }
       }
 
-      const candidate = expression.substring(i, j);
+      candidate = expression.substring(i, j);
 
       // ---- Проверка на дробь, где числитель содержит степень (например, 4^7÷3^5) ----
       if (j < len && expression[j] === '^') {
@@ -459,6 +480,25 @@ export function parseExpressionToTokens(expression) {
       if (candidate.includes(MARKERS.DIV) &&
         !candidate.includes(MARKERS.WHOLE_START) &&
         !candidate.includes(MARKERS.COMPLEX_NUM_START)) {
+
+        // ===== Блокируем парсинг как дробь =====
+        // Случай 1: "число÷(" — заканчивается на ÷ и следующий символ (
+        const endsWithDiv = candidate.endsWith(MARKERS.DIV);
+        const nextChar = j < len ? expression[j] : '';
+        const isFollowedByOpenParen = nextChar === '(';
+
+        // Случай 2: "(число÷(" — содержит паттерн ÷( 
+        const hasDivFollowedByParen = candidate.includes(MARKERS.DIV + '(');
+
+        // Если это признаки оператора деления со скобками, а не дроби
+        if ((endsWithDiv && isFollowedByOpenParen) || hasDivFollowedByParen) {
+          // Это НЕ дробь, а текст — отправляем как есть
+          tokens.push({ type: 'text', value: candidate });
+          i = j;
+          continue;
+        }
+
+        // Иначе — пробуем распарсить как простую дробь (например, 3÷5)
         const parsed = parseSimpleFraction(candidate);
         if (parsed) {
           tokens.push({
