@@ -269,6 +269,8 @@
 </div>
 
 <style lang="scss">
+	$fontSize: 1.1rem;
+
 	// Полностью наследуем стили основного контейнера из DisText.svelte
 	.display-box {
 		min-height: 100%;
@@ -287,7 +289,7 @@
 			$shadow-inset,
 			0px 0px 2px 4px rgba(0, 0, 0, 0.5);
 		border: 1px solid $clr-slate;
-		font-size: 2.5rem;
+		font-size: $fontSize; //2.5rem;
 		text-align: left;
 		color: rgba(255, 255, 255, 0.8);
 	}
@@ -336,7 +338,7 @@
 		align-items: center; // Центрирует операторы (+, -, *, =) строго по центру дроби
 		gap: 4px;
 		font-family: inherit;
-		height: 4rem;
+		min-height: 4rem;
 	}
 
 	.history-section {
@@ -344,9 +346,8 @@
 		min-height: 0;
 		overflow-y: scroll;
 		overflow-x: hidden;
-		// === -📝=TODO=📝- ===
 		// уменьшить шрифт, чтоб больше помещалось в одну строку
-		font-size: 1.25rem;
+		font-size: $fontSize; //1.25rem;
 		line-height: 1.75rem;
 		color: $clr-slate;
 		margin-bottom: 0.5rem;
@@ -389,7 +390,7 @@
 	// Стили для обычных знаков (+, -, *, =, пробелы) и десятичных дробей
 	.math-text,
 	.radical-wrapper {
-		font-size: 2rem;
+		font-size: $fontSize; //2rem;
 		padding: 0 4px;
 		display: inline-flex;
 		align-items: center;
@@ -413,7 +414,9 @@
 		// указатель степени в надстрочном шрифте
 		.super-exponent {
 			display: inline-block;
-			font-size: 0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
+			font-size: calc(
+				$fontSize * 0.6
+			); //0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
 			font-weight: 500;
 			line-height: 1;
 			color: $clr-white;
@@ -466,8 +469,6 @@
 		}
 	}
 
-	$fontSizeFractionPart: 1rem;
-
 	.fraction-container {
 		max-width: fit-content;
 		display: flex;
@@ -475,15 +476,13 @@
 	}
 	.math-text,
 	.whole-part {
-		// === -📝=TODO=📝- ===
 		color: $clr-mint;
-		font-size: calc(1.5 * $fontSizeFractionPart);
+		font-size: calc(1.25 * $fontSize);
 		padding-right: 0.5rem;
 	}
 	.num-part {
-		// === -📝=TODO=📝- ===
 		color: rgb(192, 235, 3);
-		font-size: $fontSizeFractionPart;
+		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- ЗАПРЕЩАЕМ ВЫВАЛИВАНИЕ СИМВОЛОВ НАВЕРХ
 	}
@@ -493,14 +492,12 @@
 		height: 2px;
 		margin: 2px 0;
 
-		// === -📝=TODO=📝- ===
 		background-color: rgb(153, 0, 255);
-		font-size: $fontSizeFractionPart;
+		font-size: $fontSize;
 	}
 	.den-part {
-		// === -📝=TODO=📝- ===
 		color: $clr-coral;
-		font-size: $fontSizeFractionPart;
+		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- УДЕРЖИВАЕМ СИМВОЛЫ НА НИЖНЕМ УРОВНЕ
 	}
@@ -509,12 +506,12 @@
 	.display-line {
 		.math-text,
 		.whole-part {
-			font-size: calc(1.75 * $fontSizeFractionPart);
+			font-size: calc(1.25 * $fontSize);
 		}
 		.num-part,
 		.fraction-line,
 		.den-part {
-			font-size: calc(1.5 * $fontSizeFractionPart);
+			font-size: calc(1 * $fontSize);
 		}
 	}
 
@@ -535,7 +532,7 @@
 	}
 
 	.radical-tick {
-		font-size: 3rem; // Делаем галочку чуть выше контента
+		font-size: calc($fontSize * 2.5); //3rem; // Делаем галочку чуть выше контента
 		font-weight: 100;
 		line-height: 100%; // 0.9;
 		color: $clr-mint;

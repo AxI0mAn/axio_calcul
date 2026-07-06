@@ -1607,7 +1607,7 @@ fractionCore.js:393 Input expression: 2+(3÷(3-19))
 
 
 =============
-Шаг 4: Исправление выравнивания результата в history-steps-block (Случаи 4, 6, 8, 11, 13, 14, 16)
+❎    Шаг 4: Исправление выравнивания результата в history-steps-block (Случаи 4, 6, 8, 11, 13, 14, 16)
 Контекст задачи: Файл src/lib/components/Display/DisFraction/DisFraction.svelte. CSS-стили для .step-line и .history-steps-block. Результат справа от = съезжает вниз.
 
 Архитектура и Архитектурные связи:
@@ -1630,7 +1630,7 @@ fractionCore.js:393 Input expression: 2+(3÷(3-19))
 
 
 =============
-Шаг 5: Исправление ввода под знаком ÷ в fraction-input-area (Случай 6)
+❎    Шаг 5: Исправление ввода под знаком ÷ в fraction-input-area (Случай 6)
 Контекст задачи: Файл src/lib/services/math/fractionActions.js, функция addDigitFraction и addOperatorFraction. При вводе (8-12)+((5-3)÷(3+ следующие цифры пишутся над знаком ÷.
 
 Архитектура и Архитектурные связи:
