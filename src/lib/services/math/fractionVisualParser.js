@@ -147,6 +147,11 @@ export function stripMarkers(str) {
  * @returns {Array<{type: string, value?: string, whole?: string, num?: string, den?: string}>}
  */
 export function parseExpressionToTokens(expression) {
+  // =====  Обработка ERROR =====
+  if (expression === 'ERROR') {
+    return [{ type: 'text', value: 'ERROR' }];
+  }
+
   if (!expression || expression.trim() === '') return [];
 
   const tokens = [];

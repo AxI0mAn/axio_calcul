@@ -356,7 +356,6 @@ function tokenizeFractionExpression(expr) {
   // === -📝=TODO=📝- ===
   // ===== ВРЕМЕННАЯ ОТЛАДКА =====
   // console.log("Сгенерированные токены ядра (отладка):", tokens);
-  console.log('[DEBUG-STEP6-TOKENS] Токены:', JSON.stringify(tokens, null, 2));
   return tokens;
 }
 
@@ -476,12 +475,6 @@ export function evaluateFractionExpression(expression) {
   // ===== ВРЕМЕННАЯ ОТЛАДКА =====
   // console.log('Final Output Stack (RPN):', output);
 
-  console.log('[DEBUG-STEP6-RPN] RPN стек (детально):', output.map(item => {
-    if (item instanceof Fraction) {
-      return { type: 'Fraction', value: item.toDecimal ? item.toDecimal() : item.toMixedString() };
-    }
-    return { type: 'operator', value: item };
-  }));
 
 
   // --- ВЫЧИСЛЕНИЕ СТЕКА ---
@@ -502,7 +495,6 @@ export function evaluateFractionExpression(expression) {
       const a = stack.pop(); // Левый операнд
       if (a === undefined || b === undefined) throw new Error('Invalid expression structure');
 
-      console.log('[DEBUG-STEP6-CALC] Обработка оператора:', item, '| Левый:', a?.toDecimal ? a.toDecimal() : a, '| Правый:', b?.toDecimal ? b.toDecimal() : b);
 
       let result;
       switch (item) {

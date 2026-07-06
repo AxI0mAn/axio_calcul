@@ -373,28 +373,70 @@ export function fractionToDecimal() {
 
   if (isError()) return;
 
-  // Фиксируем исходное значение для записи в историю сессии
   const originalDisplay = appState.display;
   const expr = appState.display;
 
+  // ===== ОБРАБОТКА ДЕЛЕНИЯ НА НОЛЬ (единая точка) =====
+  if (/[÷/]0(?=\D|$|\))/.test(expr)) {
+    appState.historySession.push({
+      type: 'fractionSteps',
+      steps: [expr, 'ERROR']
+    });
+    appState.display = 'ERROR';
+    appState.expression = '';
+    appState.isNewInput = true;
+    return;
+  }
+
   try {
-    let normalized = expr.replace(/⥑/g, ' ').replace(/÷/g, '/').replace(/⥏/g, '');
+    // Нормализация: маркеры → скобки
+    let normalized = expr
+      .replace(/⥾/g, '(')
+      .replace(/⥿/g, ')')
+      .replace(/⥑/g, '(')
+      .replace(/⥏/g, ')');
+
+    // Распознаем смешанную дробь: "7(1÷5)" → "7 1/5"
+    const mixedMatch = normalized.match(/^(-?)(\d+)\((\d+)[÷/](\d+)\)$/);
+    if (mixedMatch) {
+      const sign = mixedMatch[1] === '-' ? '-' : '';
+      const whole = mixedMatch[2];
+      const num = mixedMatch[3];
+      const den = mixedMatch[4];
+
+      // Проверка на деление на ноль (дублирующая, но оставляем для безопасности)
+      if (parseInt(den) === 0) {
+        throw new Error('Division by zero');
+      }
+
+      normalized = `${sign}${whole} ${num}/${den}`;
+    } else {
+      // Простая дробь: "3÷4" → "3/4"
+      normalized = normalized.replace(/÷/g, '/');
+    }
+
     const frac = new FractionJS(normalized);
     const decimal = frac.valueOf();
-
     const resultStr = String(decimal);
 
-    // ДОПОЛНЕНИЕ: Запись операции перевода в историю сессии
     appState.historySession.push({
       type: 'fractionSteps',
       steps: [originalDisplay, resultStr]
     });
 
     appState.display = resultStr;
-    appState.isNewInput = true;  // чтобы следующий ввод заменил десятичную дробь
+    appState.isNewInput = true;
   } catch (e) {
-    console.error(e);
+    console.error('fractionToDecimal error:', e);
+
+    appState.historySession.push({
+      type: 'fractionSteps',
+      steps: [originalDisplay, 'ERROR']
+    });
+
     appState.display = 'ERROR';
+    appState.expression = '';
+    appState.isNewInput = true;
   }
 }
 
@@ -1348,7 +1390,6 @@ export function evaluateFraction() {
   try {
     // 8. Переносим целые части в числитель дроби
     fullExpr = convertMixedToImproper(fullExpr);
-    console.log('[DEBUG-STEP6] После преобразования в неправильные дроби:', fullExpr);
 
     // 1. Переводим всю строку в чистый текстовый вид для математического ядра
     // (например, конвертируем superscript-символы степени: "2^³" -> "2^3")
@@ -1405,15 +1446,11 @@ export function evaluateFraction() {
     // console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
 
-    console.log('[DEBUG-STEP6-FULL] fullExpr после трансформаций:', fullExpr);
-    console.log('[DEBUG-STEP6-CLEAN] cleanExpr перед ядром:', cleanExpr);
 
     appState.historySession.push({
       type: 'fractionSteps',
       steps: finalStepsArray
     });
-
-
 
     // Обновляем состояние дисплея для пользователя
     appState.display = displayStr;
@@ -1423,7 +1460,14 @@ export function evaluateFraction() {
   } catch (err) {
     console.error('Evaluation error:', err);
 
-    // В случае ошибки при включенных шагах — получаем шаги до места сбоя + "ERROR"
+    // =====   Обработка деления на ноль в смешанной дроби =====
+    // Проверяем, является ли ошибка делением на ноль
+    const isDivisionByZero = err.message && (
+      err.message.includes('Division by zero') ||
+      err.message.includes('division by zero')
+    );
+
+    // Формируем массив шагов для истории
     let errorStepsArray = [historyDisplayExpr, 'ERROR'];
     if (appState.stepsFraction) {
       errorStepsArray = generateSteps(fromSuperscript(fullExpr));
@@ -1432,18 +1476,15 @@ export function evaluateFraction() {
       }
     }
 
+    // Записываем ошибку в историю
     appState.historySession.push({
       type: 'fractionSteps',
       steps: errorStepsArray
     });
 
-    // 2. КАК ДОЛЖНО БЫТЬ: переводим главный дисплей в режим ожидания (выводим "0")
-    appState.display = '0';
-
-    // 3. Очищаем верхнюю строку цепочки выражений
+    // =====  Отображаем ERROR на дисплее =====
+    appState.display = 'ERROR';
     appState.expression = '';
-
-    // 4. Выставляем флаг, что следующий ввод сотрет этот ноль и начнется заново
     appState.isNewInput = true;
   }
 }
