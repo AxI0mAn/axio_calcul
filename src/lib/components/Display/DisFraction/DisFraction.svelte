@@ -89,66 +89,114 @@
 	<div class="history-section" bind:this={historyContain}>
 		{#each tokenizedHistory as entry}
 			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
-				<!-- Рендеринг дробного пошагового решения (без изменений) -->
-				<div
-					class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}"
-					use:longpress
-					onlongpress={() => btnMemo(null, true, entry.steps[entry.steps.length - 1])}
-				>
-					{#each entry.steps as step, idx}
-						<div class="step-line">
-							{#if idx > 1}
-								<span class="math-text equal-prefix"> = </span>
-							{/if}
-
-							{#if step === 'ERROR'}
-								<span class="math-text notValid">ERROR</span>
-							{:else}
-								{#each entry.tokenizedSteps[idx] as token, tokenIdx (tokenIdx)}
-									{#if token.type === 'text'}
-										{#if token.value === '√'}
-											<div class="radical-wrapper">
-												<span class="radical-tick">√</span>
-											</div>
-										{:else}
-											<span class="math-text">{stripMarkers(token.value)}</span>
-										{/if}
-									{:else if token.type === 'superscript'}
-										<span class="super-exponent">{token.value}</span>
-									{:else if token.type === 'fraction'}
-										<div
-											class="fraction-block {entry.tokenizedSteps[idx][tokenIdx - 1]?.value === '√'
-												? 'under-radical'
-												: ''}"
-										>
-											{#if token.whole && token.whole !== '0'}
-												<span class="whole-part">{token.whole}</span>
-											{/if}
-											<div class="fraction-container">
-												<span class="num-part">{token.num}</span>
-												<span class="fraction-line"></span>
-												<span class="den-part">{token.den}</span>
-											</div>
+				<div class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}">
+					{#if !appState.stepsFraction && entry.steps.length === 2}
+						<!-- ===== РЕЖИМ БЕЗ ПОШАГОВОГО РЕШЕНИЯ: 2 шага в одной строке ===== -->
+						<div class="step-line single-line">
+							<!-- Первый шаг (выражение) -->
+							{#each entry.tokenizedSteps[0] as token, tokenIdx (tokenIdx)}
+								{#if token.type === 'text'}
+									{#if token.value === '√'}
+										<div class="radical-wrapper">
+											<span class="radical-tick">√</span>
 										</div>
+									{:else}
+										<span class="math-text">{stripMarkers(token.value)}</span>
 									{/if}
-								{/each}
-							{/if}
+								{:else if token.type === 'superscript'}
+									<span class="super-exponent">{token.value}</span>
+								{:else if token.type === 'fraction'}
+									<div class="fraction-block">
+										{#if token.whole && token.whole !== '0'}
+											<span class="whole-part">{token.whole}</span>
+										{/if}
+										<div class="fraction-container">
+											<span class="num-part">{token.num}</span>
+											<span class="fraction-line"></span>
+											<span class="den-part">{token.den}</span>
+										</div>
+									</div>
+								{/if}
+							{/each}
 
-							{#if idx >= 0 && idx < entry.steps.length - 1}
-								<span class="math-text equal-prefix"> = </span>
-							{/if}
+							<!-- Знак равенства -->
+							<span class="math-text equal-prefix"> = </span>
+
+							<!-- Второй шаг (результат) -->
+							{#each entry.tokenizedSteps[1] as token, tokenIdx (tokenIdx)}
+								{#if token.type === 'text'}
+									{#if token.value === '√'}
+										<div class="radical-wrapper">
+											<span class="radical-tick">√</span>
+										</div>
+									{:else}
+										<span class="math-text">{stripMarkers(token.value)}</span>
+									{/if}
+								{:else if token.type === 'superscript'}
+									<span class="super-exponent">{token.value}</span>
+								{:else if token.type === 'fraction'}
+									<div class="fraction-block">
+										{#if token.whole && token.whole !== '0'}
+											<span class="whole-part">{token.whole}</span>
+										{/if}
+										<div class="fraction-container">
+											<span class="num-part">{token.num}</span>
+											<span class="fraction-line"></span>
+											<span class="den-part">{token.den}</span>
+										</div>
+									</div>
+								{/if}
+							{/each}
 						</div>
-					{/each}
+					{:else}
+						<!-- ===== ПОШАГОВЫЙ РЕЖИМ ИЛИ БОЛЕЕ 2 ШАГОВ: каждый шаг на новой строке ===== -->
+						{#each entry.steps as step, idx}
+							<div class="step-line">
+								{#if idx > 1}
+									<span class="math-text equal-prefix"> = </span>
+								{/if}
+
+								{#if step === 'ERROR'}
+									<span class="math-text notValid">ERROR</span>
+								{:else}
+									{#each entry.tokenizedSteps[idx] as token, tokenIdx (tokenIdx)}
+										{#if token.type === 'text'}
+											{#if token.value === '√'}
+												<div class="radical-wrapper">
+													<span class="radical-tick">√</span>
+												</div>
+											{:else}
+												<span class="math-text">{stripMarkers(token.value)}</span>
+											{/if}
+										{:else if token.type === 'superscript'}
+											<span class="super-exponent">{token.value}</span>
+										{:else if token.type === 'fraction'}
+											<div
+												class="fraction-block {entry.tokenizedSteps[idx][tokenIdx - 1]?.value ===
+												'√'
+													? 'under-radical'
+													: ''}"
+											>
+												{#if token.whole && token.whole !== '0'}
+													<span class="whole-part">{token.whole}</span>
+												{/if}
+												<div class="fraction-container">
+													<span class="num-part">{token.num}</span>
+													<span class="fraction-line"></span>
+													<span class="den-part">{token.den}</span>
+												</div>
+											</div>
+										{/if}
+									{/each}
+								{/if}
+
+								{#if idx >= 0 && idx < entry.steps.length - 1}
+									<span class="math-text equal-prefix"> = </span>
+								{/if}
+							</div>
+						{/each}
+					{/if}
 				</div>
-			{:else}
-				<!-- Отображение обычной строки -->
-				<p
-					class="history-text-entry"
-					use:longpress
-					onlongpress={() => btnMemo(null, true, getStringEntry(entry))}
-				>
-					{getStringEntry(entry)}
-				</p>
 			{/if}
 		{/each}
 	</div>
@@ -313,7 +361,7 @@
 	.history-steps-block {
 		display: flex;
 		flex-flow: row wrap;
-		justify-content: center;
+		justify-content: flex-start; //center;
 		align-items: center;
 		gap: 0.2rem;
 		padding: 4px 8px 4px 4px;
