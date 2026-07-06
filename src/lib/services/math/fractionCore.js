@@ -310,6 +310,7 @@ function tokenizeFractionExpression(expr) {
         continue;
       }
 
+      //  Обработка смешанной дроби как единого целого =====
       // Кейс А: Смешанная дробь (например, 2⥑1÷3⥏)
       const mixedMatch = raw.match(/^(-?)(\d+)⥑(\d+)÷(\d+)⥏$/);
       if (mixedMatch) {
@@ -317,9 +318,10 @@ function tokenizeFractionExpression(expr) {
         const whole = parseInt(mixedMatch[2], 10);
         const num = parseInt(mixedMatch[3], 10);
         const den = parseInt(mixedMatch[4], 10);
+        // Вычисляем значение смешанной дроби как единое целое: sign * (whole + num/den)
         const totalNum = sign * (whole * den + num);
         tokens.push({ type: 'fraction', value: new Fraction(totalNum, den) });
-        i = j; // Успешный разбор, переносим указатель
+        i = j;
         continue;
       }
 
@@ -351,7 +353,10 @@ function tokenizeFractionExpression(expr) {
     i++;
   }
 
-  console.log("Сгенерированные токены ядра (отладка):", tokens);
+  // === -📝=TODO=📝- ===
+  // ===== ВРЕМЕННАЯ ОТЛАДКА =====
+  // console.log("Сгенерированные токены ядра (отладка):", tokens);
+  console.log('[DEBUG-STEP6-TOKENS] Токены:', JSON.stringify(tokens, null, 2));
   return tokens;
 }
 
@@ -389,8 +394,10 @@ function applyOperator(op, a, b = null) {
 
 
 export function evaluateFractionExpression(expression) {
-  console.log('=== evaluateFractionExpression ===');
-  console.log('Input expression:', expression);
+  // === -📝=TODO=📝- ===
+  // ===== ВРЕМЕННАЯ ОТЛАДКА =====
+  // console.log('=== evaluateFractionExpression ===');
+  // console.log('Input expression:', expression);
 
   let tokens = tokenizeFractionExpression(expression);
 
@@ -465,8 +472,17 @@ export function evaluateFractionExpression(expression) {
   while (ops.length) {
     output.push(ops.pop());
   }
+  // === -📝=TODO=📝- ===
+  // ===== ВРЕМЕННАЯ ОТЛАДКА =====
+  // console.log('Final Output Stack (RPN):', output);
 
-  console.log('Final Output Stack (RPN):', output);
+  console.log('[DEBUG-STEP6-RPN] RPN стек (детально):', output.map(item => {
+    if (item instanceof Fraction) {
+      return { type: 'Fraction', value: item.toDecimal ? item.toDecimal() : item.toMixedString() };
+    }
+    return { type: 'operator', value: item };
+  }));
+
 
   // --- ВЫЧИСЛЕНИЕ СТЕКА ---
   const stack = [];
@@ -485,6 +501,8 @@ export function evaluateFractionExpression(expression) {
       const b = stack.pop(); // Правый операнд
       const a = stack.pop(); // Левый операнд
       if (a === undefined || b === undefined) throw new Error('Invalid expression structure');
+
+      console.log('[DEBUG-STEP6-CALC] Обработка оператора:', item, '| Левый:', a?.toDecimal ? a.toDecimal() : a, '| Правый:', b?.toDecimal ? b.toDecimal() : b);
 
       let result;
       switch (item) {
@@ -534,7 +552,9 @@ if (typeof window !== 'undefined') {
   window.testEvaluate = function (expr) {
     try {
       const result = evaluateFractionExpression(expr);
-      console.log('Результат для "' + expr + '":', result.toMixedString(), 'десятичное:', result.toDecimal());
+      // === -📝=TODO=📝- ===
+      // ===== ВРЕМЕННАЯ ОТЛАДКА =====
+      // console.log('Результат для "' + expr + '":', result.toMixedString(), 'десятичное:', result.toDecimal());
       return result;
     } catch (e) {
       console.error('Ошибка:', e.message);

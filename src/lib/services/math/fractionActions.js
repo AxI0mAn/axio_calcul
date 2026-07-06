@@ -29,7 +29,6 @@ function clearErrorIfNeeded() {
 }
 
 // ---- вспомогательные функции для проверки готовности маркеров к закрытию ----
-// ---- вспомогательные функции для проверки готовности маркеров к закрытию ----
 /**
  * Проверяет, есть ли незакрытая сложная скобка (⥾) в выражении.
  */
@@ -85,7 +84,6 @@ function isWholePartReadyToClose(expr, display) {
   const lastChar = display.slice(-1);
   return lastChar === ')';
 }
-// --------------------------------------------
 
 // ---- цифры и точка ----
 export function addDigitFraction(digit) {
@@ -128,8 +126,6 @@ export function addDigitFraction(digit) {
     appState.display += digit;
   }
 }
-
-
 
 // ---- операторы + - * / ÷ √ ^ ---- 
 export function addOperatorFraction(op) {
@@ -1114,8 +1110,6 @@ export function transformMixedNumberWithComplexBrackets(expr) {
         // Условие: ровно одна операция ÷ на верхнем уровне и нет других операторов
         const isSimpleFraction = (divCountOnTopLevel === 1) && !hasOtherOpsOnTopLevel;
 
-        console.log('[DEBUG-STEP3-CORE] numberPart:', numberPart, 'content:', content, 'divCountOnTopLevel:', divCountOnTopLevel, 'hasOtherOpsOnTopLevel:', hasOtherOpsOnTopLevel, 'isSimpleFraction:', isSimpleFraction);
-
         // =====   Если это смешанная дробь, преобразуем ВСЕГДА =====
         // Даже если после закрывающей скобки идет ÷, это все равно смешанная дробь
         // Пример: 2(3÷6)÷7 → 2+(3÷6)÷7 → затем обработается деление
@@ -1245,6 +1239,18 @@ function formatHistoryExpr(expr) {
 }
 
 /**
+ * Преобразует все смешанные дроби вида "число+(число÷число)" в неправильные дроби "(число*знаменатель+числитель)÷знаменатель"
+ * Пример: "4+(3÷4)" → "(4*4+3)÷4" → "19÷4"
+ */
+function convertMixedToImproper(expr) {
+  // Ищем паттерн: число+(числитель÷знаменатель)
+  return expr.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `(${improperNum}÷${den})`;
+  });
+}
+
+/**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
  * передает выражение в математическое ядро и управляет выводом результата или ERROR.
@@ -1291,21 +1297,14 @@ export function evaluateFraction() {
   // === ТРАНСФОРМАЦИИ (все существующие) === 
   // 1. Обрабатываем смешанные числа с маркерами целой части (⥑...⥏)
   fullExpr = transformMixedNumberWithoutDivision(fullExpr);
-  console.log('[DEBUG-STEP3] После transformMixedNumberWithoutDivision:', fullExpr);
   // 2. Обрабатываем отрицательные смешанные числа
   fullExpr = transformNegativeMixedNumber(fullExpr);
-  console.log('[DEBUG-STEP3] После transformNegativeMixedNumber:', fullExpr);
   // 3. Обрабатываем смешанные дроби с оператором ÷ после скобок
   fullExpr = transformMixedFractionWithDivision(fullExpr);
-  console.log('[DEBUG-STEP3] После transformMixedFractionWithDivision:', fullExpr);
   // 4. Обрабатываем сложные скобки ⥾...⥿ (Правило 1: число+дробь)
   fullExpr = transformMixedNumberWithComplexBrackets(fullExpr);
-  console.log('[DEBUG-STEP3] После transformMixedNumberWithComplexBrackets:', fullExpr);
-
   // 6. Преобразуем маркеры в обычные скобки
   fullExpr = stripMarkers(fullExpr);
-  console.log('[DEBUG-STEP3] После stripMarkers:', fullExpr);
-
   // 5. Обрабатываем случаи с оператором перед смешанной дробью (Правило 2: оператор(число+дробь))
   fullExpr = wrapMixedNumberWithOperator(fullExpr);
 
@@ -1316,18 +1315,19 @@ export function evaluateFraction() {
   fullExpr = fullExpr.replace(mixedDivisionPattern, (match, whole, fraction, divisor) => {
     return '(' + whole + '+' + fraction + ')÷' + divisor;
   });
-  console.log('[DEBUG-STEP3] После обработки деления смешанной дроби:', fullExpr);
 
-  const historyExpr = fullExpr;
-  // Сохраняем версию для истории (без трансформаций)
-  const historyDisplayExpr = formatHistoryExpr(historyExpr);
-  console.log('[DEBUG-STEP3-FIX] historyDisplayExpr:', historyDisplayExpr); // ВРЕМЕННЫЙ ДЕБАГ
+  // Форматирование истории с компактным видом смешанных дробей =====
+  // Преобразуем "4+(3÷4)" → "4(3÷4)" для истории
+  let historyDisplayExpr = fullExpr;
+  // Сначала заменяем маркеры на скобки (если они есть)
+  historyDisplayExpr = formatHistoryExpr(historyDisplayExpr);
+  // Затем сворачиваем смешанные дроби: "число+(дробь)" → "число(дробь)"
+  historyDisplayExpr = historyDisplayExpr.replace(/(\d+)\+\(([^)]+)\)/g, '$1($2)');
 
   // 7. Вставляем неявные операторы для оставшихся случаев (Правила 3, 4, 5)
   fullExpr = insertImplicitMultiplication(fullExpr);
   fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
   fullExpr = insertImplicitMultiplication(fullExpr);
-  console.log('[DEBUG-STEP3] После insertImplicitMultiplication:', fullExpr);
 
 
 
@@ -1346,14 +1346,15 @@ export function evaluateFraction() {
   }
 
   try {
+    // 8. Переносим целые части в числитель дроби
+    fullExpr = convertMixedToImproper(fullExpr);
+    console.log('[DEBUG-STEP6] После преобразования в неправильные дроби:', fullExpr);
 
     // 1. Переводим всю строку в чистый текстовый вид для математического ядра
     // (например, конвертируем superscript-символы степени: "2^³" -> "2^3")
     let cleanExpr = fromSuperscript(fullExpr);
 
     console.log("Исходная строка перед фиксом скобок:", cleanExpr);
-
-
 
     // 2. ИЗОЛЯЦИЯ ПРИОРИТЕТОВ СТЕПЕНИ ДЛЯ ЯДРА
     // Если пользователь ввел "1÷4^2", ядро без скобок посчитает это как (1÷4)^2.
@@ -1404,7 +1405,9 @@ export function evaluateFraction() {
     // console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
 
-    console.log('[DEBUG-STEP3-FINAL] finalStepsArray (история):', finalStepsArray);
+    console.log('[DEBUG-STEP6-FULL] fullExpr после трансформаций:', fullExpr);
+    console.log('[DEBUG-STEP6-CLEAN] cleanExpr перед ядром:', cleanExpr);
+
     appState.historySession.push({
       type: 'fractionSteps',
       steps: finalStepsArray
@@ -1536,12 +1539,4 @@ export function backspaceFraction() {
 }
 
 
-if (typeof window !== 'undefined') {
-  // @ts-ignore
-  window.testTransformMixed = function (expr) {
-    const result = transformMixedNumberWithoutDivision(expr);
-    console.log('Вход:  ', expr);
-    console.log('Выход: ', result);
-    return result;
-  };
-}
+
