@@ -290,16 +290,53 @@ function tokenizeFractionExpression(expr) {
     // ВАЖНО: Мы поглощаем символы в строку raw только если это:
     // - цифры или точка
     // - или специальные маркеры смешанной дроби (⥑, ⥏)
-    // - символ '÷' поглощается ТУТ только если он зажат между цифрами (простая дробь)
     while (j < len && (
       expr[j].match(/[\d.]/) ||
       expr[j] === MARKERS.WHOLE_START ||
-      expr[j] === MARKERS.WHOLE_END ||
-      (expr[j] === MARKERS.DIV && j + 1 < len && /\d/.test(expr[j + 1]) && !expr.includes('^'))
-      // ^ Если в выражении вообще есть знак степени, запрещаем склеивать дробь атомарно!
+      expr[j] === MARKERS.WHOLE_END
     )) {
       j++;
     }
+
+    // ===== ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА ДЛЯ ПРОСТОЙ ДРОБИ =====
+    // Если текущий символ '÷' и он окружен цифрами, и это не десятичное число с точкой
+    if (j < len && expr[j] === MARKERS.DIV) {
+      // Проверяем, что слева от ÷ были цифры (мы только что их собрали)
+      const leftPart = expr.substring(i, j);
+      if (leftPart.match(/^-?\d+\.?\d*$/)) {
+        // Проверяем, что справа от ÷ идут цифры (простые или с точкой)
+        let k = j + 1;
+        let rightDigits = '';
+        while (k < len && /[\d.]/.test(expr[k])) {
+          rightDigits += expr[k];
+          k++;
+        }
+        if (rightDigits.length > 0 && !rightDigits.endsWith('.')) {
+          // Это простая дробь! Захватываем ÷ и знаменатель
+          j = k;
+          // Обновляем raw с учетом захваченного ÷ и знаменателя
+          const rawFraction = expr.substring(i, j);
+          // Проверяем, что это действительно дробь (а не просто "число÷")
+          const fractionMatch = rawFraction.match(/^(-?)(\d+\.?\d*)÷(\d+\.?\d*)$/);
+          if (fractionMatch) {
+            // Это простая дробь — обрабатываем как токен fraction
+            const numerator = parseFloat(fractionMatch[2]);
+            const denominator = parseFloat(fractionMatch[3]);
+            if (denominator !== 0) {
+              // Преобразуем десятичные числа в дроби для точности
+              const numFrac = Fraction.fromDecimal(numerator);
+              const denFrac = Fraction.fromDecimal(denominator);
+              // Делим числитель на знаменатель для получения итоговой дроби
+              const result = numFrac.div(denFrac);
+              tokens.push({ type: 'fraction', value: result });
+              i = j;
+              continue;
+            }
+          }
+        }
+      }
+    }
+
 
     // Если удалось захватить подстроку
     if (j > i) {
@@ -340,7 +377,7 @@ function tokenizeFractionExpression(expr) {
       const numVal = parseFloat(raw);
       if (!isNaN(numVal)) {
         tokens.push({ type: 'number', value: numVal });
-        i = j; // Успешный разбор, переносим указатель
+        i = j; // Успешный разбор, переносим указатель 
         continue;
       }
       // Предохранитель: если j > i, но строка не распозналась регулярками,
@@ -396,7 +433,7 @@ export function evaluateFractionExpression(expression) {
   // === -📝=TODO=📝- ===
   // ===== ВРЕМЕННАЯ ОТЛАДКА =====
   // console.log('=== evaluateFractionExpression ===');
-  // console.log('Input expression:', expression);
+  console.log('Input expression:', expression);
 
   let tokens = tokenizeFractionExpression(expression);
 
@@ -473,7 +510,7 @@ export function evaluateFractionExpression(expression) {
   }
   // === -📝=TODO=📝- ===
   // ===== ВРЕМЕННАЯ ОТЛАДКА =====
-  // console.log('Final Output Stack (RPN):', output);
+  console.log('Final Output Stack (RPN):', output);
 
 
 
