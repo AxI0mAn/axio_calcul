@@ -658,7 +658,14 @@ export function insertImplicitMultiplication(expr) {
         const hasDivAfter = hasDivisionAfter(result, closePos);
 
         let operator = '*';
-        if (isNumber && hasDivInside && !hasDivAfter) {
+        // Проверяем, является ли содержимое скобок простой дробью (ровно одна ÷ и нет других операторов)
+        const insideContent = result.substring(i + 1, closePos);
+        const divCount = (insideContent.match(/[÷\/]/g) || []).length;
+        const hasOtherOps = /[\+\-\*]/.test(insideContent);
+        const isSimpleFraction = (divCount === 1) && !hasOtherOps;
+
+        // Вставляем '+' только если это смешанная дробь (число + простая дробь)
+        if (isNumber && isSimpleFraction && !hasDivAfter) {
           operator = '+';
         }
         // Если isClosingBracket — всегда '*'
@@ -1155,6 +1162,7 @@ export function transformMixedNumberWithComplexBrackets(expr) {
         // =====   Если это смешанная дробь, преобразуем ВСЕГДА =====
         // Даже если после закрывающей скобки идет ÷, это все равно смешанная дробь
         // Пример: 2(3÷6)÷7 → 2+(3÷6)÷7 → затем обработается деление
+
         if (isSimpleFraction) {
           // Заменяем "число⥾дробь⥿" на "число+дробь" (БЕЗ дополнительных скобок)
           const bracketPart = result.slice(openPos, closePos + 1);
@@ -1298,6 +1306,15 @@ function convertMixedToImproper(expr) {
  * передает выражение в математическое ядро и управляет выводом результата или ERROR.
  */
 export function evaluateFraction() {
+  // ===== ВРЕМЕННЫЙ ДЕБАГ ШАГА 9 =====
+  console.log('🔍 [ДЕБАГ-9] === НАЧАЛО evaluateFraction ===');
+  console.log('🔍 [ДЕБАГ-9] appState.expression:', JSON.stringify(appState.expression));
+  console.log('🔍 [ДЕБАГ-9] appState.display:', JSON.stringify(appState.display));
+  console.log('🔍 [ДЕБАГ-9] Полное выражение (concat):', JSON.stringify((appState.expression || '') + (appState.display || '')));
+  console.log('🔍 [ДЕБАГ-9] Длина display:', appState.display.length);
+  console.log('🔍 [ДЕБАГ-9] Символы display по порядку:', appState.display.split('').map((ch, idx) => `${idx}:${ch}(${ch.charCodeAt(0)})`).join(', '));
+  // ===== КОНЕЦ ДЕБАГА =====
+
   // Если калькулятор уже находится в состоянии ошибки, нажатие "=" сбрасывает его в "0"
   if (isError()) {
     appState.display = '0';
@@ -1349,7 +1366,6 @@ export function evaluateFraction() {
   fullExpr = stripMarkers(fullExpr);
   // 5. Обрабатываем случаи с оператором перед смешанной дробью (Правило 2: оператор(число+дробь))
   fullExpr = wrapMixedNumberWithOperator(fullExpr);
-
   // ===== ИСПРАВЛЕНИЕ ШАГА 3: Обработка деления смешанной дроби =====
   // После stripMarkers, выражение вида "2+(3÷6)÷7" должно стать "(2+(3÷6))÷7"
   // Ищем паттерн: число+(выражение)÷число
@@ -1370,7 +1386,6 @@ export function evaluateFraction() {
   fullExpr = insertImplicitMultiplication(fullExpr);
   fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
   fullExpr = insertImplicitMultiplication(fullExpr);
-
 
 
   // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
