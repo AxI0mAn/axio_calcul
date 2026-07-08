@@ -154,12 +154,6 @@ export function parseExpressionToTokens(expression) {
 
   if (!expression || expression.trim() === '') return [];
 
-  // ===== ВРЕМЕННЫЙ ДЕБАГ ШАГА 11.16 =====
-  console.log('🔍 [ДЕБАГ-11.16] === parseExpressionToTokens ===');
-  console.log('🔍 [ДЕБАГ-11.16] Входное выражение:', JSON.stringify(expression));
-  console.log('🔍 [ДЕБАГ-11.16] Длина выражения:', expression.length);
-  console.log('🔍 [ДЕБАГ-11.16] Символы по порядку:', expression.split('').map((ch, idx) => `${idx}:${ch}(${ch.charCodeAt(0)})`).join(', '));
-  // ===== КОНЕЦ ДЕБАГА =====
 
   const tokens = [];
   let i = 0;

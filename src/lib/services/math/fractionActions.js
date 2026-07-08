@@ -556,12 +556,6 @@ export function addBracketFraction(bracket) {
     const lastOpenComplex = lastComplexIdx !== -1 && !lastComplexClosed;
     const lastOpenWhole = lastWholeIdx !== -1 && !lastWholeClosed;
 
-    // ===== ВРЕМЕННЫЙ ДЕБАГ ШАГА 11.19 (LIFO) =====
-    console.log('🔍 [ДЕБАГ-11.19] === АНАЛИЗ ЗАКРЫТИЯ ===');
-    console.log('🔍 [ДЕБАГ-11.19] fullExpr:', JSON.stringify(fullExpr));
-    console.log('🔍 [ДЕБАГ-11.19] lastComplexIdx:', lastComplexIdx, 'lastWholeIdx:', lastWholeIdx);
-    console.log('🔍 [ДЕБАГ-11.19] lastOpenComplex:', lastOpenComplex, 'lastOpenWhole:', lastOpenWhole);
-    // ===== КОНЕЦ ДЕБАГА =====
 
     if (lastOpenComplex && lastOpenWhole) {
       // Оба открыты — закрываем тот, который был открыт позже
@@ -1344,6 +1338,9 @@ function convertMixedToImproper(expr) {
   });
 }
 
+
+
+
 /**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
@@ -1372,6 +1369,7 @@ export function evaluateFraction() {
 
   // Собираем полное выражение
   let fullExpr = (appState.expression || '') + (appState.display || '');
+
   fullExpr = autoCompleteEmptyBrackets(fullExpr);
 
   // === АВТОЗАКРЫТИЕ МАРКЕРОВ (оставляем как есть) ===
@@ -1397,6 +1395,7 @@ export function evaluateFraction() {
   fullExpr = transformMixedFractionWithDivision(fullExpr);
   // 4. Обрабатываем сложные скобки ⥾...⥿ (Правило 1: число+дробь)
   fullExpr = transformMixedNumberWithComplexBrackets(fullExpr);
+
   // 6. Преобразуем маркеры в обычные скобки
   fullExpr = stripMarkers(fullExpr);
   // 5. Обрабатываем случаи с оператором перед смешанной дробью (Правило 2: оператор(число+дробь))
