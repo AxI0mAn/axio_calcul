@@ -89,6 +89,8 @@ function isWholePartReadyToClose(expr, display) {
 export function addDigitFraction(digit) {
   clearErrorIfNeeded();
 
+
+
   if (appState.isNewInput) {
     appState.display = digit;
     appState.isNewInput = false;
@@ -461,6 +463,7 @@ export function fractionToPower2() {
 */
 export function addBracketFraction(bracket) {
   clearErrorIfNeeded();
+
   // ======================== ОТКРЫВАЮЩАЯ СКОБКА '(' ========================
   if (bracket === '(') {
     // ---- Если активен режим степени, добавляем обычную скобку в показатель ----
@@ -485,9 +488,24 @@ export function addBracketFraction(bracket) {
       lastChar = appState.display.slice(-1);
     }
 
-    // ВСЕГДА создаём сложную скобку (⥾) для группировки числителя/знаменателя.
-    // Целая часть (⥑) не должна создаваться через обычную скобку.
-    const marker = MARKERS.COMPLEX_NUM_START;
+    // Определяем, какой маркер использовать:
+    // - Если перед скобкой стоит число И внутри скобок на верхнем уровне будет не более одной ÷
+    //   и нет других операторов → это смешанная дробь → ⥑
+    // - Иначе → сложное выражение → ⥾
+    let marker = MARKERS.COMPLEX_NUM_START; // ⥾ по умолчанию
+
+    // Проверяем, что перед скобкой стоит число (целое, без операторов)
+    const displayBeforeBracket = appState.display;
+    if (displayBeforeBracket && /^-?\d+$/.test(displayBeforeBracket)) {
+      // Это потенциально смешанная дробь.
+      // Нужно проверить, что внутри скобок на верхнем уровне не более одной ÷
+      // и нет других операторов (+ - *).
+      // Мы не можем знать, что будет введено внутри скобок заранее,
+      // поэтому мы используем ⥑ (целая часть) по умолчанию для числа перед скобкой.
+      // Если внутри окажется сложное выражение, трансформации (transformMixedNumberWithComplexBrackets)
+      // преобразуют это в умножение.
+      marker = MARKERS.WHOLE_START; // ⥑
+    }
 
     if (shouldReplace) {
       appState.display = marker;
@@ -515,31 +533,57 @@ export function addBracketFraction(bracket) {
     }
 
     const fullExpr = (appState.expression || '') + (appState.display || '');
-    const stack = getUnclosedMarkersStack(fullExpr); // только сложные маркеры
 
-    // Если есть незакрытые сложные маркеры – закрываем последний
-    if (stack.length > 0) {
-      appState.display += MARKERS.COMPLEX_END;
-      appState.isNewInput = false;
-      return;
+    // Определяем, какой маркер был открыт последним (сложный ⥾ или целая часть ⥑)
+    const lastComplexIdx = fullExpr.lastIndexOf(MARKERS.COMPLEX_NUM_START);
+    const lastWholeIdx = fullExpr.lastIndexOf(MARKERS.WHOLE_START);
+
+    // Проверяем, не закрыт ли уже последний маркер
+    let lastComplexClosed = false;
+    let lastWholeClosed = false;
+
+    if (lastComplexIdx !== -1) {
+      const afterComplex = fullExpr.substring(lastComplexIdx + 1);
+      lastComplexClosed = afterComplex.includes(MARKERS.COMPLEX_END);
     }
 
-    // Если сложных нет, проверяем наличие незакрытой целой части (⥑ без ⥏)
-    const lastWholeStartIdx = fullExpr.lastIndexOf(MARKERS.WHOLE_START);
-    let hasUnclosedWhole = false;
-    if (lastWholeStartIdx !== -1) {
-      const afterWhole = fullExpr.substring(lastWholeStartIdx + 1);
-      if (!afterWhole.includes(MARKERS.WHOLE_END)) {
-        hasUnclosedWhole = true;
+    if (lastWholeIdx !== -1) {
+      const afterWhole = fullExpr.substring(lastWholeIdx + 1);
+      lastWholeClosed = afterWhole.includes(MARKERS.WHOLE_END);
+    }
+
+    // Определяем, какой маркер открыт последним и еще не закрыт
+    const lastOpenComplex = lastComplexIdx !== -1 && !lastComplexClosed;
+    const lastOpenWhole = lastWholeIdx !== -1 && !lastWholeClosed;
+
+    // ===== ВРЕМЕННЫЙ ДЕБАГ ШАГА 11.19 (LIFO) =====
+    console.log('🔍 [ДЕБАГ-11.19] === АНАЛИЗ ЗАКРЫТИЯ ===');
+    console.log('🔍 [ДЕБАГ-11.19] fullExpr:', JSON.stringify(fullExpr));
+    console.log('🔍 [ДЕБАГ-11.19] lastComplexIdx:', lastComplexIdx, 'lastWholeIdx:', lastWholeIdx);
+    console.log('🔍 [ДЕБАГ-11.19] lastOpenComplex:', lastOpenComplex, 'lastOpenWhole:', lastOpenWhole);
+    // ===== КОНЕЦ ДЕБАГА =====
+
+    if (lastOpenComplex && lastOpenWhole) {
+      // Оба открыты — закрываем тот, который был открыт позже
+      if (lastComplexIdx > lastWholeIdx) {
+        // Сложный маркер открыт позже → закрываем его
+        appState.display += MARKERS.COMPLEX_END;
+      } else {
+        // Целая часть открыта позже → закрываем ее
+        appState.display += MARKERS.WHOLE_END;
       }
-    }
-
-    if (hasUnclosedWhole) {
-      // Закрываем целую часть
+    } else if (lastOpenComplex) {
+      // Только сложный маркер открыт → закрываем его
+      appState.display += MARKERS.COMPLEX_END;
+    } else if (lastOpenWhole) {
+      // Только целая часть открыта → закрываем ее
       appState.display += MARKERS.WHOLE_END;
-      appState.isNewInput = false;
+    } else {
+      // Нет незакрытых маркеров → скобка игнорируется
       return;
     }
+
+    appState.isNewInput = false;
 
     // Если стек пуст и нет незакрытой целой части – ничего не делаем (игнорируем лишнюю закрывающую скобку)
     // Это предотвращает появление непарной ')' в выражениях типа 3+4)
@@ -1306,15 +1350,6 @@ function convertMixedToImproper(expr) {
  * передает выражение в математическое ядро и управляет выводом результата или ERROR.
  */
 export function evaluateFraction() {
-  // ===== ВРЕМЕННЫЙ ДЕБАГ ШАГА 9 =====
-  console.log('🔍 [ДЕБАГ-9] === НАЧАЛО evaluateFraction ===');
-  console.log('🔍 [ДЕБАГ-9] appState.expression:', JSON.stringify(appState.expression));
-  console.log('🔍 [ДЕБАГ-9] appState.display:', JSON.stringify(appState.display));
-  console.log('🔍 [ДЕБАГ-9] Полное выражение (concat):', JSON.stringify((appState.expression || '') + (appState.display || '')));
-  console.log('🔍 [ДЕБАГ-9] Длина display:', appState.display.length);
-  console.log('🔍 [ДЕБАГ-9] Символы display по порядку:', appState.display.split('').map((ch, idx) => `${idx}:${ch}(${ch.charCodeAt(0)})`).join(', '));
-  // ===== КОНЕЦ ДЕБАГА =====
-
   // Если калькулятор уже находится в состоянии ошибки, нажатие "=" сбрасывает его в "0"
   if (isError()) {
     appState.display = '0';
@@ -1386,7 +1421,6 @@ export function evaluateFraction() {
   fullExpr = insertImplicitMultiplication(fullExpr);
   fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
   fullExpr = insertImplicitMultiplication(fullExpr);
-
 
   // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
   // Считаем количество открывающих и закрывающих скобок во всей строке

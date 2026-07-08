@@ -154,6 +154,13 @@ export function parseExpressionToTokens(expression) {
 
   if (!expression || expression.trim() === '') return [];
 
+  // ===== ВРЕМЕННЫЙ ДЕБАГ ШАГА 11.16 =====
+  console.log('🔍 [ДЕБАГ-11.16] === parseExpressionToTokens ===');
+  console.log('🔍 [ДЕБАГ-11.16] Входное выражение:', JSON.stringify(expression));
+  console.log('🔍 [ДЕБАГ-11.16] Длина выражения:', expression.length);
+  console.log('🔍 [ДЕБАГ-11.16] Символы по порядку:', expression.split('').map((ch, idx) => `${idx}:${ch}(${ch.charCodeAt(0)})`).join(', '));
+  // ===== КОНЕЦ ДЕБАГА =====
+
   const tokens = [];
   let i = 0;
   const len = expression.length;
@@ -173,127 +180,6 @@ export function parseExpressionToTokens(expression) {
       continue;
     }
 
-    // =========================================================================
-    // ПРОВЕРКА НА СОСТАВНУЮ ДРОБЬ (С ЦЕЛОЙ ЧАСТЬЮ ИЛИ БЕЗ): паттерн (( числитель ))
-    // =========================================================================
-    if (ch === '(' && i + 1 < len && expression[i + 1] === '(') {
-      // 1. Динамически вычисляем целую часть перед текущей позицией '((', если она есть
-      let j = i - 1;
-      while (j >= 0 && (expression[j].match(/[\d.]/) || expression[j] === '-')) {
-        // Прерываем сбор целой части, если упёрлись в оператор (кроме унарного минуса на старте)
-        if (expression[j] === '-' && j > 0 && !'+*/=([√÷'.includes(expression[j - 1])) {
-          break;
-        }
-        j--;
-      }
-      let wholePart = expression.substring(j + 1, i).trim();
-
-      let k = i + 2; // Пропускаем стартовые технологические скобки '(('
-      let numeratorBuf = '';
-      let numBracketBalance = 2;
-      let closedNumIdx = -1;
-
-      // Шаг 1: Ищем физическое закрытие технологических скобок числителя )) по балансу
-      while (k < len) {
-        const numChar = expression[k];
-
-        if (numChar === '(') numBracketBalance++;
-        if (numChar === ')') numBracketBalance--;
-
-        // Записываем символ в буфер числителя ТОЛЬКО если это внутренний контент,
-        // а не финальная закрывающая скобка числителя ))
-        if (numBracketBalance > 0 || numChar !== ')') {
-          numeratorBuf += numChar;
-        }
-
-        if (numBracketBalance === 0) {
-          closedNumIdx = k; // closedNumIdx указывает строго на вторую закрывающую скобку ')'
-          k++; // Сдвигаем k за пределы числителя
-          break;
-        }
-        k++;
-      }
-
-      // Шаг 2: Ищем знак деления строго НАЧИНАЯ с позиции сразу за закрывающей скобкой числителя
-      let hasMainDiv = false;
-      let divPosition = -1;
-
-      if (closedNumIdx !== -1) {
-        // Начинаем сканирование со следующего символа после ')'
-        for (let scan = closedNumIdx + 1; scan < len; scan++) {
-          const scanChar = expression[scan];
-
-          if (scanChar === '÷' || scanChar === '/') {
-            hasMainDiv = true;
-            divPosition = scan; // Зафиксировали точную позицию знака деления
-            break;
-          }
-
-          // Разрешаем проходить ТОЛЬКО через пробелы или открывающиеся скобки знаменателя
-          if (scanChar !== ' ' && scanChar !== '(') {
-            break;
-          }
-        }
-      }
-
-      // Шаг 3: Если знак деления обнаружен — строим двухэтажный токен дроби
-      if (hasMainDiv && divPosition !== -1) {
-        let cleanNum = numeratorBuf.trim();
-        if (cleanNum.endsWith(')')) cleanNum = cleanNum.slice(0, -1).trim();
-
-        // Знаменатель — это строго всё, что находится ПОСЛЕ найденного знака деления
-        let denominatorBuf = expression.substring(divPosition + 1).trim();
-        let cleanDen = denominatorBuf;
-
-        // УМНАЯ ОЧИСТКА ЗНАМЕНАТЕЛЯ: убираем только внешние скобки, если они ЕСТЬ.
-        // Если там просто число "5", этот код ничего не тронет и сохранит его.
-        if (cleanDen.startsWith('((') && cleanDen.endsWith('))')) {
-          cleanDen = cleanDen.substring(2, cleanDen.length - 2);
-        } else if (cleanDen.startsWith('(') && cleanDen.endsWith(')')) {
-          cleanDen = cleanDen.substring(1, cleanDen.length - 1);
-        }
-
-        cleanDen = cleanDen.trim();
-
-        // Если знаменатель пустой (только что нажали ÷)
-        if (!cleanDen || cleanDen.length === 0 || /^[\(\s]+$/.test(cleanDen)) {
-          cleanDen = '?';
-        }
-
-        // Удаляем целую часть из текста, если она была перед скобками
-        if (wholePart.length > 0) {
-          let charsToRemove = wholePart.length;
-          while (charsToRemove > 0 && tokens.length > 0) {
-            let lastToken = tokens[tokens.length - 1];
-            if (lastToken.type === 'text') {
-              if (lastToken.value.length <= charsToRemove) {
-                charsToRemove -= lastToken.value.length;
-                tokens.pop();
-              } else {
-                lastToken.value = lastToken.value.substring(0, lastToken.value.length - charsToRemove);
-                charsToRemove = 0;
-              }
-            } else {
-              break;
-            }
-          }
-        }
-
-        // Пушим единый токен двухэтажной дроби
-        tokens.push({
-          type: 'fraction',
-          whole: wholePart || undefined, // Будет числом для "7((2+8))÷..." и undefined для остальные кейсов
-          num: cleanNum || '?',
-          den: cleanDen
-        });
-
-        // 1. Вычисляем полную длину строки от начала целой части (или первой скобки) до конца знаменателя
-        // divPosition + 1 дает позицию начала знаменателя, прибавляем к ней полную длину строки знаменателя
-        i = divPosition + 1 + denominatorBuf.length;
-
-        continue;
-      }
-    }
 
     // 1. Смешанная дробь: целое⥑числитель÷знаменатель⥏
     if (ch === MARKERS.WHOLE_START) {
