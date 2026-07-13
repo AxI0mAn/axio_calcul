@@ -111,10 +111,89 @@ function toMixedFraction(value) {
 }
 
 /**
- * Анализирует выражение и заменяет обычные скобки на маркеры
- * @param {string} fullExpr - выражение для анализа
- * @returns {string} - выражение с маркерами
+ * Проверяет, есть ли ÷ или / на верхнем уровне внутри строки
+ * @param {string} str - строка для проверки
+ * @returns {boolean} - true если есть деление на верхнем уровне
  */
+function hasDivisionOnTopLevel(str) {
+  if (!str) {
+    return false;
+  }
+
+  let depth = 0;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    else if (depth === 0 && (ch === '÷' || ch === '/')) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// ===== ЕДИНАЯ ЛОГИКА ДЛЯ НЕЯВНЫХ ОПЕРАТОРОВ =====
+/**
+ * Проверяет, является ли содержимое скобок "чистой" дробью
+ * @param {string} content - содержимое скобок
+ * @returns {boolean} - true если это чистая дробь (число÷число или выражение÷выражение без других операторов на верхнем уровне)
+ */
+function isPureFractionContent(content) {
+  if (!content) return false;
+
+  let divCount = 0;
+  let hasOtherOps = false;
+  let depth = 0;
+
+  for (let i = 0; i < content.length; i++) {
+    const ch = content[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    else if (depth === 0) {
+      if (ch === '÷' || ch === '/') {
+        divCount++;
+      } else if (/[\+\-\*]/.test(ch)) {
+        hasOtherOps = true;
+      }
+    }
+  }
+
+  // Чистая дробь: ровно одна ÷ на верхнем уровне и нет других операторов
+  return divCount === 1 && !hasOtherOps;
+}
+
+/**
+ * Определяет оператор между числом и скобкой
+ * @param {string} insideContent - содержимое скобок
+ * @param {boolean} hasDivisionAfter - есть ли ÷ или / после закрывающей скобки
+ * @param {boolean} isNumberBefore - есть ли число перед открывающей скобкой
+ * @returns {'+' | '*'} 
+ */
+function getImplicitOperator(insideContent, hasDivisionAfter, isNumberBefore) {
+  // Логируем ВХОДНЫЕ ДАННЫЕ
+
+  // Если перед скобкой не число → умножение
+  if (!isNumberBefore) {
+    return '*';
+  }
+
+  // Если после скобки есть ÷ → умножение (это числитель)
+  if (hasDivisionAfter) {
+    return '*';
+  }
+
+  // Проверяем, является ли содержимое скобок "чистой" дробью
+  const isPureFraction = isPureFractionContent(insideContent);
+
+  // Если внутри есть ÷ → смешанная дробь → '+'
+  if (isPureFraction) {
+    return '+';
+  }
+
+  // Во всех остальных случаях → умножение
+  return '*';
+}
+
 /**
  * Анализирует выражение и заменяет обычные скобки на маркеры
  * @param {string} fullExpr - выражение для анализа
@@ -153,28 +232,6 @@ function analyzeAndReplaceMarkers(fullExpr) {
           closePos: pair.closePos + (after ? 1 : 0),
           replacement: replacement,
           type: 'MIXED_FRACTION'
-        });
-        break;
-
-      case 'MIXED_WITH_COMPLEX_NUMERATOR':
-        // число(выражение÷число) → число⥑выражение÷число⥏
-        replacement = before + MARKERS.WHOLE_START + content + MARKERS.WHOLE_END;
-        replacements.push({
-          openPos: pair.openPos - (before ? 1 : 0),
-          closePos: pair.closePos + (after ? 1 : 0),
-          replacement: replacement,
-          type: 'MIXED_WITH_COMPLEX_NUMERATOR'
-        });
-        break;
-
-      case 'MIXED_WITH_COMPLEX_DENOMINATOR':
-        // число(число÷выражение) → число⥑число÷выражение⥏
-        replacement = before + MARKERS.WHOLE_START + content + MARKERS.WHOLE_END;
-        replacements.push({
-          openPos: pair.openPos - (before ? 1 : 0),
-          closePos: pair.closePos + (after ? 1 : 0),
-          replacement: replacement,
-          type: 'MIXED_WITH_COMPLEX_DENOMINATOR'
         });
         break;
 
@@ -218,9 +275,7 @@ function analyzeAndReplaceMarkers(fullExpr) {
   return result;
 }
 
-
 // Функция поиска пар скобок
-
 function findMatchingParens(str) {
   const pairs = [];
   const stack = [];
@@ -251,9 +306,7 @@ function findMatchingParens(str) {
   return pairs;
 }
 
-
 // Функция определения типа скобок
-
 function getBracketType(openPos, closePos, fullExpr) {
   const content = fullExpr.substring(openPos + 1, closePos);
   const before = openPos > 0 ? fullExpr[openPos - 1] : '';
@@ -278,40 +331,10 @@ function getBracketType(openPos, closePos, fullExpr) {
     return 'SIMPLE_PARENS';
   }
 
-  // ===  Смешанная дробь со сложным числителем ===
-  // число(выражение÷число)
-  if (isNumberBefore && content.includes('÷') && hasOtherOps) {
-    // Проверяем, что перед ÷ выражение, после ÷ число
-    const parts = content.split('÷');
-    if (parts.length === 2) {
-      const left = parts[0].trim();
-      const right = parts[1].trim();
-      if (/[+\-*()]/.test(left) && /^\d+$/.test(right)) {
-        if (after !== '÷' && after !== '/') {
-          return 'MIXED_WITH_COMPLEX_NUMERATOR';
-        }
-      }
-    }
-  }
-
-  // === ПРАВИЛО 4.5: Смешанная дробь со сложным знаменателем ===
-  // число(число÷выражение)
-  if (isNumberBefore && content.includes('÷') && hasOtherOps) {
-    const parts = content.split('÷');
-    if (parts.length === 2) {
-      const left = parts[0].trim();
-      const right = parts[1].trim();
-      if (/^\d+$/.test(left) && /[+\-*()]/.test(right)) {
-        if (after !== '÷' && after !== '/') {
-          return 'MIXED_WITH_COMPLEX_DENOMINATOR';
-        }
-      }
-    }
-  }
-
-  // === ПРАВИЛО 3: Смешанная дробь ===
-  // число(число÷число)
-  if (isNumberBefore && isSimpleFraction) {
+  // ===== СМЕШАННАЯ ДРОБЬ (ЛЮБОЕ СОДЕРЖИМОЕ) =====
+  // число(любое выражение÷любое выражение)
+  // Проверяем: перед скобкой число, внутри есть ÷ или / на верхнем уровне
+  if (isNumberBefore && hasDivisionOnTopLevel(content)) {
     if (after !== '÷' && after !== '/') {
       return 'MIXED_FRACTION';
     }
@@ -436,8 +459,6 @@ function isWholePartReadyToClose(expr, display) {
 export function addDigitFraction(digit) {
   clearErrorIfNeeded();
 
-
-
   if (appState.isNewInput) {
     appState.display = digit;
     appState.isNewInput = false;
@@ -452,7 +473,6 @@ export function addDigitFraction(digit) {
     const currentParts = appState.display.split(/[\+\-\*\/÷\^\(]/);
     const lastPart = currentParts[currentParts.length - 1];
     if (lastPart.includes('.')) return;
-
 
     // В режиме степени точка добавляется как обычный символ (без суперскрипта)
     if (isPowerMode) {
@@ -582,15 +602,9 @@ export function addOperatorFraction(op) {
     isWholePartReadyToClose(fullExpr, appState.display)) {
     appState.display += MARKERS.WHOLE_END;
   }
-
-
-  // ===== АНАЛИЗ ПОСЛЕ ДОБАВЛЕНИЯ ОПЕРАТОРА =====
-  // массив операторов, которые запускают анализ
-  const isTriggerOp = ['÷', '/'].includes(op); // было '+', '-', '*',
-  // Сохраняем значение display перед сбросом
+  // ===== ПЕРЕНОС В EXPRESSION =====
   const displayValue = appState.display;
 
-  // Переносим в expression
   if (appState.isNewInput && appState.expression !== '') {
     appState.expression = appState.expression.slice(0, -1) + op;
   } else {
@@ -598,29 +612,6 @@ export function addOperatorFraction(op) {
   }
   appState.display = '0';
   appState.isNewInput = true;
-
-  // ===== АНАЛИЗ ТОЛЬКО ДЛЯ ÷ И / =====
-  if (isTriggerOp) {
-    const fullExprForAnalysis = appState.expression + displayValue + op;
-    const analyzedExpr = analyzeAndReplaceMarkers(fullExprForAnalysis);
-
-    const lastOpRegex = /[+\-*/÷]/g;
-    let lastOpIndex = -1;
-    let match;
-    while ((match = lastOpRegex.exec(analyzedExpr)) !== null) {
-      lastOpIndex = match.index;
-    }
-
-    if (lastOpIndex !== -1) {
-      appState.expression = analyzedExpr.substring(0, lastOpIndex + 1);
-      const rest = analyzedExpr.substring(lastOpIndex + 1);
-      appState.display = rest || '0';
-    } else {
-      appState.expression = '';
-      appState.display = analyzedExpr || '0';
-    }
-  }
-
 }
 
 // ---- смена знака +/- ----
@@ -920,9 +911,7 @@ export function autoCompleteEmptyBrackets(expr) {
 
 /**
  * Вставляет явный знак умножения '*' или сложения '+' в местах неявных операций.
- * Правила:
- * - Если перед '(' стоит число и внутри скобок есть '÷' или '/', а после закрывающей скобки НЕТ деления → вставляем '+'.
- * - Во всех остальных случаях (перед '(' стоит ')' или внутри нет деления или после есть деление) → вставляем '*'.
+ * Использует единую функцию getImplicitOperator для определения оператора.
  * @param {string} expr - выражение с обычными скобками (без маркеров)
  * @returns {string} - выражение с явными операторами
  */
@@ -940,12 +929,6 @@ export function insertImplicitMultiplication(expr) {
       }
     }
     return -1;
-  }
-
-  // Вспомогательная: проверяет, есть ли внутри скобок (на любом уровне) знак деления
-  function hasDivisionInside(str, openPos, closePos) {
-    const inside = str.substring(openPos + 1, closePos);
-    return /[÷\/]/.test(inside);
   }
 
   // Вспомогательная: проверяет, есть ли после закрывающей скобки (пропуская пробелы) знак деления
@@ -972,27 +955,17 @@ export function insertImplicitMultiplication(expr) {
       const isClosingBracket = prevChar === ')';
 
       if (isNumber || isClosingBracket) {
-        // Находим парную закрывающую скобку
+        // Находим парную закрывающую скобку 
         const closePos = findMatchingClose(result, i);
         if (closePos === -1) { i++; continue; }
 
-        // Проверяем, есть ли деление внутри
-        const hasDivInside = hasDivisionInside(result, i, closePos);
+        // Получаем содержимое скобок
+        const insideContent = result.substring(i + 1, closePos);
         // Проверяем, есть ли деление после
         const hasDivAfter = hasDivisionAfter(result, closePos);
 
-        let operator = '*';
-        // Проверяем, является ли содержимое скобок простой дробью (ровно одна ÷ и нет других операторов)
-        const insideContent = result.substring(i + 1, closePos);
-        const divCount = (insideContent.match(/[÷\/]/g) || []).length;
-        const hasOtherOps = /[\+\-\*]/.test(insideContent);
-        const isSimpleFraction = (divCount === 1) && !hasOtherOps;
-
-        // Вставляем '+' только если это смешанная дробь (число + простая дробь)
-        if (isNumber && isSimpleFraction && !hasDivAfter) {
-          operator = '+';
-        }
-        // Если isClosingBracket — всегда '*'
+        // Используем единую функцию для определения оператора
+        const operator = getImplicitOperator(insideContent, hasDivAfter, isNumber);
 
         // Проверяем, что между prevIdx и i нет другого оператора (кроме пробелов)
         let hasOpBetween = false;
@@ -1022,124 +995,99 @@ export function insertImplicitMultiplication(expr) {
 
 /**
  * Вставляет '+' или '*' между числом/закрывающей скобкой и открывающей скобкой
- * в зависимости от того, стоит ли после соответствующей закрывающей скобки знак '÷' или '/'.
- * Если после закрывающей скобки есть деление → вставляем '*', иначе → '+'.
- * Для отрицательных чисел вида -A(...) → преобразует в -(A+...), если вставляется '+'.
+ * Использует единую функцию getImplicitOperator для определения оператора.
  * @param {string} expr - выражение с обычными скобками (без маркеров)
  * @returns {string} - выражение с явными операторами
  */
 export function processImplicitOperators(expr) {
   if (!expr) return expr;
 
-  // Вспомогательная функция: найти позицию парной закрывающей скобки
   function findMatchingClose(str, openPos) {
     let depth = 1;
     for (let i = openPos + 1; i < str.length; i++) {
       if (str[i] === '(') depth++;
-      else if (str[i] === ')') depth--;
-      if (depth === 0) return i;
+      else if (str[i] === ')') {
+        depth--;
+        if (depth === 0) return i;
+      }
     }
     return -1;
   }
 
+  function hasDivisionAfter(str, closePos) {
+    let i = closePos + 1;
+    while (i < str.length && str[i] === ' ') i++;
+    return i < str.length && /[÷\/]/.test(str[i]);
+  }
+
   let result = expr;
   let i = 0;
+
   while (i < result.length) {
-    // Ищем открывающую скобку, перед которой стоит число или ')'
     if (result[i] === '(') {
-      // Проверяем предыдущий символ (не пробел)
       let prevIdx = i - 1;
       while (prevIdx >= 0 && result[prevIdx] === ' ') prevIdx--;
       if (prevIdx < 0) { i++; continue; }
+
       const prevChar = result[prevIdx];
-      // Предыдущий символ должен быть цифрой или ')'
-      if (!/\d/.test(prevChar) && prevChar !== ')') { i++; continue; }
+      const isNumber = /\d/.test(prevChar);
+      const isClosingBracket = prevChar === ')';
 
-      // Находим закрывающую скобку для текущей открывающей
-      const closePos = findMatchingClose(result, i);
-      if (closePos === -1) { i++; continue; }
+      if (!isNumber && !isClosingBracket) { i++; continue; }
 
-      // Проверяем, есть ли после закрывающей скобки (пропуская пробелы) знак деления
-      let nextIdx = closePos + 1;
-      while (nextIdx < result.length && result[nextIdx] === ' ') nextIdx++;
-      const hasDivision = nextIdx < result.length && (result[nextIdx] === '÷' || result[nextIdx] === '/');
-
-      // Определяем, нужно ли вставлять оператор (если между предыдущим и '(' нет оператора)
-      // Проверяем, что между prevIdx и i нет других операторов (кроме пробелов)
-      let hasOp = false;
+      // Проверяем, есть ли оператор между
+      let hasOperatorBetween = false;
       for (let k = prevIdx + 1; k < i; k++) {
         if (result[k] !== ' ' && /[+\-*/÷^()]/.test(result[k])) {
-          hasOp = true;
+          hasOperatorBetween = true;
           break;
         }
       }
-      if (hasOp) { i++; continue; }
+      if (hasOperatorBetween) { i++; continue; }
 
-      // Если предыдущий символ - цифра, собираем число (может быть с минусом)
-      let numberStart = prevIdx;
-      let numberEnd = i; // позиция перед '('
-      // Ищем начало числа, учитывая унарный минус
-      let start = numberStart;
-      if (/\d/.test(result[numberStart])) {
-        while (start > 0 && /[\d.]/.test(result[start - 1])) start--;
-        // Если перед числом стоит '-', и это унарный (перед ним не цифра и не ')')
-        if (start > 0 && result[start - 1] === '-') {
-          const beforeMinus = start - 2;
-          if (beforeMinus < 0 || !/[\d)]/.test(result[beforeMinus])) {
-            start--;
-          }
-        }
-      } else if (result[numberStart] === ')') {
-        // Если предыдущий символ - ')', то оператор будет вставлен перед '('
-        // В этом случае мы не обрабатываем отрицательное число отдельно
-        // просто вставляем оператор
-        const op = hasDivision ? '*' : '+';
-        // Вставляем оператор между ')' и '('
-        result = result.slice(0, i) + op + result.slice(i);
-        // Сдвигаем указатель на 2 символа (оператор + '(')
+      const closePos = findMatchingClose(result, i);
+      if (closePos === -1) { i++; continue; }
+
+      const insideContent = result.substring(i + 1, closePos);
+      const hasDivAfter = hasDivisionAfter(result, closePos);
+
+      // Если предыдущий символ - ')', обрабатываем отдельно
+      if (isClosingBracket) {
+        const operator = getImplicitOperator(insideContent, hasDivAfter, false);
+        result = result.slice(0, i) + operator + result.slice(i);
         i += 2;
         continue;
       }
 
-      // Если мы дошли сюда, значит перед '(' стоит число (возможно с минусом)
-      const numberStr = result.slice(start, i);
-      // Проверяем, является ли это число целым или десятичным (без операторов)
-      if (!/^-?\d+\.?\d*$/.test(numberStr)) { i++; continue; }
+      // Если перед скобкой число
+      // Находим начало числа (учитываем знак минус)
+      let start = prevIdx;
+      while (start > 0 && /[\d.]/.test(result[start - 1])) start--;
 
-      // Определяем, есть ли унарный минус перед числом
-      const hasUnaryMinus = numberStr.startsWith('-') && (start === 0 || !/[\d)]/.test(result[start - 1]));
-
-      if (hasDivision) {
-        // Вставляем '*' между числом и '('
-        const op = '*';
-        result = result.slice(0, i) + op + result.slice(i);
-        i += 2; // пропускаем '*' и '('
-      } else {
-        // Вставляем '+'
-        if (hasUnaryMinus) {
-          // Преобразуем -A( ... ) в -(A+ ... )
-          // Удаляем минус и число, вставляем '-(число+'
-          const numWithoutMinus = numberStr.slice(1);
-          const beforeMinus = start - 1;
-          // Заменяем часть строки
-          const prefix = result.slice(0, beforeMinus);
-          const suffix = result.slice(i); // начинается с '('
-          // Формируем: prefix + '-( ' + numWithoutMinus + '+' + suffix
-          result = prefix + '-(' + numWithoutMinus + '+' + suffix;
-          // Сдвигаем указатель на позицию после вставленного '+'
-          i = beforeMinus + 2 + numWithoutMinus.length + 1; // перед '(' уже есть, но мы сдвигаем
-          // Теперь нужно продолжить, но наша структура изменилась, проще начать заново
-          // или перезапустить цикл с начала для простоты.
-          // Перезапускаем цикл с начала
-          i = 0;
-          continue;
-        } else {
-          // Вставляем '+' между числом и '('
-          const op = '+';
-          result = result.slice(0, i) + op + result.slice(i);
-          i += 2; // пропускаем '+' и '('
+      // Проверяем, есть ли минус перед числом
+      let hasMinus = false;
+      if (start > 0 && result[start - 1] === '-') {
+        // Проверяем, что это унарный минус (перед ним не число и не ')')
+        const beforeMinus = start - 2;
+        if (beforeMinus < 0 || !/[\d)]/.test(result[beforeMinus])) {
+          hasMinus = true;
+          start--;
         }
       }
+
+      const numberStr = result.slice(start, i);
+
+      // Проверяем, что это число
+      if (!/^-?\d+\.?\d*$/.test(numberStr)) { i++; continue; }
+
+      // Определяем оператор
+      const operator = getImplicitOperator(insideContent, hasDivAfter, true);
+
+      // Просто вставляем оператор между числом и скобкой
+      // НЕ преобразуем в -(число+...)
+      result = result.slice(0, i) + operator + result.slice(i);
+      i += 2;
+
     } else {
       i++;
     }
@@ -1147,7 +1095,6 @@ export function processImplicitOperators(expr) {
 
   return result;
 }
-
 
 /**
  * Преобразует смешанные дроби вида [−]число(выражение)÷ в [−]число+(выражение)÷
@@ -1284,7 +1231,6 @@ export function transformMixedNumberWithoutDivision(expr) {
   const OPEN = MARKERS.WHOLE_START;   // '⥑'
   const CLOSE = MARKERS.WHOLE_END;    // '⥏'
 
-  // Вспомогательная функция для поиска парного закрывающего маркера
   function findMatchingCloseMarker(str, startIdx) {
     if (str[startIdx] !== OPEN) return -1;
     let stack = 1;
@@ -1301,34 +1247,30 @@ export function transformMixedNumberWithoutDivision(expr) {
   let i = 0;
 
   while (i < result.length) {
-    // Ищем паттерн: необязательный минус, затем цифры, затем OPEN
     let match = result.slice(i).match(/^(-?\d+)⥑/);
     if (match) {
       const fullMatch = match[0];
-      const numberPart = match[1]; // может содержать минус
+      const numberPart = match[1];
       const numStart = i;
-      const openPos = i + fullMatch.length - 1; // позиция символа ⥑
+      const openPos = i + fullMatch.length - 1;
       const closePos = findMatchingCloseMarker(result, openPos);
+
       if (closePos !== -1) {
-        // Содержимое между ⥑ и ⥏
         const content = result.slice(openPos + 1, closePos);
-        // Проверяем условия: ровно один ÷, нет других операторов + - *
+
+        // Проверяем: ровно один ÷, нет других операторов
         const hasDiv = content.includes('÷');
         const hasOtherOps = /[\+\-\*]/.test(content);
         const isSimpleFraction = hasDiv && !hasOtherOps;
-        // =====  Если это смешанная дробь, преобразуем ВСЕГДА =====
-        // Даже если после закрывающей скобки идет ÷, это все равно смешанная дробь
-        // Например: 2(3÷6)÷7 → (2+(3÷6))÷7 → затем обработается деление
+
         if (isSimpleFraction) {
-          // Заменяем "число⥑дробь⥏" на "(число+дробь)" (СОХРАНЯЕМ внешние скобки)
-          const bracketPart = result.slice(openPos, closePos + 1);
-          const replacement = '(' + numberPart + '+' + bracketPart + ')';
-          result = result.slice(0, numStart) + replacement + result.slice(closePos + 1);
-          i = numStart + replacement.length;
+          // ===== ПРОСТАЯ ДРОБЬ: НЕ добавляем + и скобки =====
+          // Оставляем как есть: 9⥑7÷23⥏
+          // Просто пропускаем, ничего не меняем
+          i += fullMatch.length;
           continue;
         }
       }
-      // Если не подошло, пропускаем этот фрагмент
       i += fullMatch.length;
     } else {
       i++;
@@ -1441,13 +1383,7 @@ export function transformMixedNumberWithComplexBrackets(expr) {
   let i = 0;
 
   while (i < result.length) {
-    // Ищем паттерн: число + ⥾
-    // Ищем паттерн: число + ⥾ (число может быть после оператора)
-    let match = result.slice(i).match(/(\d+)⥾/);
-    // Или с учетом возможного минуса
-    if (!match) {
-      match = result.slice(i).match(/(-?\d+)⥾/);
-    }
+    let match = result.slice(i).match(/(-?\d+)⥾/);
     if (match) {
       const fullMatch = match[0];
       const numberPart = match[1];
@@ -1458,39 +1394,39 @@ export function transformMixedNumberWithComplexBrackets(expr) {
       if (closePos !== -1) {
         const content = result.slice(openPos + 1, closePos);
 
-        // ===== ИСПРАВЛЕНИЕ ШАГА 3: Анализируем ТОЛЬКО верхний уровень =====
-        // Считаем операции ÷ на верхнем уровне (не внутри вложенных ⥾...⥿)
+        // Считаем операции ÷ на верхнем уровне
         let divCountOnTopLevel = 0;
         let hasOtherOpsOnTopLevel = false;
         let depth = 0;
 
         for (let k = 0; k < content.length; k++) {
           const ch = content[k];
-          if (ch === OPEN) {
-            depth++;
-          } else if (ch === CLOSE) {
-            depth--;
-          } else if (depth === 0) {
-            // Мы на верхнем уровне внутри ⥾...⥿
-            if (ch === '÷') {
-              divCountOnTopLevel++;
-            } else if (/[\+\-\*]/.test(ch)) {
-              hasOtherOpsOnTopLevel = true;
-            }
+          if (ch === OPEN) depth++;
+          else if (ch === CLOSE) depth--;
+          else if (depth === 0) {
+            if (ch === '÷') divCountOnTopLevel++;
+            else if (/[\+\-\*]/.test(ch)) hasOtherOpsOnTopLevel = true;
           }
         }
 
-        // Условие: ровно одна операция ÷ на верхнем уровне и нет других операторов
         const isSimpleFraction = (divCountOnTopLevel === 1) && !hasOtherOpsOnTopLevel;
 
-        // =====   Если это смешанная дробь, преобразуем ВСЕГДА =====
-        // Даже если после закрывающей скобки идет ÷, это все равно смешанная дробь
-        // Пример: 2(3÷6)÷7 → 2+(3÷6)÷7 → затем обработается деление
-
         if (isSimpleFraction) {
-          // Заменяем "число⥾дробь⥿" на "(число+дробь)" (СОХРАНЯЕМ внешние скобки)
+          // ===== СЛОЖНОЕ ВЫРАЖЕНИЕ: добавляем + =====
           const bracketPart = result.slice(openPos, closePos + 1);
-          const replacement = '(' + numberPart + '+' + bracketPart + ')';
+
+          const hasMinus = numberPart.startsWith('-');
+          const numWithoutMinus = hasMinus ? numberPart.slice(1) : numberPart;
+
+          let replacement;
+          if (hasMinus) {
+            // -7⥾15÷(9-2)⥿ → -(7+⥾15÷(9-2)⥿)
+            replacement = `-(${numWithoutMinus}+${bracketPart})`;
+          } else {
+            // 1⥾5÷(8-3)⥿ → (1+⥾5÷(8-3)⥿)
+            replacement = `(${numberPart}+${bracketPart})`;
+          }
+
           result = result.slice(0, numStart) + replacement + result.slice(closePos + 1);
           i = numStart + replacement.length;
           continue;
@@ -1624,9 +1560,6 @@ function convertMixedToImproper(expr) {
   });
 }
 
-
-
-
 /**
  * Равно (вычисление финального выражения).
  * Собирает цепочку из expression и display, автоматически закрывает скобки,
@@ -1699,10 +1632,27 @@ export function evaluateFraction() {
   // 4. Обрабатываем сложные скобки ⥾...⥿ (Правило 1: число+дробь)
   fullExpr = transformMixedNumberWithComplexBrackets(fullExpr);
 
-  // ===== ШАГ 7: Преобразуем маркеры в обычные скобки =====
+  // ===== ШАГ 7: ВСТАВКА НЕЯВНЫХ ОПЕРАТОРОВ (ДО УДАЛЕНИЯ МАРКЕРОВ) =====
+  // Это ключевое изменение! Вставляем операторы пока еще есть маркеры
+  fullExpr = processImplicitOperators(fullExpr);
+  fullExpr = insertImplicitMultiplication(fullExpr);
+
+  // ===== ШАГ 8: СОХРАНЯЕМ ИСТОРИЮ С ОПЕРАТОРАМИ =====
+  // Берем выражение с операторами и маркерами
+  let historyDisplayExpr = fullExpr;
+
+  // Просто заменяем маркеры на скобки для читаемости
+  // НЕ УДАЛЯЕМ операторы! НЕ используем formatHistoryExpr!
+  historyDisplayExpr = historyDisplayExpr
+    .replace(/⥾/g, '(')
+    .replace(/⥿/g, ')')
+    .replace(/⥑/g, '(')
+    .replace(/⥏/g, ')');
+
+  // ===== ШАГ 9: Преобразуем маркеры в обычные скобки для вычислений =====
   fullExpr = stripMarkers(fullExpr);
 
-  // ===== ШАГ 8: Восстановление скобок числителя =====
+  // ===== ШАГ 10: Восстановление скобок числителя =====
   // Восстанавливаем скобки числителя, если они были потеряны
   // Проверяем, было ли выражение вида ⥾...⥿÷... (дробь с числителем)
   const hasFractionStructure = /[⥾⥿]/.test(
@@ -1733,7 +1683,7 @@ export function evaluateFraction() {
     }
   }
 
-  // ===== ШАГ 9: Остальные трансформации =====
+  // ===== ШАГ 11: Остальные трансформации =====
 
   // Обрабатываем случаи с оператором перед смешанной дробью (Правило 2: оператор(число+дробь))
   fullExpr = wrapMixedNumberWithOperator(fullExpr);
@@ -1746,20 +1696,12 @@ export function evaluateFraction() {
     return '(' + whole + '+' + fraction + ')÷' + divisor;
   });
 
-  // Форматирование истории с компактным видом смешанных дробей =====
-  // Преобразуем "4+(3÷4)" → "4(3÷4)" для истории
-  let historyDisplayExpr = fullExpr;
-  // Сначала заменяем маркеры на скобки (если они есть)
-  historyDisplayExpr = formatHistoryExpr(historyDisplayExpr);
-  // Затем сворачиваем смешанные дроби: "число+(дробь)" → "число(дробь)"
-  historyDisplayExpr = historyDisplayExpr.replace(/(\d+)\+\(([^)]+)\)/g, '$1($2)');
-
-  // Вставляем неявные операторы для оставшихся случаев  
-  fullExpr = insertImplicitMultiplication(fullExpr);
+  // ===== ДОПОЛНИТЕЛЬНАЯ ВСТАВКА ОПЕРАТОРОВ =====
   fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
   fullExpr = insertImplicitMultiplication(fullExpr);
 
-  // ===== ШАГ 10: Вычисление =====
+  // ===== ШАГ 12: Вычисление =====
+
   try {
     // Переносим целые части в числитель дроби
     fullExpr = convertMixedToImproper(fullExpr);
@@ -1813,12 +1755,14 @@ export function evaluateFraction() {
       finalStepsArray = generateSteps(cleanExpr, resultFraction);
     }
 
+    console.log('📊 [DEBUG] История с операторами:', historyDisplayExpr);
+    console.log('📊 [DEBUG] Результат:', displayStr);
+
     // === -📝=TODO=📝- ===
     // ===== ВРЕМЕННАЯ ОТЛАДКА =====
     console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
     console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
-
 
     appState.historySession.push({
       type: 'fractionSteps',
@@ -1926,7 +1870,6 @@ export function backspaceFraction() {
     return;
   }
 
-
   // === ЗАЩИТА СТРУКТУРЫ ДРОБИ ===
   // Если expression оканчивается на '÷', значит мы находимся в режиме ввода знаменателя
   if (appState.expression.endsWith('÷')) {
@@ -1951,6 +1894,3 @@ export function backspaceFraction() {
     appState.isNewInput = true;
   }
 }
-
-
-

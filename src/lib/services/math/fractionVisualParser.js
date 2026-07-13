@@ -292,7 +292,7 @@ export function parseExpressionToTokens(expression) {
           // === КЕЙС ШАГА 3 (Случай 3: Сложное выражение в скобках) ===
           const multiplier = expression.substring(i, j);
           tokens.push({ type: 'text', value: multiplier });
-          tokens.push({ type: 'text', value: '*' });
+          // tokens.push({ type: 'text', value: '' }); // если value: '*' }); то при вводе смешанной дроби, до ввода знаменателя есть * между целой частью и скобкой от дробной части
           i = j;
           continue;
         }
@@ -417,7 +417,7 @@ export function parseExpressionToTokens(expression) {
           }
 
           if (!bracketContent.includes('÷')) {
-            tokens.push({ type: 'text', value: '*' });
+            // tokens.push({ type: 'text', value: '' }); // если value: '*' }); то при вводе смешанной дроби, до ввода знаменателя есть * между целой частью и скобкой от дробной части
           }
         }
         // === КОНЕЦ LOOKAHEAD ДЛЯ СЛУЧАЯ 2 ===
