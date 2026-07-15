@@ -4,12 +4,12 @@
 export const testMatrix = [
   { id: 1, input: "1÷2", expected: "1÷2" },
   { id: 2, input: "5÷2", expected: "2⥑1÷2⥏" },
-  { id: 3, input: "-7÷3", expected: "-2⥑1÷3⥏)" },
+  { id: 3, input: "-7÷3", expected: "-2⥑1÷3⥏" },
   { id: 4, input: "(3÷(1-1))", expected: "ERROR" },
   { id: 5, input: "(53÷51)÷(2÷17)", expected: "8⥑5÷6⥏" },
-  { id: 6, input: "5(1÷2+1÷2)+3", expected: "9" },
+  { id: 6, input: "5(1÷2+1÷2)+3", expected: "8" },
   { id: 7, input: "5*(1÷2+1÷2)*3", expected: "15" },
-  { id: 8, input: "5(1÷2-1÷2)÷4", expected: "ERROR" },
+  { id: 8, input: "5(1÷2-1÷2)÷4", expected: "0÷1" },
   { id: 9, input: "5÷8+0.5", expected: "1⥑1÷8⥏" },
   { id: 10, input: "0.5+0.75", expected: "1⥑1÷4⥏" },
   { id: 11, input: "3÷4+0.5+1÷8", expected: "1⥑3÷8⥏" },
@@ -52,9 +52,9 @@ export const testMatrix = [
 
   // ===== СЛОЖЕНИЕ ДРОБЕЙ =====
   { id: 34, input: "1÷2+5÷8", expected: "1⥑1÷8⥏" },
-  { id: 35, input: "1÷4+3÷8", expected: "5÷8⥏" },
+  { id: 35, input: "1÷4+3÷8", expected: "5÷8" },
   { id: 36, input: "1÷2-5", expected: "-4⥑1÷2⥏" },
-  { id: 37, input: "5(1÷2+1÷2)+3", expected: "15" },
+  { id: 37, input: "5(1÷2+1÷2)+3", expected: "8" },
 
   { id: 38, input: "5+((1÷2+1÷2)÷(3-2))", expected: "6" },
   { id: 39, input: "5+(1÷2+1÷2)÷(3-2-1)", expected: "ERROR" },
@@ -105,8 +105,8 @@ export const testMatrix = [
 
   { id: 74, input: "1/2/1/4", expected: "1÷8" },
   { id: 75, input: "1÷2/1÷4", expected: "2" },
-  { id: 76, input: "1÷2÷3÷4", expected: "1÷26" },
-  { id: 77, input: "3(1/2)", expected: "1⥑1÷2⥏" },
+  { id: 76, input: "(1÷2)/(3÷4)", expected: "2÷3" },
+  { id: 77, input: "3(1/2)", expected: "3⥑1÷2⥏" },
   { id: 78, input: "3(1÷2)", expected: "3⥑1÷2⥏" },
 
   { id: 79, input: "3(1÷3)/4(2÷5)", expected: "25÷33" },
@@ -146,4 +146,13 @@ export const testMatrix = [
   { id: 106, input: "2*3(4÷5)÷7", expected: "1⥑3÷35⥏" },
   { id: 107, input: "3*4(1÷2)", expected: "13⥑1÷2⥏" },
   { id: 108, input: "5(1÷2-1÷2)+4", expected: "4" },
+
+  // { id: 109, input: "(5(1÷2-1÷2)÷4)+(3÷4)", expected: "3÷4" },
+
+  // { id: 110, input: "3(1/2)", expected: "3⥑1÷2⥏" },
+  // { id: 111, input: "3+(1/2)", expected: "3⥑1÷2⥏" },
+  // { id: 112, input: "3*(1/2)", expected: "1⥑1÷2⥏" },
+  // { id: 113, input: "3(1÷2)", expected: "3⥑1÷2⥏" },
+  // { id: 114, input: "3+(1÷2)", expected: "3⥑1÷2⥏" },
+  // { id: 115, input: "3*(1÷2)", expected: "1⥑1÷2⥏" },
 ];
