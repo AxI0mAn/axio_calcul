@@ -2170,11 +2170,6 @@ ERROR
 
 
 
-
-
-
-
-
 https://chat.deepseek.com/a/chat/s/7c315675-4d1c-43c6-beff-fda797e29d6f
 
 Ты — ИИ-архитектор и эксперт по дифференциальной отладке (Regression & Git Diff Analyst). 
@@ -2183,11 +2178,110 @@ https://chat.deepseek.com/a/chat/s/7c315675-4d1c-43c6-beff-fda797e29d6f
 
 
 
+
+
+
+
+
+
+
+
+
  
 
+Тестирование.
+
+Вводится 5((1÷2+1÷2))+2(12÷33)
+Ожидаемый ответ 7(4÷11)
+
+Вводится 5((1÷2+1÷2)÷(1+2))
+Ожидаемый ответ 5(1÷3)
+
+Ошибка 1.
+Вводится 5(1÷3)÷2(12÷33)
+Ожидается в истории  (5+(1÷3))÷(2+(12÷33))
+Ожидаемый ответ 2(10÷39)
+В истории: 5*(1÷3)÷2+(12÷33)
+Получен НЕ ПРАВИЛЬНЫЙ ответ 1(13÷66)
+Ответ не правильный!
+В консоли:
+fractionActions.js:1701 📊 [DEBUG] fullExpr перед вычислением: 5*(1÷3)÷2+(4÷11)
+fractionActions.js:1707 Строка, отправляемая в ядро: 5*(1÷3)÷2+(4÷11)
+fractionCore.js:436 Input expression: 5*(1÷3)÷2+(4÷11)
+fractionCore.js:513 Final Output Stack (RPN): Array(7)0: Fraction {num: 5, den: 1}1: Fraction {num: 1, den: 3}2: "*"3: Fraction {num: 2, den: 1}4: "÷"5: Fraction {num: 4, den: 11}6: "+"length: 7[[Prototype]]: Array(0)
+fractionActions.js:1731 📊 [DEBUG] История с операторами: 5*(1÷3)÷2+(4÷11)
+fractionActions.js:1732 📊 [DEBUG] Результат: 1⥑13÷66⥏
+
+
+Ошибка 2.
+Вводится 5((1÷2+1÷2)÷(1+2))+2(12÷33)
+Ожидается в истории 5+((1÷2+1÷2)÷(1+2))+(2+(12÷33))
+Ожидаемый ответ 6(4÷11)
+В истории: 5+((1÷2+1÷2)÷(1+2))*22+(12÷33 )
+Получен НЕ ПРАВИЛЬНЫЙ ответ 12(23÷33)
+Ответ не правильный!
+В консоли:
+
+
+fractionActions.js:1701 📊 [DEBUG] fullExpr перед вычислением: 5+((1÷2+1÷2)÷(1+2))*22+(12÷33)
+fractionActions.js:1707 Строка, отправляемая в ядро: 5+((1÷2+1÷2)÷(1+2))*22+(12÷33)
+fractionCore.js:436 Input expression: 5+((1÷2+1÷2)÷(1+2))*22+(12÷33)
+fractionCore.js:513 Final Output Stack (RPN): (13) [Fraction, Fraction, Fraction, '+', Fraction, Fraction, '+', '÷', Fraction, '*', '+', Fraction, '+']0: Fraction {num: 5, den: 1}1: Fraction {num: 1, den: 2}2: Fraction {num: 1, den: 2}3: "+"4: Fraction {num: 1, den: 1}5: Fraction {num: 2, den: 1}6: "+"7: "÷"8: Fraction {num: 22, den: 1}9: "*"10: "+"11: Fraction {num: 4, den: 11}12: "+"length: 13[[Prototype]]: Array(0)
+fractionActions.js:1731 📊 [DEBUG] История с операторами: 5+((1÷2+1÷2)÷(1+2))*22+(12÷33)
+fractionActions.js:1732 📊 [DEBUG] Результат: 12⥑23÷33⥏
 
 
 
+Ошибка 3.
+Вводим 1÷2÷3÷4
+должно быть ⥾⥾⥾1÷2⥿÷3⥿÷4⥿
+Ожидаемый ответ 1÷24
+На экране видим ÷÷3÷4=2÷3 - ответ не правильный!
+
+
+fractionActions.js:1697 📊 [DEBUG] fullExpr перед вычислением: 1÷2÷3÷4
+fractionActions.js:1709 Строка, отправляемая в ядро: 1÷2÷3÷4
+fractionCore.js:436 Input expression: 1÷2÷3÷4
+fractionCore.js:513 Final Output Stack (RPN): (3) [Fraction, Fraction, '÷']
+fractionActions.js:1736 📊 [DEBUG] История с операторами: 1÷2÷3÷4
+fractionActions.js:1737 📊 [DEBUG] Результат: 2÷3
+
+
+Ошибка 4.
+Вводим 2((3+4)÷5)+6
+должно быть  2⥑⥾3+4⥿÷5⥏+6
+Ожидаемый ответ  8(2÷5)
+На экране видим 2+((3+4)÷5)*6 = 10⥑2÷5⥏ ОТВЕТ НЕ ПРАВИЛЬНЫЙ
+в консоли
+
+fractionActions.js:1701 📊 [DEBUG] fullExpr перед вычислением: 1÷2÷3÷4
+fractionActions.js:1707 Строка, отправляемая в ядро: 1÷2÷3÷4
+fractionCore.js:436 Input expression: 1÷2÷3÷4
+fractionCore.js:513 Final Output Stack (RPN): (3) [Fraction, Fraction, '÷']0: Fraction {num: 1, den: 2}1: Fraction {num: 3, den: 4}2: "÷"length: 3[[Prototype]]: Array(0)
+fractionActions.js:1731 📊 [DEBUG] История с операторами: 1÷2÷3÷4
+fractionActions.js:1732 📊 [DEBUG] Результат: 2÷3
+fractionActions.js:1701 📊 [DEBUG] fullExpr перед вычислением: 2+((3+4)÷5)*6
+fractionActions.js:1707 Строка, отправляемая в ядро: 2+((3+4)÷5)*6
+fractionCore.js:436 Input expression: 2+((3+4)÷5)*6
+fractionCore.js:513 Final Output Stack (RPN): (9) [Fraction, Fraction, Fraction, '+', Fraction, '÷', Fraction, '*', '+']0: Fraction {num: 2, den: 1}1: Fraction {num: 3, den: 1}2: Fraction {num: 4, den: 1}3: "+"4: Fraction {num: 5, den: 1}5: "÷"6: Fraction {num: 6, den: 1}7: "*"8: "+"length: 9[[Prototype]]: Array(0)
+fractionActions.js:1731 📊 [DEBUG] История с операторами: 2+((3+4)÷5)*6
+fractionActions.js:1732 📊 [DEBUG] Результат: 10⥑2÷5⥏
+ИСЧЕЗ + перед числом 6 !! Почему???
+
+
+Ошибка 5.
+Вводим 2(1÷3)+3(1÷2)
+должно быть 2⥑1÷3⥏+3⥑1÷2⥏
+Ожидаемый ответ 5(5÷6)
+На экране видим 2+(1÷3)*33+(1÷2)=13(1÷2) АБСОЛЮТНО НЕ ПРАВИЛЬНЫЙ ОТВЕТ!!! ПОТЕРЯН +
+
+в консоли
+fractionActions.js:1701 📊 [DEBUG] fullExpr перед вычислением: 2+(1÷3)*33+(1÷2)
+fractionActions.js:1707 Строка, отправляемая в ядро: 2+(1÷3)*33+(1÷2)
+fractionCore.js:436 Input expression: 2+(1÷3)*33+(1÷2)
+fractionCore.js:513 Final Output Stack (RPN): (7) [Fraction, Fraction, Fraction, '*', '+', Fraction, '+']0: Fraction {num: 2, den: 1}1: Fraction {num: 1, den: 3}2: Fraction {num: 33, den: 1}3: "*"4: "+"5: Fraction {num: 1, den: 2}6: "+"length: 7[[Prototype]]: Array(0)
+fractionActions.js:1731 📊 [DEBUG] История с операторами: 2+(1÷3)*33+(1÷2)
+fractionActions.js:1732 📊 [DEBUG] Результат: 13⥑1÷2⥏
 
 
 
