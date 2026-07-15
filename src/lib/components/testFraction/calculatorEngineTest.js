@@ -1,6 +1,6 @@
 // src/lib/components/testFraction/calculatorEngineTest.js
 
-import { testMatrix } from "./testMatrix.js";
+import { testMatrix56 } from "./testMatrix56.js";
 import { evaluateFraction } from "$lib/services/math/fractionActions.js";
 import { appState } from "$lib/store/appState.svelte.js";
 
@@ -56,7 +56,7 @@ export function runSingleTest(input) {
 export function runAllTests() {
   const results = [];
 
-  for (const test of testMatrix) {
+  for (const test of testMatrix56) {
     const startTime = performance.now();
     const result = runSingleTest(test.input);
     const endTime = performance.now();

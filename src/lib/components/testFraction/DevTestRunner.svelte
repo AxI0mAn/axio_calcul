@@ -2,7 +2,7 @@
 <!-- src/lib/components/testFraction/DevTestRunner.svelte -->
 <script>
 	import { onMount } from 'svelte';
-	import { testMatrix } from './testMatrix.js';
+	import { testMatrix56 } from './testMatrix56.js';
 	import { runAllTests, checkRegression } from './calculatorEngineTest.js';
 
 	// ===== СОСТОЯНИЕ =====
@@ -127,7 +127,7 @@
 	{#if isVisible}
 		<div class="test-runner">
 			<div class="header">
-				<h3>🧪 Автоматический прогон ({testMatrix.length} тестов)</h3>
+				<h3>🧪 Автоматический прогон ({testMatrix56.length} тестов)</h3>
 				<div class="controls">
 					<button onclick={runTests} disabled={isRunning} class="run-btn">
 						{isRunning ? '🔄 Запуск...' : '▶️ Запустить тесты'}

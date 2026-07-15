@@ -1,5 +1,5 @@
 // src/lib/components/testFraction/testMatrix.js
-// testMatrix.js простой массив из всех 30 тест-кейсов
+// testMatrix.js простой массив всех тест-кейсов
 
 export const testMatrix = [
   { id: 1, input: "1÷2", expected: "1÷2" },
@@ -147,12 +147,12 @@ export const testMatrix = [
   { id: 107, input: "3*4(1÷2)", expected: "13⥑1÷2⥏" },
   { id: 108, input: "5(1÷2-1÷2)+4", expected: "4" },
 
-  // { id: 109, input: "(5(1÷2-1÷2)÷4)+(3÷4)", expected: "3÷4" },
+  { id: 109, input: "(5(1÷2-1÷2)÷4)+(3÷4)", expected: "3÷4" },
 
-  // { id: 110, input: "3(1/2)", expected: "3⥑1÷2⥏" },
-  // { id: 111, input: "3+(1/2)", expected: "3⥑1÷2⥏" },
-  // { id: 112, input: "3*(1/2)", expected: "1⥑1÷2⥏" },
-  // { id: 113, input: "3(1÷2)", expected: "3⥑1÷2⥏" },
-  // { id: 114, input: "3+(1÷2)", expected: "3⥑1÷2⥏" },
-  // { id: 115, input: "3*(1÷2)", expected: "1⥑1÷2⥏" },
+  { id: 110, input: "3(1/2)", expected: "3⥑1÷2⥏" },
+  { id: 111, input: "3+(1/2)", expected: "3⥑1÷2⥏" },
+  { id: 112, input: "3*(1/2)", expected: "1⥑1÷2⥏" },
+  { id: 113, input: "3(1÷2)", expected: "3⥑1÷2⥏" },
+  { id: 114, input: "3+(1÷2)", expected: "3⥑1÷2⥏" },
+  { id: 115, input: "3*(1÷2)", expected: "1⥑1÷2⥏" },
 ];
