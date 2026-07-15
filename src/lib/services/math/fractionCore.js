@@ -166,6 +166,7 @@ function toFraction(value) {
 
 // ----- Токенизация (поддержка отрицательных чисел и дробей) -----
 function tokenizeFractionExpression(expr) {
+  console.log('🔍 [DEBUG] tokenizeFractionExpression получил:', expr);
   const tokens = [];
   let i = 0;
   const len = expr.length;
@@ -189,7 +190,6 @@ function tokenizeFractionExpression(expr) {
     // Натыкаемся на открывающую скобку 
     if (ch === '(') {
       if (tokens.length > 0 && tokens[tokens.length - 1].type === 'number') {
-
         // --- КЕЙС ШАГА 6 / СЛУЧАЙ 4: Проверяем на паттерн двойных скобок NUMBER + (( ---
         if (expr[i + 1] === '(') {
           let k = i + 2;
@@ -200,7 +200,6 @@ function tokenizeFractionExpression(expr) {
             if (expr[k] === '(') openBrackets++;
             if (expr[k] === ')') {
               openBrackets--;
-              // Если внешние скобки числителя закрылись, проверяем символ за ними
               if (openBrackets === 0 && expr[k + 1] === '÷') {
                 hasMainDiv = true;
                 break;
@@ -210,19 +209,15 @@ function tokenizeFractionExpression(expr) {
           }
 
           if (hasMainDiv) {
-            // Связываем целую часть с составным числителем через ПЛЮС
             tokens.push({ type: 'operator', value: '+' });
             console.log('[Ядро] Обнаружена составная дробь NUMBER + ((...)) ÷. Неявно подставлен "+"');
-
-            // Пушим первую скобку из пары и сдвигаем указатель на вторую скобку, 
-            // чтобы на следующем шаге цикла она обработалась как обычная одиночная скобка
             tokens.push({ type: 'operator', value: '(' });
             i++;
             continue;
           }
         }
 
-        // --- СЛУЧАИ 1, 2, 3: Анализ одиночной скобки (или fallback для двойной без ÷) ---
+        // --- СЛУЧАИ 1, 2, 3: Анализ одиночной скобки ---
         let k = i + 1;
         let bracketContent = '';
         let openCount = 1;
@@ -241,23 +236,20 @@ function tokenizeFractionExpression(expr) {
         const hasOtherOps = /[\+\-\*\/]/.test(bracketContent);
 
         if (hasSingleDiv && !hasOtherOps) {
-          // Случай 1: Смешанная дробь
           tokens.push({ type: 'operator', value: '+' });
           console.log('[Ядро] Между целой частью и дробью неявно подставлен оператор "+"');
         } else {
-          // Случай 2 и 3: Неявное умножение
           tokens.push({ type: 'operator', value: '*' });
           console.log('[Ядро] Перед скобкой неявно подставлен оператор "*" (умножение)');
         }
       }
 
-      // Пушим текущую открывающую скобку и идём дальше
       tokens.push({ type: 'operator', value: '(' });
       i++;
       continue;
     }
 
-    // 1. Обрабатываем операторы и скобки (добавили '÷' и '^')
+    // 1. Обрабатываем операторы и скобки
     if ('+*/()^√'.includes(ch) || ch === '÷') {
       tokens.push({ type: 'operator', value: ch });
       i++;
@@ -266,7 +258,6 @@ function tokenizeFractionExpression(expr) {
 
     // 2. Обработка минуса (бинарный vs унарный)
     if (ch === '-') {
-      // Если перед минусом стоит число, закрывающая скобка или маркер конца дроби — это бинарный минус
       const isBinary = i > 0 && /[\d)⥏]/.test(expr[i - 1]);
       if (isBinary) {
         tokens.push({ type: 'operator', value: '-' });
@@ -280,37 +271,43 @@ function tokenizeFractionExpression(expr) {
           i++;
           continue;
         }
+        // Унарный минус перед числом — захватываем число с минусом
+        let numStart = i;
+        let numEnd = i + 1;
+        while (numEnd < len && /[\d.]/.test(expr[numEnd])) {
+          numEnd++;
+        }
+        const numStr = expr.substring(numStart, numEnd);
+        const numVal = parseFloat(numStr);
+        if (!isNaN(numVal)) {
+          tokens.push({ type: 'number', value: numVal });
+          i = numEnd;
+          continue;
+        }
       }
     }
 
-    // 3. Сбор чисел, простых и смешанных дробей
+    // 3. Сбор чисел, простых дробей и смешанных дробей
     let j = i;
-    if (expr[j] === '-') j++; // Учитываем унарный минус в начале числа
+    if (expr[j] === '-') j++; // Пропускаем минус (обработан отдельно)
 
-    // ВАЖНО: Мы поглощаем символы в строку raw только если это:
-    // - цифры или точка
-    // - или специальные маркеры смешанной дроби (⥑, ⥏)
-    // - символ '÷' поглощается ТУТ только если он зажат между цифрами (простая дробь)
     while (j < len && (
       expr[j].match(/[\d.]/) ||
       expr[j] === MARKERS.WHOLE_START ||
-      expr[j] === MARKERS.WHOLE_END ||
-      (expr[j] === MARKERS.DIV && j + 1 < len && /\d/.test(expr[j + 1]) && !expr.includes('^'))
-      // ^ Если в выражении вообще есть знак степени, запрещаем склеивать дробь атомарно!
+      expr[j] === MARKERS.WHOLE_END
     )) {
       j++;
     }
 
-    // Если удалось захватить подстроку
     if (j > i) {
       const raw = expr.substring(i, j);
       if (raw === '-') {
         tokens.push({ type: 'operator', value: '-' });
-        i = j; // Минус обработан как оператор, двигаем указатель
+        i = j;
         continue;
       }
 
-      // Кейс А: Смешанная дробь (например, 2⥑1÷3⥏)
+      // === ОБРАБОТКА СМЕШАННОЙ ДРОБИ (⥑...⥏) ===
       const mixedMatch = raw.match(/^(-?)(\d+)⥑(\d+)÷(\d+)⥏$/);
       if (mixedMatch) {
         const sign = mixedMatch[1] === '-' ? -1 : 1;
@@ -319,39 +316,52 @@ function tokenizeFractionExpression(expr) {
         const den = parseInt(mixedMatch[4], 10);
         const totalNum = sign * (whole * den + num);
         tokens.push({ type: 'fraction', value: new Fraction(totalNum, den) });
-        i = j; // Успешный разбор, переносим указатель
+        i = j;
         continue;
       }
 
-      // Кейс Б: Простая дробь (например, 1÷2)
-      const simpleMatch = raw.match(/^(-?)(\d+)÷(\d+)$/);
-      if (simpleMatch) {
-        const sign = simpleMatch[1] === '-' ? -1 : 1;
-        const num = parseInt(simpleMatch[2], 10);
-        const den = parseInt(simpleMatch[3], 10);
-        tokens.push({ type: 'fraction', value: new Fraction(sign * num, den) });
-        i = j; // Успешный разбор, переносим указатель
-        continue;
+      // === ОБРАБОТКА ПРОСТОЙ ДРОБИ (число÷число) ===
+      if (j < len && expr[j] === MARKERS.DIV) {
+        let k = j + 1;
+        let rightDigits = '';
+        while (k < len && /[\d.]/.test(expr[k])) {
+          rightDigits += expr[k];
+          k++;
+        }
+        if (rightDigits.length > 0 && !rightDigits.endsWith('.')) {
+          j = k;
+          const rawFraction = expr.substring(i, j);
+          const fractionMatch = rawFraction.match(/^(-?)(\d+\.?\d*)÷(\d+\.?\d*)$/);
+          if (fractionMatch) {
+            const numerator = parseFloat(fractionMatch[2]);
+            const denominator = parseFloat(fractionMatch[3]);
+            if (denominator !== 0) {
+              const numFrac = Fraction.fromDecimal(numerator);
+              const denFrac = Fraction.fromDecimal(denominator);
+              const result = numFrac.div(denFrac);
+              tokens.push({ type: 'fraction', value: result });
+              i = j;
+              continue;
+            }
+          }
+        }
       }
 
-      // Кейс В: Обычное число (целое или десятичное)
+      // === ОБЫЧНОЕ ЧИСЛО ===
       const numVal = parseFloat(raw);
       if (!isNaN(numVal)) {
         tokens.push({ type: 'number', value: numVal });
-        i = j; // Успешный разбор, переносим указатель
+        i = j;
         continue;
       }
-      // Предохранитель: если j > i, но строка не распозналась регулярками,
-      // сдвигаем указатель на 1 символ во избежание бесконечного цикла
+
       i++;
       continue;
     }
 
-    // Если ни один шаблон не подошел, двигаем указатель
     i++;
   }
 
-  console.log("Сгенерированные токены ядра (отладка):", tokens);
   return tokens;
 }
 
@@ -366,13 +376,16 @@ function applyOperator(op, a, b = null) {
 
   // Отдельная ветка для оператора '/' – десятичное деление
   if (op === '/') {
-    const leftNum = left.toDecimal();
-    const rightNum = right.toDecimal();
-    if (rightNum === 0) throw new Error('Division by zero');
-    const result = leftNum / rightNum;
-    return Fraction.fromDecimal(result);
+    return left.div(right); // внутри уже есть проверка на 0
   }
-
+  /* if (op === '/') {
+     const leftNum = left.toDecimal();
+     const rightNum = right.toDecimal();
+     if (rightNum === 0) throw new Error('Division by zero');
+     const result = leftNum / rightNum;
+     return Fraction.fromDecimal(result);
+   }
+ */
   // Для всех остальных бинарных операторов (включая '÷') – дробная арифметика
   switch (op) {
     case '+': return left.add(right);
@@ -386,12 +399,15 @@ function applyOperator(op, a, b = null) {
 
 
 export function evaluateFractionExpression(expression) {
-  console.log('=== evaluateFractionExpression ===');
-  console.log('Input expression:', expression);
+  // ===== ВРЕМЕННАЯ ОТЛАДКА =====
+  // console.log('=== evaluateFractionExpression ===');
+  // console.log('Input expression:', expression);
 
   let tokens = tokenizeFractionExpression(expression);
+  // === -📝=TODO=📝- ===
+  console.log('🔍 [DEBUG] Токены до RPN:', tokens);
 
-  // === МОДИФИКАЦИЯ ШАГА 7 (Виртуальное автозакрытие скобок) ===
+  // ===  Виртуальное автозакрытие скобок ===
   let bracketBalance = 0;
   for (const tok of tokens) {
     if (tok.value === '(') bracketBalance++;
@@ -405,7 +421,6 @@ export function evaluateFractionExpression(expression) {
       tokens.push({ type: 'operator', value: ')' });
     }
   }
-  // === КОНЕЦ МОДИФИКАЦИИ ШАГА 7 ===
 
   const output = [];
   const ops = [];
@@ -462,8 +477,11 @@ export function evaluateFractionExpression(expression) {
   while (ops.length) {
     output.push(ops.pop());
   }
-
+  // === -📝=TODO=📝- ===
+  // ===== ВРЕМЕННАЯ ОТЛАДКА =====
   console.log('Final Output Stack (RPN):', output);
+
+
 
   // --- ВЫЧИСЛЕНИЕ СТЕКА ---
   const stack = [];
@@ -482,6 +500,7 @@ export function evaluateFractionExpression(expression) {
       const b = stack.pop(); // Правый операнд
       const a = stack.pop(); // Левый операнд
       if (a === undefined || b === undefined) throw new Error('Invalid expression structure');
+
 
       let result;
       switch (item) {
@@ -524,18 +543,3 @@ export function evaluateFractionExpression(expression) {
 }
 
 
-// === -📝=TODO=📝- ===
-// ВРЕМЕННО: для ручного тестирования (удалить после проверки)
-if (typeof window !== 'undefined') {
-  // @ts-ignore
-  window.testEvaluate = function (expr) {
-    try {
-      const result = evaluateFractionExpression(expr);
-      console.log('Результат для "' + expr + '":', result.toMixedString(), 'десятичное:', result.toDecimal());
-      return result;
-    } catch (e) {
-      console.error('Ошибка:', e.message);
-      return null;
-    }
-  };
-}

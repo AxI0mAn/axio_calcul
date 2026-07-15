@@ -28,15 +28,26 @@
 			customClass="trigMode {appState.corner === mode ? 'action' : ''}"
 		/>
 	{/each}
-	<BtnText customClass="op btn__func constanta trigMode" onclick={() => addPi()} buttonText="π" />
-	<BtnText customClass="op btn__func trigMode" onclick={() => denominator()} buttonText="1/x" />
+	<div class="rowConst">
+		<BtnText
+			customClass="op btn__func constanta trigMode trigModeConst"
+			onclick={() => addPi()}
+			buttonText="π"
+		/>
+		<BtnText
+			customClass="op btn__func trigMode trigModeConst"
+			onclick={() => denominator()}
+			buttonText="1/x"
+		/>
+	</div>
 </div>
 
 <style lang="scss">
 	.corner-switch {
 		padding: 0.25rem;
 		padding-left: 0.75rem;
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.25rem;
+		width: fit-content;
 		display: flex;
 		flex-flow: row nowrap;
 		justify-content: flex-start;
@@ -46,5 +57,13 @@
 			gap: 4px;
 			padding-bottom: 0;
 		}
+	}
+
+	.rowConst {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: space-around;
+		padding: 0.25rem 0.5rem;
+		gap: 0.5rem;
 	}
 </style>

@@ -48,7 +48,7 @@
 
 		background-color: transparent;
 		border-radius: 8px;
-		border: 1px solid $clr-mint;
+		// border: 1px solid $clr-mint;
 
 		aspect-ratio: 1 / 1;
 		transition:

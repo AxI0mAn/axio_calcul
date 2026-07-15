@@ -18,3 +18,5 @@ export function fromSuperscript(superStr) {
   };
   return superStr.split('').map(ch => map[ch] || ch).join('');
 }
+
+// В верхнем регистре ⁽ ⁺ ⁻ * /  ÷ ⁾

@@ -7,6 +7,8 @@
 		parseExpressionToTokens,
 		stripMarkers
 	} from '$lib/services/math/fractionVisualParser.js';
+	import { btnMemo } from '$lib/utils/btnMemo.js';
+	import { longpress } from '$lib/actions/longpress.js';
 
 	let expressionTokens = $derived(parseExpressionToTokens(appState.expression));
 	let displayTokens = $derived(parseExpressionToTokens(appState.display));
@@ -87,58 +89,114 @@
 	<div class="history-section" bind:this={historyContain}>
 		{#each tokenizedHistory as entry}
 			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
-				<!-- Рендеринг дробного пошагового решения (без изменений) -->
 				<div class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}">
-					{#each entry.steps as step, idx}
-						<div class="step-line">
-							{#if idx > 0}
-								<span class="math-text equal-prefix"> = </span>
-							{/if}
-
-							{#if step === 'ERROR'}
-								<span class="math-text notValid">ERROR</span>
-							{:else}
-								{#each entry.tokenizedSteps[idx] as token, tokenIdx (tokenIdx)}
-									{#if token.type === 'text'}
-										{#if token.value === '√'}
-											<div class="radical-wrapper">
-												<span class="radical-tick">√</span>
-											</div>
-										{:else}
-											<span class="math-text">{stripMarkers(token.value)}</span>
-										{/if}
-									{:else if token.type === 'superscript'}
-										<span class="super-exponent">{token.value}</span>
-									{:else if token.type === 'fraction'}
-										<div
-											class="fraction-block {entry.tokenizedSteps[idx][tokenIdx - 1]?.value === '√'
-												? 'under-radical'
-												: ''}"
-										>
-											{#if token.whole && token.whole !== '0'}
-												<span class="whole-part">{token.whole}</span>
-											{/if}
-											<div class="fraction-container">
-												<span class="num-part">{token.num}</span>
-												<span class="fraction-line"></span>
-												<span class="den-part">{token.den}</span>
-											</div>
+					{#if !appState.stepsFraction && entry.steps.length === 2}
+						<!-- ===== РЕЖИМ БЕЗ ПОШАГОВОГО РЕШЕНИЯ: 2 шага в одной строке ===== -->
+						<div class="step-line single-line">
+							<!-- Первый шаг (выражение) -->
+							{#each entry.tokenizedSteps[0] as token, tokenIdx (tokenIdx)}
+								{#if token.type === 'text'}
+									{#if token.value === '√'}
+										<div class="radical-wrapper">
+											<span class="radical-tick">√</span>
 										</div>
+									{:else}
+										<span class="math-text">{stripMarkers(token.value)}</span>
 									{/if}
-								{/each}
-							{/if}
+								{:else if token.type === 'superscript'}
+									<span class="super-exponent">{token.value}</span>
+								{:else if token.type === 'fraction'}
+									<div class="fraction-block">
+										{#if token.whole && token.whole !== '0'}
+											<span class="whole-part">{token.whole}</span>
+										{/if}
+										<div class="fraction-container">
+											<span class="num-part">{token.num}</span>
+											<span class="fraction-line"></span>
+											<span class="den-part">{token.den}</span>
+										</div>
+									</div>
+								{/if}
+							{/each}
 
-							{#if idx < entry.steps.length - 1}
-								<span class="math-text equal-postfix"> =</span>
-							{/if}
+							<!-- Знак равенства -->
+							<span class="math-text equal-prefix"> = </span>
+
+							<!-- Второй шаг (результат) -->
+							{#each entry.tokenizedSteps[1] as token, tokenIdx (tokenIdx)}
+								{#if token.type === 'text'}
+									{#if token.value === '√'}
+										<div class="radical-wrapper">
+											<span class="radical-tick">√</span>
+										</div>
+									{:else}
+										<span class="math-text">{stripMarkers(token.value)}</span>
+									{/if}
+								{:else if token.type === 'superscript'}
+									<span class="super-exponent">{token.value}</span>
+								{:else if token.type === 'fraction'}
+									<div class="fraction-block">
+										{#if token.whole && token.whole !== '0'}
+											<span class="whole-part">{token.whole}</span>
+										{/if}
+										<div class="fraction-container">
+											<span class="num-part">{token.num}</span>
+											<span class="fraction-line"></span>
+											<span class="den-part">{token.den}</span>
+										</div>
+									</div>
+								{/if}
+							{/each}
 						</div>
-					{/each}
+					{:else}
+						<!-- ===== ПОШАГОВЫЙ РЕЖИМ ИЛИ БОЛЕЕ 2 ШАГОВ: каждый шаг на новой строке ===== -->
+						{#each entry.steps as step, idx}
+							<div class="step-line">
+								{#if idx > 1}
+									<span class="math-text equal-prefix"> = </span>
+								{/if}
+
+								{#if step === 'ERROR'}
+									<span class="math-text notValid">ERROR</span>
+								{:else}
+									{#each entry.tokenizedSteps[idx] as token, tokenIdx (tokenIdx)}
+										{#if token.type === 'text'}
+											{#if token.value === '√'}
+												<div class="radical-wrapper">
+													<span class="radical-tick">√</span>
+												</div>
+											{:else}
+												<span class="math-text">{stripMarkers(token.value)}</span>
+											{/if}
+										{:else if token.type === 'superscript'}
+											<span class="super-exponent">{token.value}</span>
+										{:else if token.type === 'fraction'}
+											<div
+												class="fraction-block {entry.tokenizedSteps[idx][tokenIdx - 1]?.value ===
+												'√'
+													? 'under-radical'
+													: ''}"
+											>
+												{#if token.whole && token.whole !== '0'}
+													<span class="whole-part">{token.whole}</span>
+												{/if}
+												<div class="fraction-container">
+													<span class="num-part">{token.num}</span>
+													<span class="fraction-line"></span>
+													<span class="den-part">{token.den}</span>
+												</div>
+											</div>
+										{/if}
+									{/each}
+								{/if}
+
+								{#if idx >= 0 && idx < entry.steps.length - 1}
+									<span class="math-text equal-prefix"> = </span>
+								{/if}
+							</div>
+						{/each}
+					{/if}
 				</div>
-			{:else}
-				<!-- Отображение обычной строки -->
-				<p class="history-text-entry">
-					{getStringEntry(entry)}
-				</p>
 			{/if}
 		{/each}
 	</div>
@@ -211,6 +269,8 @@
 </div>
 
 <style lang="scss">
+	$fontSize: 1.1rem;
+
 	// Полностью наследуем стили основного контейнера из DisText.svelte
 	.display-box {
 		min-height: 100%;
@@ -229,7 +289,7 @@
 			$shadow-inset,
 			0px 0px 2px 4px rgba(0, 0, 0, 0.5);
 		border: 1px solid $clr-slate;
-		font-size: 2.5rem;
+		font-size: $fontSize; //2.5rem;
 		text-align: left;
 		color: rgba(255, 255, 255, 0.8);
 	}
@@ -258,12 +318,14 @@
 	// ===================НОВЫЕ СТИЛИ
 
 	.fraction-input-area {
+		// ********************
 		display: flex;
 		flex-flow: row wrap;
 		justify-content: flex-start;
 		align-items: center;
 
-		padding-top: 0.4rem;
+		// padding-top: 0.4rem;
+		// padding-bottom: 0.4rem;
 		padding-left: 1.2rem;
 		border-top: 4px groove rgba($clr-mint-soft-rgb, 0.4);
 	}
@@ -276,6 +338,7 @@
 		align-items: center; // Центрирует операторы (+, -, *, =) строго по центру дроби
 		gap: 4px;
 		font-family: inherit;
+		min-height: 4rem;
 	}
 
 	.history-section {
@@ -283,7 +346,8 @@
 		min-height: 0;
 		overflow-y: scroll;
 		overflow-x: hidden;
-		font-size: 1.25rem;
+		// уменьшить шрифт, чтоб больше помещалось в одну строку
+		font-size: $fontSize; //1.25rem;
 		line-height: 1.75rem;
 		color: $clr-slate;
 		margin-bottom: 0.5rem;
@@ -298,7 +362,7 @@
 	.history-steps-block {
 		display: flex;
 		flex-flow: row wrap;
-		justify-content: center;
+		justify-content: flex-start; //center;
 		align-items: center;
 		gap: 0.2rem;
 		padding: 4px 8px 4px 4px;
@@ -324,8 +388,9 @@
 	}
 
 	// Стили для обычных знаков (+, -, *, =, пробелы) и десятичных дробей
-	.math-text {
-		font-size: 2rem;
+	.math-text,
+	.radical-wrapper {
+		font-size: $fontSize; //2rem;
 		padding: 0 4px;
 		display: inline-flex;
 		align-items: center;
@@ -333,32 +398,75 @@
 		height: 4rem; // чтоб отцентрировать по вертикали десятичные дроби
 		line-height: 1;
 	}
+
+	// Контекстная корректировка для дробей, чтобы степень не падала на числитель!
 	.expression-line,
 	.display-line,
 	.step-line {
-		// Контекстная корректировка для дробей, чтобы степень не падала на числитель!
 		.fraction-block {
 			display: inline-flex;
 			align-items: center;
 			vertical-align: middle;
 			position: relative;
 			margin: 0 4px;
+		}
 
-			// Если степень идет сразу за блоком дроби без скобок (как 1/5 в квадрате)
-			+ .super-exponent {
-				// Опускаем чуть ниже по сравнению со скобочной степенью
-				font-size: 0.75rem;
-				transform: translateX(-0.4rem) translateY(0.7rem);
-				margin-left: 1px;
-			}
+		// указатель степени в надстрочном шрифте
+		.super-exponent {
+			display: inline-block;
+			font-size: calc(
+				$fontSize * 0.6
+			); //0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
+			font-weight: 500;
+			line-height: 1;
+			color: $clr-white;
+			// Базовый подъем для степени после скобок или обычных чисел
+			// transform: translateX(-0.4rem) translateY(-0.8em);
+			margin-left: 2px; /* Отступ от скобки, чтобы не липла */
+			margin-right: 2px; /* Отступ перед знаком равенства */
+		}
+
+		// Если степень идет сразу за блоком дроби без скобок (как 1/5 , где 5 в квадрате)
+		// .fraction-block + .super-exponent {
+		// 	// Опускаем чуть ниже по сравнению со скобочной степенью
+		// 	transform: translateX(-0.35rem) translateY(0.5rem);
+		// 	margin-left: 1px;
+		// }
+	}
+
+	// степень после скобки или целого числа в строке ввода
+	.expression-line,
+	.display-line {
+		.math-text + .super-exponent {
+			transform: translateX(-0.5rem) translateY(-0.95rem);
 		}
 	}
-	$fontSizeFractionPart: 1rem;
 
-	// === -📝=TODO=📝- ===
-	.history-section .history-steps-block .step-line .math-text + .super-exponent {
-		color: red;
-		transform: translateX(-0.4rem) translateY(2rem);
+	// степень после скобки или целого числа в истории
+	.step-line {
+		.math-text + .super-exponent {
+			transform: translateX(-0.5rem) translateY(0.95rem);
+		}
+	}
+
+	// степень для знаменателя в истории
+	.step-line {
+		// Если степень идет сразу за блоком дроби без скобок (как 1/5 в квадрате)
+		.fraction-block + .super-exponent {
+			// Опускаем чуть ниже по сравнению со скобочной степенью
+			transform: translateX(-0.35rem) translateY(2.25rem);
+			margin-left: 1px;
+		}
+	}
+
+	// стили к контейнеру .num-part и .den-part, для решения Проблема: юникодные символы верхнего индекса ¹²³ отображаются корректно, а ⁴⁵⁶⁷⁸⁹⁰ – ниже и менее жирно.
+
+	.fraction-block {
+		.num-part,
+		.den-part {
+			font-family: inherit; //system-ui, sans-serif; // или любой другой шрифт с хорошей поддержкой юникода
+			font-weight: 300; // подберите под основной текст
+		}
 	}
 
 	.fraction-container {
@@ -368,15 +476,13 @@
 	}
 	.math-text,
 	.whole-part {
-		// === -📝=TODO=📝- ===
 		color: $clr-mint;
-		font-size: calc(1.5 * $fontSizeFractionPart);
+		font-size: calc(1.25 * $fontSize);
 		padding-right: 0.5rem;
 	}
 	.num-part {
-		// === -📝=TODO=📝- ===
 		color: rgb(192, 235, 3);
-		font-size: $fontSizeFractionPart;
+		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- ЗАПРЕЩАЕМ ВЫВАЛИВАНИЕ СИМВОЛОВ НАВЕРХ
 	}
@@ -386,14 +492,12 @@
 		height: 2px;
 		margin: 2px 0;
 
-		// === -📝=TODO=📝- ===
 		background-color: rgb(153, 0, 255);
-		font-size: $fontSizeFractionPart;
+		font-size: $fontSize;
 	}
 	.den-part {
-		// === -📝=TODO=📝- ===
 		color: $clr-coral;
-		font-size: $fontSizeFractionPart;
+		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- УДЕРЖИВАЕМ СИМВОЛЫ НА НИЖНЕМ УРОВНЕ
 	}
@@ -402,28 +506,36 @@
 	.display-line {
 		.math-text,
 		.whole-part {
-			font-size: calc(1.75 * $fontSizeFractionPart);
+			font-size: calc(1.25 * $fontSize);
 		}
 		.num-part,
 		.fraction-line,
 		.den-part {
-			font-size: calc(1.5 * $fontSizeFractionPart);
+			font-size: calc(1 * $fontSize);
 		}
 	}
 
 	// Контейнер для самой галочки корня
 	.radical-wrapper {
 		display: inline-flex;
+		flex-flow: column;
+		justify-content: center;
 		align-items: flex-start;
 		height: 100%;
-		padding-top: 2px;
 		margin-right: -2px; // Прижимаем контент вплотную к галочке
+	}
+	.step-line {
+		.radical-wrapper {
+			height: 4rem; // чтоб отцентрировать по вертикали десятичные дроби
+			line-height: 1;
+		}
 	}
 
 	.radical-tick {
-		font-size: 1.45em; // Делаем галочку чуть выше контента
-		line-height: 0.9;
-		color: $clr-white;
+		font-size: calc($fontSize * 2.5); //3rem; // Делаем галочку чуть выше контента
+		font-weight: 100;
+		line-height: 100%; // 0.9;
+		color: $clr-mint;
 		user-select: none;
 	}
 
@@ -454,19 +566,6 @@
 		.whole-part {
 			padding-top: 0; // Коррекция шрифта целой части под линией
 		}
-	}
-
-	// указатель степени в надстрочном шрифте
-	.super-exponent {
-		display: inline-block;
-		font-size: 0.95rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
-		font-weight: bold;
-		line-height: 1;
-		color: $clr-mint-soft;
-		// Базовый подъем для степени после скобок или обычных чисел
-		transform: translateX(-0.4rem) translateY(-0.8em);
-		margin-left: 2px; /* Отступ от скобки, чтобы не липла */
-		margin-right: 2px; /* Отступ перед знаком равенства */
 	}
 
 	.history-steps-block.is-multistep {

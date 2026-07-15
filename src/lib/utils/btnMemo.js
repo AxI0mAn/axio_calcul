@@ -26,8 +26,9 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
   const currentDisplay = String(appState.display);
   const lastChar = currentDisplay.slice(-1);
   const sqrtSym = String.fromCharCode(8730); //  Определяем символ корня √
-  const endsWithSqrt = appState.display.endsWith(sqrtSym) || appState.display.endsWith(sqrtSym + '('); // Проверяем, заканчивается ли дисплей оператором или корнем 
-  // Проверяем, является ли последний символ оператором
+  // Проверяем, заканчивается ли дисплей оператором или корнем:
+  const endsWithSqrt = appState.display.endsWith(sqrtSym) || appState.display.endsWith(sqrtSym + '(');
+  // Проверяем, является ли последний символ оператором:
   const isOperator = ['+', '-', '*', '/'].includes(lastChar);
 
   // --- СЦЕНАРИЙ 1: Двойной клик (Извлечение копии без удаления) ---
@@ -90,41 +91,69 @@ export function btnMemo(slot, isDoubleClick = false, sourceData = null) {
     appState.isNewInput = true;
   } else {
     // ВЫДАЧА (ИЗВЛЕЧЕНИЕ)
-    // Преобразуем дробь в десятичную, если нужно
+    // 1. Получаем значение из ячейки с преобразованием дроби в десятичную (если нужно)
     let val = String(convertFractionToDecimalIfNeeded(currentValueInMemo));
-    const lastChar = String(appState.display).slice(-1);
-    // const preLastChar = val.slice(-1);
-    const isOperator = ['+', '-', '*', '/'].includes(lastChar);
-
-    // избавляемся от -> М* и отрицательное число берём в скобки
-    // Сначала очищаем от пробелов
+    // 2. Очищаем от пробелов и суффикса "M*"
     let cleanVal = val.trim();
-    //  Если в конце конструкция с "M", извлекаем само число
     if (cleanVal.at(-2) === 'M') {
-      // parseFloat сам заберет "-206" или "206" из начала строки
       cleanVal = String(parseFloat(cleanVal));
     }
-    // Теперь проверяем на отрицательность (parseFloat преобразует строку в число для сравнения)
+    // 3. Обрабатываем отрицательность: если число отрицательное, берём в скобки
     if (parseFloat(cleanVal) < 0) {
       val = `(${cleanVal})`;
     } else {
       val = cleanVal;
     }
 
+    // --- НОВЫЙ БЛОК: РЕЖИМ ВВОДА ЗНАМЕНАТЕЛЯ ДРОБИ (только в дробном режиме) ---
+    // Если дисплей заканчивается на '÷', значит мы вводим знаменатель.
+    if (appState.now_mode === 'FRACTION' && appState.display.endsWith('÷')) {
+      // Приклеиваем значение из памяти к дисплею (получится "12÷4")
+      appState.display = appState.display + val;
+      appState.isNewInput = false;
+      // Очищаем память, если это не двойной клик
+      if (!isDoubleClick) {
+        appState.memoryUpdate(slot, null);
+      }
+      return;
+    }
+
+    // Условие: выражение заканчивается на '÷', дисплей пуст или '0',
+    // и мы находимся в дробном режиме.
+    if (appState.now_mode === 'FRACTION' &&
+      appState.expression.endsWith('÷') &&
+      (appState.display === '0' || appState.display === '')) {
+      // Устанавливаем display как знаменатель
+      appState.display = val;
+      appState.isNewInput = false; // чтобы дальнейший ввод цифр добавлялся к знаменателю
+      // Очищаем память, если это не двойной клик
+      if (!isDoubleClick) {
+        appState.memoryUpdate(slot, null);
+      }
+      // Логи для отладки (можно удалить после проверки)
+      console.log('[btnMemo] Знаменатель установлен:', val);
+      return; // выходим, не выполняя стандартную логику вставки
+    }
+
+    // --- СТАНДАРТНАЯ ЛОГИКА ВСТАВКИ (без изменений) ---
+    // Определяем, есть ли оператор на конце дисплея или корень
+    const lastChar = String(appState.display).slice(-1);
+    const isOperator = ['+', '-', '*', '/'].includes(lastChar);
+
     // ЗОЛОТОЕ ПРАВИЛО:
     // 1. Если на экране оператор (30+) — ПРИКЛЕИВАЕМ (30+1)
     // 2. Если на экране 0 или флаг нового ввода (после "=" или записи) — ЗАМЕНЯЕМ
     // 3. Если на экране просто другое число (121) БЕЗ оператора — ЗАМЕНЯЕМ (предотвращаем конкатенацию)
-    // 4. Если строка на экране заканчивается как  String.fromCharCode(8730) или "√(" ,то не заменить а добавить цифры из памяти
+    // 4. Если строка на экране заканчивается как √ или "√(" — добавляем цифры из памяти
 
     if (isOperator || endsWithSqrt) {
-      appState.display = currentDisplay + val;
+      appState.display = appState.display + val;
     } else {
       appState.display = val;
     }
 
-    // После того как число извлечено:
-    // Мы ставим false, чтобы кнопка [+] увидела это число и смогла его забрать в expression.
+    // После того как число извлечено, ставим false,
+    // чтобы кнопка [+] могла забрать это число в expression.
     appState.isNewInput = false;
 
     // Очищаем память, если это не двойной клик

@@ -28,7 +28,7 @@
 		justify-content: center;
 		align-items: center;
 		padding: 4px 8px;
-		font-size: 2rem;
+		font-size: calc(1vh + 1rem); //2rem;
 		color: $clr-mint;
 		cursor: pointer;
 		transition: 0.25s ease;
@@ -88,13 +88,18 @@
 
 	.btn.btn__func {
 		padding: 2px 8px;
-		font-size: calc(1vh + 1rem); //1.25rem;
+		font-size: calc(1vh + 0.7rem); //1.25rem;
 		color: $clr-text-main;
 		border: transparent;
 		background: transparent;
 		@media (orientation: portrait) and (max-height: 670px) {
-			padding: 1px 4px;
+			padding: 2px 4px;
 			font-size: calc(1vh + 1rem);
+		}
+		@media (orientation: portrait) and (max-height: 570px) {
+			margin: 1px;
+			padding: 2px 4px;
+			font-size: calc(1vh + 0.5rem);
 		}
 	}
 
@@ -118,8 +123,11 @@
 	}
 
 	.btn.op.btn__func.trigonom {
+		min-width: fit-content;
+		padding: 2px 4px;
+
 		@media (orientation: portrait) and (max-height: 670px) {
-			padding: 1px 4px;
+			padding: 2px 4px;
 			font-size: calc(1vh + 0.6rem);
 		}
 	}
@@ -127,7 +135,7 @@
 	.btn.trigMode,
 	.btn.fractionSwitch {
 		padding: 2px 8px;
-		font-size: 1.2rem;
+		font-size: calc(1vh + 0.7rem); //1.2
 		color: $clr-text-main;
 		border: transparent;
 		background: transparent;

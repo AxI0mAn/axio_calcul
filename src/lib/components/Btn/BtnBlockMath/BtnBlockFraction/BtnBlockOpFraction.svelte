@@ -7,7 +7,6 @@
 	import { appState } from '$lib/store/appState.svelte';
 	import { addE, addPi } from '$lib/services/math/opBtnBasic.js';
 	import { addSqrt2 } from '$lib/services/math/opBtnEngineer';
-	import { addOperator } from '$lib/services/math/mathActions.js';
 	import {
 		addBracketFraction,
 		addOperatorFraction,
@@ -73,7 +72,7 @@
 		display: grid;
 		grid-template-columns: 1fr;
 		grid-template-rows: repeat(auto, 1fr);
-		gap: 8px;
+		gap: clamp(4px, 0.4rem, 8px);
 		.row {
 			display: flex;
 			flex-flow: row wrap;

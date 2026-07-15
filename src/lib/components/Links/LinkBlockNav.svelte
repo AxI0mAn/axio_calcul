@@ -60,7 +60,7 @@
 		border-radius: 8px;
 
 		// Рамка в цвет неона
-		border: 1px solid $clr-mint;
+		// border: 1px solid $clr-mint;
 
 		aspect-ratio: 1 / 1;
 		transition:
