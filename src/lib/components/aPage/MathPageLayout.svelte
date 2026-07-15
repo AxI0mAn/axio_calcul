@@ -49,6 +49,10 @@
 		window.addEventListener('keydown', onKeyDown);
 		return () => window.removeEventListener('keydown', onKeyDown);
 	});
+
+	// === -📝=TODO=📝- === ТЕСТИРОВАНИЕ
+	import DevTestRunner from '$lib/components/testFraction/DevTestRunner.svelte';
+	// === -📝=TODO=📝- ===
 </script>
 
 <div class="app-wrapper">
@@ -78,6 +82,9 @@
 			{@render ads()}
 		</div>
 	</main>
+	<!-- TODO -->
+	<DevTestRunner />
+
 	<article class="instruction" id="instruction">
 		<!-- текстовые блоки  и иллюстрации -->
 	</article>

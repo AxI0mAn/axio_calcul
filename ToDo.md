@@ -2315,7 +2315,9 @@ fractionActions.js:1732 📊 [DEBUG] Результат: 13⥑1÷2⥏
 ПОСЛЕ УДАЛЕНИЯ СТАРОЙ ЛОГИКИ МАРКЕРОВ - НЕОБХОДИМО ПРОВЕСТИ ПОЛНОЕ РУЧНОЕ ТЕСТИРОВАНИЕ И ДЛЯ КОРНЯ И ДЛЯ СТЕПЕНЕЙ!
 
 
-
+Закомментировать или задокументировать и убрать тесты из:
+src/lib/components/testFraction
+src/lib/components/aPage/MathPageLayout.svelte
 
 
 
