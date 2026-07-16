@@ -78,12 +78,14 @@ export class Fraction {
   }
 
   pow(other) {
-    // Вычисляем вещественное значение текущей дроби и дроби-степени
+    console.log('🔍 [DEBUG] Fraction.pow: this=', this, 'other=', other);
     const base = this.num / this.den;
     const exponent = other.num / other.den;
     const resultAsDecimal = Math.pow(base, exponent);
-
-    return Fraction.fromDecimal(resultAsDecimal);
+    console.log('🔍 [DEBUG] Fraction.pow: resultAsDecimal=', resultAsDecimal);
+    const result = Fraction.fromDecimal(resultAsDecimal);
+    console.log('🔍 [DEBUG] Fraction.pow: result=', result);
+    return result;
   }
 
   sqrt() {
@@ -166,7 +168,6 @@ function toFraction(value) {
 
 // ----- Токенизация (поддержка отрицательных чисел и дробей) -----
 function tokenizeFractionExpression(expr) {
-  console.log('🔍 [DEBUG] tokenizeFractionExpression получил:', expr);
   const tokens = [];
   let i = 0;
   const len = expr.length;
@@ -217,7 +218,7 @@ function tokenizeFractionExpression(expr) {
           }
         }
 
-        // --- СЛУЧАИ 1, 2, 3: Анализ одиночной скобки ---
+        // ---   Анализ одиночной скобки ---
         let k = i + 1;
         let bracketContent = '';
         let openCount = 1;
@@ -250,9 +251,31 @@ function tokenizeFractionExpression(expr) {
     }
 
     // 1. Обрабатываем операторы и скобки
-    if ('+*/()^√'.includes(ch) || ch === '÷') {
+    if ('+*/()√'.includes(ch) || ch === '÷') {
       tokens.push({ type: 'operator', value: ch });
       i++;
+      continue;
+    }
+    // ===== СПЕЦИАЛЬНАЯ ОБРАБОТКА СТЕПЕНИ =====
+    if (ch === '^') {
+      tokens.push({ type: 'operator', value: '^' });
+      i++;
+      // Собираем ЧИСЛО-ПОКАЗАТЕЛЬ (только цифры и точка, без дробей)
+      let numStart = i;
+      let numEnd = i;
+      while (numEnd < len && /[\d.]/.test(expr[numEnd])) {
+        numEnd++;
+      }
+      if (numEnd > numStart) {
+        const numStr = expr.substring(numStart, numEnd);
+        const numVal = parseFloat(numStr);
+        if (!isNaN(numVal)) {
+          tokens.push({ type: 'number', value: numVal });
+          i = numEnd;
+          continue;
+        }
+      }
+      // Если после ^ нет числа, добавляем заглушку
       continue;
     }
 
@@ -328,6 +351,21 @@ function tokenizeFractionExpression(expr) {
           rightDigits += expr[k];
           k++;
         }
+
+        // ===== ПРОВЕРКА ИЗ ВАРИАНТА 5: если после знаменателя идет '^', НЕ создаем дробь! =====
+        if (k < len && expr[k] === '^') {
+          // Создаем токены: число, ÷, число (без дробного токена)
+          const leftNum = parseFloat(expr.substring(i, j));
+          const rightNum = parseFloat(rightDigits);
+          if (!isNaN(leftNum) && !isNaN(rightNum) && rightNum !== 0) {
+            tokens.push({ type: 'number', value: leftNum });
+            tokens.push({ type: 'operator', value: '÷' });
+            tokens.push({ type: 'number', value: rightNum });
+            i = k; // переходим к '^'
+            continue;
+          }
+        }
+
         if (rightDigits.length > 0 && !rightDigits.endsWith('.')) {
           j = k;
           const rawFraction = expr.substring(i, j);
@@ -397,6 +435,66 @@ function applyOperator(op, a, b = null) {
   }
 }
 
+/**
+ * Точное вычисление квадратного корня из дроби.
+ * Если числитель и знаменатель являются полными квадратами, возвращает точную дробь.
+ * В противном случае возвращает исходную дробь под корнем.
+ * 
+ * @param {Fraction} frac - дробь для извлечения корня
+ * @returns {Fraction} - результат (точная дробь или исходная под корнем)
+ */
+function exactSqrt(frac) {
+  console.log('🔍 [DEBUG] exactSqrt получил:', frac);
+  const num = frac.num;
+  const den = frac.den;
+  console.log('🔍 [DEBUG] num:', num, 'den:', den);
+
+  // Проверяем, являются ли числитель и знаменатель полными квадратами
+  const numSqrt = Math.sqrt(Math.abs(num));
+  const denSqrt = Math.sqrt(Math.abs(den));
+
+  // Проверяем, что корень извлекается точно (целое число)
+  const isNumPerfectSquare = Number.isInteger(numSqrt);
+  const isDenPerfectSquare = Number.isInteger(denSqrt);
+
+  if (isNumPerfectSquare && isDenPerfectSquare) {
+    // Точный корень: √(9/4) = 3/2
+    return new Fraction(numSqrt, denSqrt);
+  }
+
+  // Если корень не извлекается точно, проверяем, можно ли упростить подкоренное выражение
+  // √(4/9) = 2/3 (уже обработано выше)
+  // √(8/9) = √8/3 = 2√2/3 → оставляем как √(8/9)
+
+  // Для дробей, где числитель или знаменатель не являются полными квадратами,
+  // но могут быть упрощены: √(4/18) = √(2/9) = √2/3
+
+  // Проверяем, можно ли сократить дробь под корнем
+  const gcd = (a, b) => {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b) { [a, b] = [b, a % b]; }
+    return a;
+  };
+
+  const divisor = gcd(Math.abs(num), Math.abs(den));
+  if (divisor > 1) {
+    const simplifiedNum = num / divisor;
+    const simplifiedDen = den / divisor;
+    const numSqrt2 = Math.sqrt(Math.abs(simplifiedNum));
+    const denSqrt2 = Math.sqrt(Math.abs(simplifiedDen));
+    if (Number.isInteger(numSqrt2) && Number.isInteger(denSqrt2)) {
+      return new Fraction(numSqrt2, denSqrt2);
+    }
+    // Если упрощение не помогло, возвращаем исходную дробь под корнем
+    // В FractionJS мы не можем представить √(2/3) как дробь, поэтому оставляем как есть
+    // Но в нашем формате это будет √(2÷3)
+    return frac.sqrt(); // используем стандартный метод как fallback
+  }
+
+  // Если ничего не помогло, используем стандартный метод
+  return frac.sqrt();
+}
 
 export function evaluateFractionExpression(expression) {
   // ===== ВРЕМЕННАЯ ОТЛАДКА =====
@@ -404,8 +502,6 @@ export function evaluateFractionExpression(expression) {
   // console.log('Input expression:', expression);
 
   let tokens = tokenizeFractionExpression(expression);
-  // === -📝=TODO=📝- ===
-  console.log('🔍 [DEBUG] Токены до RPN:', tokens);
 
   // ===  Виртуальное автозакрытие скобок ===
   let bracketBalance = 0;
@@ -494,7 +590,7 @@ export function evaluateFractionExpression(expression) {
       const a = stack.pop();
       if (a === undefined) throw new Error('Invalid expression for sqrt');
       // Вызываем наш точный метод sqrt(), который мы настроили ранее
-      stack.push(a.sqrt());
+      stack.push(exactSqrt(a));
     } else {
       // Бинарные операторы (+, -, *, /, ÷, ^)
       const b = stack.pop(); // Правый операнд
@@ -510,24 +606,44 @@ export function evaluateFractionExpression(expression) {
         case '/': result = applyOperator('/', a, b); break;   // десятичное деление
         case '÷': result = applyOperator('÷', a, b); break;   // дробное деление
         case '^': {
-          // b.den === 1 означает, что степень целая (например, 8÷1, а не дробная)
           if (b.den === 1) {
+            // Целая степень
             const power = b.num;
             if (power >= 0) {
-              // Изолированно возводим числитель и знаменатель в степень без плавающей запятой
               const newNum = Math.pow(a.num, power);
               const newDen = Math.pow(a.den, power);
               result = new Fraction(newNum, newDen);
             } else {
-              // Отрицательная степень — переворачиваем дробь
               const positivePower = Math.abs(power);
               const newNum = Math.pow(a.den, positivePower);
               const newDen = Math.pow(a.num, positivePower);
               result = new Fraction(newNum, newDen);
             }
           } else {
-            // Если степень дробная, откатываемся к стандартному методу библиотеки
-            result = a.pow(b);
+            // Дробная степень: a^(m/n) = (a^(1/n))^m
+            // Для точных вычислений используем корень
+            const m = b.num;
+            const n = b.den;
+
+            // Проверяем, можно ли извлечь корень точно
+            const baseNum = a.num;
+            const baseDen = a.den;
+
+            // Проверяем, является ли основание полным n-м корнем
+            const numRoot = Math.pow(Math.abs(baseNum), 1 / n);
+            const denRoot = Math.pow(Math.abs(baseDen), 1 / n);
+
+            if (Number.isInteger(numRoot) && Number.isInteger(denRoot)) {
+              // Точный корень: (8/27)^(1/3) = 2/3
+              const rootFrac = new Fraction(numRoot, denRoot);
+              // Возводим в степень m
+              const resultNum = Math.pow(rootFrac.num, m);
+              const resultDen = Math.pow(rootFrac.den, m);
+              result = new Fraction(resultNum, resultDen);
+            } else {
+              // Неточный корень — используем стандартный метод
+              result = a.pow(b);
+            }
           }
           break;
         }

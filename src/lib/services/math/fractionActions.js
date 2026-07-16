@@ -1332,136 +1332,22 @@ function convertMixedToImproper(expr) {
 function fixLeftAssociativeDivision(expr) {
   if (!expr) return expr;
 
-  // Проверяем, есть ли на верхнем уровне цепочка делений
-  let depth = 0;
-  let hasOtherOps = false;
-  let divCount = 0;
-  let divPositions = [];
+  // Работаем ТОЛЬКО для простых цепочек: число÷число÷число...
+  // Проверяем, что выражение состоит только из чисел и ÷
+  if (!/^[\d÷/]+$/.test(expr)) return expr;
 
-  for (let i = 0; i < expr.length; i++) {
-    const ch = expr[i];
-    if (ch === '(') depth++;
-    else if (ch === ')') depth--;
-    else if (depth === 0) {
-      if (ch === '÷' || ch === '/') {
-        divCount++;
-        divPositions.push(i);
-      } else if (/[+\-*]/.test(ch)) {
-        hasOtherOps = true;
-        break;
-      }
-    }
-  }
+  const parts = expr.split(/(÷|\/)/);
+  if (parts.length < 3) return expr;
 
-  // Если есть другие операторы или меньше 2 делений — НЕ ТРОГАЕМ!
-  if (hasOtherOps || divCount < 2) return expr;
-
-  // ===== СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ ВЫРАЖЕНИЙ СО СКОБКАМИ =====
-  // Ищем паттерн: ... )÷...÷...
-  // Группируем все деления после закрывающей скобки
-
-  // Находим последнюю закрывающую скобку перед цепочкой делений
-  let lastCloseParen = -1;
-  for (let i = divPositions[0] - 1; i >= 0; i--) {
-    if (expr[i] === ')') {
-      lastCloseParen = i;
-      break;
-    }
-  }
-
-  if (lastCloseParen !== -1) {
-    // Ищем открывающую скобку для этой закрывающей
-    let openCount = 0;
-    let openParen = -1;
-    for (let i = lastCloseParen; i >= 0; i--) {
-      if (expr[i] === ')') openCount++;
-      else if (expr[i] === '(') {
-        openCount--;
-        if (openCount === 0) {
-          openParen = i;
-          break;
-        }
-      }
-    }
-
-    if (openParen !== -1) {
-      // Берем выражение до открывающей скобки
-      const prefix = expr.substring(0, openParen);
-      const inside = expr.substring(openParen + 1, lastCloseParen);
-      const suffix = expr.substring(lastCloseParen + 1);
-
-      // Группируем деления в суффиксе
-      const divParts = suffix.split(/(÷|\/)/);
-      let groupedSuffix = divParts[0];
-      for (let i = 1; i < divParts.length; i += 2) {
-        const op = divParts[i];
-        const next = divParts[i + 1];
-        if (i === 1) {
-          groupedSuffix = `(${groupedSuffix}${op}${next})`;
-        } else {
-          groupedSuffix = `(${groupedSuffix}${op}${next})`;
-        }
-      }
-
-      return `${prefix}(${inside})${groupedSuffix}`;
-    }
-  }
-  // Проверяем, есть ли на верхнем уровне цепочка делений
-  // (только операторы '÷' или '/' и числа между ними) 
-
-  for (let i = 0; i < expr.length; i++) {
-    const ch = expr[i];
-    if (ch === '(') depth++;
-    else if (ch === ')') depth--;
-    else if (depth === 0) {
-      if (ch === '÷' || ch === '/') {
-        divCount++;
-      } else if (/[+\-*]/.test(ch)) {
-        hasOtherOps = true;
-        break;
-      }
-    }
-  }
-
-  // Если на верхнем уровне есть другие операторы — НЕ ТРОГАЕМ!
-  if (hasOtherOps) return expr;
-
-  // Если меньше 2 делений — НЕ ТРОГАЕМ!
-  if (divCount < 2) return expr;
-
-  // ===== ТОЛЬКО ТЕПЕРЬ ПРИМЕНЯЕМ ПЕРЕГРУППИРОВКУ =====
-  // Разбиваем выражение по операторам деления
-  const parts = [];
-  let current = '';
-  let i = 0;
-
-  while (i < expr.length) {
-    const ch = expr[i];
-    if ((ch === '÷' || ch === '/')) {
-      if (current) parts.push(current);
-      parts.push(ch);
-      current = '';
-    } else {
-      current += ch;
-    }
-    i++;
-  }
-  if (current) parts.push(current);
-
-  // Собираем с левоассоциативной группировкой
   let result = parts[0];
-  let j = 1;
-
-  while (j < parts.length) {
-    const operator = parts[j];
-    const rightOperand = parts[j + 1];
-
-    if (j === 1) {
-      result = `(${result}${operator}${rightOperand})`;
+  for (let i = 1; i < parts.length; i += 2) {
+    const op = parts[i];
+    const next = parts[i + 1];
+    if (i === 1) {
+      result = `(${result}${op}${next})`;
     } else {
-      result = `(${result}${operator}${rightOperand})`;
+      result = `(${result}${op}${next})`;
     }
-    j += 2;
   }
 
   return result;
