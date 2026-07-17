@@ -845,6 +845,75 @@ export function processImplicitOperators(expr) {
   return result;
 }
 
+/**
+ * Определяет, является ли выражение сложным (требует пошагового решения).
+ * Выражения с одним из операторов (+ -  * ^ √) и имеющее не более двух ÷ (дробей) - это считаем простым выражением и для него режим steps не нужен.
+ * 
+ * @param {string} expr - выражение для проверки
+ * @returns {boolean} - true если выражение сложное
+ */
+function isComplexExpression(expr) {
+  if (!expr) return false;
+
+  // ===== СЧИТАЕМ КОЛИЧЕСТВО '÷' И '/' НА ВЕРХНЕМ УРОВНЕ =====
+  let depth = 0;
+  let divCount = 0;
+
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    else if (depth === 0 && (ch === '÷' || ch === '/')) {
+      divCount++;
+    }
+  }
+
+  // ===== ЕСЛИ БОЛЬШЕ 2 ДЕЛЕНИЙ — СЛОЖНОЕ =====
+  if (divCount > 2) return true;
+
+  // ===== ЕСЛИ 1 ИЛИ 2 ДЕЛЕНИЯ — ПРОВЕРЯЕМ КОНТЕКСТ =====
+  if (divCount >= 1) {
+    // Проверяем, есть ли вложенные выражения со смешанными дробями
+    // Паттерн: число(дробь) или число((... )÷(... ))
+    if (/\d+\([^)]*÷[^)]*\)/.test(expr)) return true;
+
+    // Проверяем, есть ли несколько операторов на верхнем уровне
+    let depth2 = 0;
+    let opCount = 0;
+    for (let i = 0; i < expr.length; i++) {
+      const ch = expr[i];
+      if (ch === '(') depth2++;
+      else if (ch === ')') depth2--;
+      else if (depth2 === 0 && /[+\-*/^]/.test(ch)) {
+        opCount++;
+      }
+    }
+
+    // Если на верхнем уровне больше 1 оператора (кроме '÷') — сложное
+    // Например: 3÷4+0.5+1÷8 → есть + и +
+    if (opCount > 1) return true;
+  }
+
+  // ===== ПРОВЕРКА НА СЛОЖНЫЕ КОРНИ =====
+  // √(9)*√(16) — простое (два корня, но нет сложных выражений внутри)
+  // √(2*((1+5+8)÷(3+8-4))) — сложное (внутри корня есть операции)
+  if (/√\([^)]*[+\-*/÷][^)]*\)/.test(expr)) {
+    // Проверяем, есть ли внутри корня операции
+    const sqrtMatch = expr.match(/√\(([^)]*)\)/);
+    if (sqrtMatch) {
+      const inside = sqrtMatch[1];
+      // Если внутри корня есть +, -, *, /, ÷ — сложное
+      if (/[+\-*/÷]/.test(inside)) return true;
+    }
+  }
+
+  // ===== ПРОВЕРКА НА СМЕШАННЫЕ ДРОБИ В СТЕПЕНИ =====
+  // (2+3(4÷5))^2 — сложное (внутри степени есть смешанная дробь)
+  if (/\^\(?[^)]*\([^)]*÷[^)]*\)/.test(expr)) return true;
+
+  // ===== ЕСЛИ НИ ОДНО УСЛОВИЕ НЕ СРАБОТАЛО — ПРОСТОЕ =====
+  return false;
+}
 
 /**
  * Преобразует смешанные дроби вида [−]число(выражение)÷ в [−]число+(выражение)÷
@@ -1312,7 +1381,7 @@ function formatHistoryExpr(expr) {
  * Преобразует все смешанные дроби вида "число+(число÷число)" в неправильные дроби "(число*знаменатель+числитель)÷знаменатель"
  * Пример: "4+(3÷4)" → "(4*4+3)÷4" → "19÷4"
  */
-function convertMixedToImproper(expr) {
+export function convertMixedToImproper(expr) {
   // Ищем паттерн: число+(числитель÷знаменатель)
   return expr.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
     const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
@@ -1332,136 +1401,22 @@ function convertMixedToImproper(expr) {
 function fixLeftAssociativeDivision(expr) {
   if (!expr) return expr;
 
-  // Проверяем, есть ли на верхнем уровне цепочка делений
-  let depth = 0;
-  let hasOtherOps = false;
-  let divCount = 0;
-  let divPositions = [];
+  // Работаем ТОЛЬКО для простых цепочек: число÷число÷число...
+  // Проверяем, что выражение состоит только из чисел и ÷
+  if (!/^[\d÷/]+$/.test(expr)) return expr;
 
-  for (let i = 0; i < expr.length; i++) {
-    const ch = expr[i];
-    if (ch === '(') depth++;
-    else if (ch === ')') depth--;
-    else if (depth === 0) {
-      if (ch === '÷' || ch === '/') {
-        divCount++;
-        divPositions.push(i);
-      } else if (/[+\-*]/.test(ch)) {
-        hasOtherOps = true;
-        break;
-      }
-    }
-  }
+  const parts = expr.split(/(÷|\/)/);
+  if (parts.length < 3) return expr;
 
-  // Если есть другие операторы или меньше 2 делений — НЕ ТРОГАЕМ!
-  if (hasOtherOps || divCount < 2) return expr;
-
-  // ===== СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ ВЫРАЖЕНИЙ СО СКОБКАМИ =====
-  // Ищем паттерн: ... )÷...÷...
-  // Группируем все деления после закрывающей скобки
-
-  // Находим последнюю закрывающую скобку перед цепочкой делений
-  let lastCloseParen = -1;
-  for (let i = divPositions[0] - 1; i >= 0; i--) {
-    if (expr[i] === ')') {
-      lastCloseParen = i;
-      break;
-    }
-  }
-
-  if (lastCloseParen !== -1) {
-    // Ищем открывающую скобку для этой закрывающей
-    let openCount = 0;
-    let openParen = -1;
-    for (let i = lastCloseParen; i >= 0; i--) {
-      if (expr[i] === ')') openCount++;
-      else if (expr[i] === '(') {
-        openCount--;
-        if (openCount === 0) {
-          openParen = i;
-          break;
-        }
-      }
-    }
-
-    if (openParen !== -1) {
-      // Берем выражение до открывающей скобки
-      const prefix = expr.substring(0, openParen);
-      const inside = expr.substring(openParen + 1, lastCloseParen);
-      const suffix = expr.substring(lastCloseParen + 1);
-
-      // Группируем деления в суффиксе
-      const divParts = suffix.split(/(÷|\/)/);
-      let groupedSuffix = divParts[0];
-      for (let i = 1; i < divParts.length; i += 2) {
-        const op = divParts[i];
-        const next = divParts[i + 1];
-        if (i === 1) {
-          groupedSuffix = `(${groupedSuffix}${op}${next})`;
-        } else {
-          groupedSuffix = `(${groupedSuffix}${op}${next})`;
-        }
-      }
-
-      return `${prefix}(${inside})${groupedSuffix}`;
-    }
-  }
-  // Проверяем, есть ли на верхнем уровне цепочка делений
-  // (только операторы '÷' или '/' и числа между ними) 
-
-  for (let i = 0; i < expr.length; i++) {
-    const ch = expr[i];
-    if (ch === '(') depth++;
-    else if (ch === ')') depth--;
-    else if (depth === 0) {
-      if (ch === '÷' || ch === '/') {
-        divCount++;
-      } else if (/[+\-*]/.test(ch)) {
-        hasOtherOps = true;
-        break;
-      }
-    }
-  }
-
-  // Если на верхнем уровне есть другие операторы — НЕ ТРОГАЕМ!
-  if (hasOtherOps) return expr;
-
-  // Если меньше 2 делений — НЕ ТРОГАЕМ!
-  if (divCount < 2) return expr;
-
-  // ===== ТОЛЬКО ТЕПЕРЬ ПРИМЕНЯЕМ ПЕРЕГРУППИРОВКУ =====
-  // Разбиваем выражение по операторам деления
-  const parts = [];
-  let current = '';
-  let i = 0;
-
-  while (i < expr.length) {
-    const ch = expr[i];
-    if ((ch === '÷' || ch === '/')) {
-      if (current) parts.push(current);
-      parts.push(ch);
-      current = '';
-    } else {
-      current += ch;
-    }
-    i++;
-  }
-  if (current) parts.push(current);
-
-  // Собираем с левоассоциативной группировкой
   let result = parts[0];
-  let j = 1;
-
-  while (j < parts.length) {
-    const operator = parts[j];
-    const rightOperand = parts[j + 1];
-
-    if (j === 1) {
-      result = `(${result}${operator}${rightOperand})`;
+  for (let i = 1; i < parts.length; i += 2) {
+    const op = parts[i];
+    const next = parts[i + 1];
+    if (i === 1) {
+      result = `(${result}${op}${next})`;
     } else {
-      result = `(${result}${operator}${rightOperand})`;
+      result = `(${result}${op}${next})`;
     }
-    j += 2;
   }
 
   return result;
@@ -1564,6 +1519,18 @@ export function evaluateFraction() {
     fullExpr += bracketsToAdd;
   }
 
+  // ======== ОПРЕДЕЛЕНИЕ СЛОЖНОСТИ И ФЛАГА stepsFraction =====
+  //Если режим steps не включен
+  if (!appState.stepsFraction) {
+    // Проверяем: есть ли в выражении смешанные дроби, несколько операторов,
+    // степени, корни или цепочки делений
+    const isComplex = isComplexExpression(fullExpr);
+
+    // Устанавливаем флаг для пошагового режима
+    // Если выражение сложное — включаем steps, иначе отключаем
+    appState.stepsFraction = isComplex;
+  }
+
   try {
     // 8. Переносим целые части в числитель дроби
     fullExpr = convertMixedToImproper(fullExpr);
@@ -1571,8 +1538,6 @@ export function evaluateFraction() {
     // 1. Переводим всю строку в чистый текстовый вид для математического ядра
     // (например, конвертируем superscript-символы степени: "2^³" -> "2^3")
     let cleanExpr = fromSuperscript(fullExpr);
-
-    console.log("Исходная строка перед фиксом скобок:", cleanExpr);
 
     // 2. ИЗОЛЯЦИЯ ПРИОРИТЕТОВ СТЕПЕНИ ДЛЯ ЯДРА
     // Если пользователь ввел "1÷4^2", ядро без скобок посчитает это как (1÷4)^2.
@@ -1582,7 +1547,7 @@ export function evaluateFraction() {
     // Убираем возможные дубликаты двойных скобок вокруг степеней, если они случайно возникли
     cleanExpr = cleanExpr.replace(/\^\(\(([^)]+)\)\)/g, '^($1)');
 
-    console.log("Строка, отправляемая в ядро (ФИКС СКОБОК):", cleanExpr);
+    // console.log("Строка, отправляемая в ядро (ФИКС СКОБОК):", cleanExpr);
 
     // 3. ВЫЧИСЛЕНИЕ
     // Отправляем полностью сбалансированное и подготовленное выражение в парсер ядра
