@@ -51,7 +51,7 @@
 	});
 
 	// === -📝=TODO=📝- === ТЕСТИРОВАНИЕ
-	import DevTestRunner from '$lib/components/testFraction/DevTestRunner.svelte';
+	// import DevTestRunner from '$lib/components/testFraction/DevTestRunner.svelte';
 	// === -📝=TODO=📝- ===
 </script>
 
@@ -83,7 +83,7 @@
 		</div>
 	</main>
 	<!-- TODO -->
-	<DevTestRunner />
+	<!-- <DevTestRunner /> -->
 
 	<article class="instruction" id="instruction">
 		<!-- текстовые блоки  и иллюстрации -->

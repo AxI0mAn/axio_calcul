@@ -10,7 +10,7 @@ import FractionJS from 'fraction.js';
 // @ts-ignore 
 
 // ----- Вспомогательные функции -----
-function gcd(a, b) {
+export function gcd(a, b) {
   a = Math.abs(a);
   b = Math.abs(b);
   while (b !== 0) {
@@ -21,7 +21,7 @@ function gcd(a, b) {
   return a;
 }
 
-function lcm(a, b) {
+export function lcm(a, b) {
   if (a === 0 || b === 0) return 0;
   return Math.abs(a * b) / gcd(a, b);
 }
@@ -208,7 +208,7 @@ function tokenizeFractionExpression(expr) {
 
           if (hasMainDiv) {
             tokens.push({ type: 'operator', value: '+' });
-            console.log('[Ядро] Обнаружена составная дробь NUMBER + ((...)) ÷. Неявно подставлен "+"');
+            // console.log('[Ядро] Обнаружена составная дробь NUMBER + ((...)) ÷. Неявно подставлен "+"');
             tokens.push({ type: 'operator', value: '(' });
             i++;
             continue;
@@ -235,10 +235,10 @@ function tokenizeFractionExpression(expr) {
 
         if (hasSingleDiv && !hasOtherOps) {
           tokens.push({ type: 'operator', value: '+' });
-          console.log('[Ядро] Между целой частью и дробью неявно подставлен оператор "+"');
+          // console.log('[Ядро] Между целой частью и дробью неявно подставлен оператор "+"');
         } else {
           tokens.push({ type: 'operator', value: '*' });
-          console.log('[Ядро] Перед скобкой неявно подставлен оператор "*" (умножение)');
+          // console.log('[Ядро] Перед скобкой неявно подставлен оператор "*" (умножение)');
         }
       }
 
@@ -507,7 +507,7 @@ export function evaluateFractionExpression(expression) {
 
   // Если открытых скобок больше, чем закрытых, искусственно добавляем недостающие в конец
   if (bracketBalance > 0) {
-    console.log(`[Ядро] Обнаружен дисбаланс скобок: +${bracketBalance}. Применяем автозакрытие.`);
+    // console.log(`[Ядро] Обнаружен дисбаланс скобок: +${bracketBalance}. Применяем автозакрытие.`);
     for (let b = 0; b < bracketBalance; b++) {
       tokens.push({ type: 'operator', value: ')' });
     }
@@ -570,7 +570,7 @@ export function evaluateFractionExpression(expression) {
   }
   // === -📝=TODO=📝- ===
   // ===== ВРЕМЕННАЯ ОТЛАДКА =====
-  console.log('Final Output Stack (RPN):', output);
+  // console.log('Final Output Stack (RPN):', output);
 
 
 

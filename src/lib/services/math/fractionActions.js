@@ -1381,7 +1381,7 @@ function formatHistoryExpr(expr) {
  * Преобразует все смешанные дроби вида "число+(число÷число)" в неправильные дроби "(число*знаменатель+числитель)÷знаменатель"
  * Пример: "4+(3÷4)" → "(4*4+3)÷4" → "19÷4"
  */
-function convertMixedToImproper(expr) {
+export function convertMixedToImproper(expr) {
   // Ищем паттерн: число+(числитель÷знаменатель)
   return expr.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
     const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
@@ -1539,8 +1539,6 @@ export function evaluateFraction() {
     // (например, конвертируем superscript-символы степени: "2^³" -> "2^3")
     let cleanExpr = fromSuperscript(fullExpr);
 
-    console.log("Исходная строка перед фиксом скобок:", cleanExpr);
-
     // 2. ИЗОЛЯЦИЯ ПРИОРИТЕТОВ СТЕПЕНИ ДЛЯ ЯДРА
     // Если пользователь ввел "1÷4^2", ядро без скобок посчитает это как (1÷4)^2.
     // Чтобы этого не происходило, мы заменяем конструкции "число÷число^степень" 
@@ -1549,7 +1547,7 @@ export function evaluateFraction() {
     // Убираем возможные дубликаты двойных скобок вокруг степеней, если они случайно возникли
     cleanExpr = cleanExpr.replace(/\^\(\(([^)]+)\)\)/g, '^($1)');
 
-    console.log("Строка, отправляемая в ядро (ФИКС СКОБОК):", cleanExpr);
+    // console.log("Строка, отправляемая в ядро (ФИКС СКОБОК):", cleanExpr);
 
     // 3. ВЫЧИСЛЕНИЕ
     // Отправляем полностью сбалансированное и подготовленное выражение в парсер ядра
@@ -1591,8 +1589,8 @@ export function evaluateFraction() {
 
     // === -📝=TODO=📝- ===
     // ===== ВРЕМЕННАЯ ОТЛАДКА =====
-    console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
-    console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
+    // console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
+    // console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
 
 
