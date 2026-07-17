@@ -78,13 +78,10 @@ export class Fraction {
   }
 
   pow(other) {
-    console.log('🔍 [DEBUG] Fraction.pow: this=', this, 'other=', other);
     const base = this.num / this.den;
     const exponent = other.num / other.den;
     const resultAsDecimal = Math.pow(base, exponent);
-    console.log('🔍 [DEBUG] Fraction.pow: resultAsDecimal=', resultAsDecimal);
     const result = Fraction.fromDecimal(resultAsDecimal);
-    console.log('🔍 [DEBUG] Fraction.pow: result=', result);
     return result;
   }
 
@@ -444,10 +441,8 @@ function applyOperator(op, a, b = null) {
  * @returns {Fraction} - результат (точная дробь или исходная под корнем)
  */
 function exactSqrt(frac) {
-  console.log('🔍 [DEBUG] exactSqrt получил:', frac);
   const num = frac.num;
   const den = frac.den;
-  console.log('🔍 [DEBUG] num:', num, 'den:', den);
 
   // Проверяем, являются ли числитель и знаменатель полными квадратами
   const numSqrt = Math.sqrt(Math.abs(num));

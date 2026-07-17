@@ -845,6 +845,75 @@ export function processImplicitOperators(expr) {
   return result;
 }
 
+/**
+ * Определяет, является ли выражение сложным (требует пошагового решения).
+ * Выражения с одним из операторов (+ -  * ^ √) и имеющее не более двух ÷ (дробей) - это считаем простым выражением и для него режим steps не нужен.
+ * 
+ * @param {string} expr - выражение для проверки
+ * @returns {boolean} - true если выражение сложное
+ */
+function isComplexExpression(expr) {
+  if (!expr) return false;
+
+  // ===== СЧИТАЕМ КОЛИЧЕСТВО '÷' И '/' НА ВЕРХНЕМ УРОВНЕ =====
+  let depth = 0;
+  let divCount = 0;
+
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    else if (depth === 0 && (ch === '÷' || ch === '/')) {
+      divCount++;
+    }
+  }
+
+  // ===== ЕСЛИ БОЛЬШЕ 2 ДЕЛЕНИЙ — СЛОЖНОЕ =====
+  if (divCount > 2) return true;
+
+  // ===== ЕСЛИ 1 ИЛИ 2 ДЕЛЕНИЯ — ПРОВЕРЯЕМ КОНТЕКСТ =====
+  if (divCount >= 1) {
+    // Проверяем, есть ли вложенные выражения со смешанными дробями
+    // Паттерн: число(дробь) или число((... )÷(... ))
+    if (/\d+\([^)]*÷[^)]*\)/.test(expr)) return true;
+
+    // Проверяем, есть ли несколько операторов на верхнем уровне
+    let depth2 = 0;
+    let opCount = 0;
+    for (let i = 0; i < expr.length; i++) {
+      const ch = expr[i];
+      if (ch === '(') depth2++;
+      else if (ch === ')') depth2--;
+      else if (depth2 === 0 && /[+\-*/^]/.test(ch)) {
+        opCount++;
+      }
+    }
+
+    // Если на верхнем уровне больше 1 оператора (кроме '÷') — сложное
+    // Например: 3÷4+0.5+1÷8 → есть + и +
+    if (opCount > 1) return true;
+  }
+
+  // ===== ПРОВЕРКА НА СЛОЖНЫЕ КОРНИ =====
+  // √(9)*√(16) — простое (два корня, но нет сложных выражений внутри)
+  // √(2*((1+5+8)÷(3+8-4))) — сложное (внутри корня есть операции)
+  if (/√\([^)]*[+\-*/÷][^)]*\)/.test(expr)) {
+    // Проверяем, есть ли внутри корня операции
+    const sqrtMatch = expr.match(/√\(([^)]*)\)/);
+    if (sqrtMatch) {
+      const inside = sqrtMatch[1];
+      // Если внутри корня есть +, -, *, /, ÷ — сложное
+      if (/[+\-*/÷]/.test(inside)) return true;
+    }
+  }
+
+  // ===== ПРОВЕРКА НА СМЕШАННЫЕ ДРОБИ В СТЕПЕНИ =====
+  // (2+3(4÷5))^2 — сложное (внутри степени есть смешанная дробь)
+  if (/\^\(?[^)]*\([^)]*÷[^)]*\)/.test(expr)) return true;
+
+  // ===== ЕСЛИ НИ ОДНО УСЛОВИЕ НЕ СРАБОТАЛО — ПРОСТОЕ =====
+  return false;
+}
 
 /**
  * Преобразует смешанные дроби вида [−]число(выражение)÷ в [−]число+(выражение)÷
@@ -1450,6 +1519,18 @@ export function evaluateFraction() {
     fullExpr += bracketsToAdd;
   }
 
+  // ======== ОПРЕДЕЛЕНИЕ СЛОЖНОСТИ И ФЛАГА stepsFraction =====
+  //Если режим steps не включен
+  if (!appState.stepsFraction) {
+    // Проверяем: есть ли в выражении смешанные дроби, несколько операторов,
+    // степени, корни или цепочки делений
+    const isComplex = isComplexExpression(fullExpr);
+
+    // Устанавливаем флаг для пошагового режима
+    // Если выражение сложное — включаем steps, иначе отключаем
+    appState.stepsFraction = isComplex;
+  }
+
   try {
     // 8. Переносим целые части в числитель дроби
     fullExpr = convertMixedToImproper(fullExpr);
@@ -1510,8 +1591,8 @@ export function evaluateFraction() {
 
     // === -📝=TODO=📝- ===
     // ===== ВРЕМЕННАЯ ОТЛАДКА =====
-    // console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
-    // console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
+    console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
+    console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
 
 
