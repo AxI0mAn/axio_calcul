@@ -1,10 +1,14 @@
 <script>
+	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
 	import { appStore } from '$lib/store/appStore.svelte';
 	import { installPwaAction } from '$lib/utils/initPwaLogic';
 	import BtnText from '$lib/components/Btn/BtnText.svelte';
 </script>
 
-<h1 class="header">install</h1>
+<header class="header">
+	<BtnBack />
+	<h1 class="headerSlogan">install</h1>
+</header>
 <div class="install-page">
 	<h3>страница install: краткое объяснение что установится как и зачем</h3>
 	<ol>
@@ -54,15 +58,22 @@
 	}
 
 	.header {
-		color: $clr-coral;
-		font-size: 3rem;
-		display: inline-block;
-		padding: 1rem 2rem;
-		margin-bottom: 2rem;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+		align-items: center;
+		padding: 2rem;
+		gap: 2rem;
+
+		.headerSlogan {
+			color: $clr-coral;
+			font-size: 3rem;
+			display: inline-block;
+		}
 	}
 	@media (max-height: 500px) and (orientation: landscape),
 		(max-width: 500px) and (orientation: portrait) {
-		.header {
+		.headerSlogan {
 			font-size: 2rem;
 		}
 	}

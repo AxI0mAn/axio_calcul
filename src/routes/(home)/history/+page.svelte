@@ -1,6 +1,7 @@
 <script>
 	// @ts-ignore
 	import { base } from '$app/paths';
+	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
 	import { historyStore } from '$lib/store/historyStore.svelte';
 	import { appState } from '$lib/store/appState.svelte.js';
 	import { longpress } from '$lib/actions/longpress.js';
@@ -40,7 +41,10 @@
 	}
 </script>
 
-<h1 class="header">history of calculated</h1>
+<header class="header">
+	<BtnBack />
+	<h1 class="headerSlogan">history of calculated</h1>
+</header>
 
 <div class="history-container">
 	{#if Object.keys(historyStore.all).length === 0}
@@ -149,11 +153,24 @@
 	}
 
 	.header {
-		color: $clr-coral;
-		font-size: 3rem;
-		display: inline-block;
-		padding: 1rem 2rem;
-		margin-bottom: 2rem;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+		align-items: center;
+		padding: 2rem;
+		gap: 2rem;
+
+		.headerSlogan {
+			color: $clr-coral;
+			font-size: 3rem;
+			display: inline-block;
+		}
+	}
+	@media (max-height: 500px) and (orientation: landscape),
+		(max-width: 500px) and (orientation: portrait) {
+		.headerSlogan {
+			font-size: 2rem;
+		}
 	}
 
 	.history-item {
@@ -197,13 +214,6 @@
 		border-bottom: 1px solid rgba($clr-slate, 0.1);
 		&:last-child {
 			border-bottom: none;
-		}
-	}
-
-	@media (max-height: 500px) and (orientation: landscape),
-		(max-width: 500px) and (orientation: portrait) {
-		.header {
-			font-size: 2rem;
 		}
 	}
 

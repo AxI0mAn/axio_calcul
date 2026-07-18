@@ -50,7 +50,7 @@
 		return () => window.removeEventListener('keydown', onKeyDown);
 	});
 
-	// === -📝=TODO=📝- === ТЕСТИРОВАНИЕ
+	// === -📝=TODO=📝- === ТЕСТИРОВАНИЕ ДРОБЕЙ
 	// import DevTestRunner from '$lib/components/testFraction/DevTestRunner.svelte';
 	// === -📝=TODO=📝- ===
 </script>

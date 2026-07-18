@@ -51,9 +51,25 @@
 	 * @property {number} [height]
 	 */
 
+	import { appStore } from '$lib/store/appStore.svelte.js'; // Импортируем твой стор
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {{webp?: string, jpeg: string}} src
+	 * @property {string} [alt]
+	 * @property {import('svelte/elements').HTMLImgAttributes['loading']} [loading]
+	 * @property {import('svelte/elements').HTMLImgAttributes['decoding']} [decoding]
+	 * @property {string} [class] - В Svelte 5 лучше использовать явное имя props.class или деструктуризацию
+	 * @property {number} [width]
+	 * @property {number} [height]
+	 */
+
 	let props = $props();
 
 	let isLoaded = $state(false);
+
+	// Вычисляем, активна ли светлая тема прямо сейчас
+	let isLightTheme = $derived(appStore.theme === 'light');
 
 	function handleLoad() {
 		isLoaded = true;
@@ -61,7 +77,7 @@
 </script>
 
 <div
-	class="picture-wrapper {props.className}"
+	class="picture-wrapper {props.class || ''}"
 	style:aspect-ratio={props.width && props.height ? `${props.width}/${props.height}` : 'auto'}
 >
 	<picture class:loaded={isLoaded}>
@@ -79,6 +95,7 @@
 			{...props.rest}
 			onload={handleLoad}
 			class="fade-img"
+			class:inverted={isLightTheme}
 		/>
 	</picture>
 
@@ -90,20 +107,28 @@
 <style lang="scss">
 	.picture-wrapper {
 		position: relative;
-		display: block; /* Изменено с inline-block для лучшего контроля размеров */
+		display: block;
 		overflow: hidden;
-		background-color: transparent; //#f3f4f6;
+		background-color: transparent;
 		border-radius: 8px;
 		width: 100%;
 	}
 
 	.fade-img {
 		opacity: 0;
-		transition: opacity 0.5s ease-in-out;
+		transition:
+			opacity 0.5s ease-in-out,
+			filter 0.3s ease; /* Добавили плавный переход для фильтра */
 		display: block;
 		width: 100%;
-		height: auto; /* Работает правильно в паре с аспектом родителя */
+		height: auto;
 		object-fit: cover;
+
+		// Класс-модификатор для превращения темной картинки в негатив
+		&.inverted {
+			// Инвертирует цвета, но делает картинку мягче чем filter: invert(1);, чтобы она аккуратно сидела на светлой кнопке
+			filter: invert(1) brightness(0.95) contrast(0.9);
+		}
 	}
 
 	.loaded .fade-img {
@@ -113,16 +138,12 @@
 	.loader-placeholder {
 		position: absolute;
 		inset: 0;
-
-		// БЫЛО: Серый градиент (#f0f0f0)
-		// СТАЛО: Темно-синий фон с неоновым бликом (Mint или Coral на выбор)
 		background: linear-gradient(
 			90deg,
 			rgba($clr-bg-darker-rgb, 0.9) 25%,
 			rgba($clr-mint-rgb, 0.2) 50%,
 			rgba($clr-bg-darker-rgb, 0.9) 75%
 		);
-
 		background-size: 200% 100%;
 		animation: skeleton-loading 1.5s infinite;
 		z-index: 1;

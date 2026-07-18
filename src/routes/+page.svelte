@@ -145,6 +145,7 @@
 					</div>
 				</section>
 			</details>
+			<!-- -->
 			<details class="groupCalc" name="my-accordion">
 				<summary>
 					<h2 class="groupCalc__title">converters</h2>
@@ -391,7 +392,7 @@
 	}
 
 	.catalog__post {
-		width: 40%;
+		width: fit-content;
 		height: fit-content;
 		margin: 0px;
 		padding: 0px;
@@ -399,6 +400,7 @@
 
 	.catalog__card {
 		height: fit-content;
+		width: 20vw;
 
 		position: relative;
 		padding: 0px;
@@ -417,6 +419,19 @@
 		-webkit-touch-callout: none;
 		user-select: none;
 		touch-action: manipulation;
+
+		// @media (min-width: 768px) {
+		// 	width: 15vmin;
+		// }
+
+		// --- РЕЖИМ:  TABLET PORTRAIT ---
+		@media screen and (max-width: 767px) {
+			min-width: 30vw;
+		}
+		// --- РЕЖИМ:  mobile PORTRAIT ---
+		@media (orientation: portrait) and (max-width: 560px) {
+			min-width: 50vw;
+		}
 	}
 
 	.catalog__card--content {

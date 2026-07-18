@@ -1,4 +1,5 @@
 <script>
+	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
 	import { appStore } from '$lib/store/appStore.svelte';
 
 	// Константы для выбора
@@ -10,7 +11,11 @@
 	];
 </script>
 
-<h1 class="header">settings</h1>
+<header class="header">
+	<BtnBack />
+	<h1 class="headerSlogan">settings</h1>
+</header>
+
 <div class="settings-page">
 	<section class="setting-group">
 		<span class="label">Цветовая тема</span>
@@ -73,11 +78,24 @@
 	}
 
 	.header {
-		color: $clr-coral;
-		font-size: 3rem;
-		display: inline-block;
-		padding: 1rem 2rem;
-		margin-bottom: 2rem;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+		align-items: center;
+		padding: 2rem;
+		gap: 2rem;
+
+		.headerSlogan {
+			color: $clr-coral;
+			font-size: 3rem;
+			display: inline-block;
+		}
+	}
+	@media (max-height: 500px) and (orientation: landscape),
+		(max-width: 500px) and (orientation: portrait) {
+		.headerSlogan {
+			font-size: 2rem;
+		}
 	}
 
 	.setting-group {
