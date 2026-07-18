@@ -7,45 +7,39 @@ const browser = typeof window !== 'undefined' && typeof document !== 'undefined'
 
 
 class AppStore {
-
   /** цветовая тема приложения
    * @type {'light' | 'dark'} */
-  #theme = $state('dark');
+  theme = $state('dark');
 
   /** выбор языка для интерфейсов и текстов
    * @type {'RU' | 'EN' | 'UA' | 'PT' | 'ES'} */
-  #lang = $state('RU');
+  lang = $state('RU');
 
   /** размер шрифта rem
    * @type {number} */
-  #fontSize = $state(16);
+  fontSize = $state(16);
 
   /** точность знаков после запятой
    *  @type {number} */
-  #toFix = $state(6);
+  toFix = $state(6);
 
-  /** количество элементов в map из historyStore в котором храним историю с предыдущими вычислениями
+  /** количество элементов в истории с предыдущими вычислениями
    * @type {number} */
-  #historyLocal = $state(12);
+  historyLocal = $state(12);
 
   /** Статус на разрешение установки PWA от браузера
-   * true - разрешение на установку получено и можно установить приложение  
-   * false - нельзя установить приложение 
    * @type {boolean} */
-  #canInstall = $state(false);
+  canInstall = $state(false);
 
-  /** * Статус установки. false - если не установлено, 
-   * или строка с датой 'YYYY.MM.DD'
-   * @type {string | boolean} 
-   */
-  #installed = $state(false);
+  /** Статус установки. false или строка с датой 'YYYY.MM.DD'
+   * @type {string | boolean} */
+  installed = $state(false);
 
   constructor() {
-    // Эта часть кода выполняется ОДИН РАЗ при загрузке приложения в браузере
     if (browser) {
-      this.#initFromStorage();
+      this.initFromStorage();
 
-      // Авто-сохранение: при любом изменении реактивных свойств
+      // Авто-сохранение: отслеживает публичные свойства через serialize()
       $effect.root(() => {
         $effect(() => {
           const data = this.serialize();
@@ -55,7 +49,8 @@ class AppStore {
     }
   }
 
-  #initFromStorage() {
+  /** Инициализация настроек из локального хранилища */
+  initFromStorage() {
     const saved = localStorage.getItem('app_settings');
     if (!saved) {
       console.log('AppStore: Настройки не найдены, использую значения по умолчанию');
@@ -64,13 +59,13 @@ class AppStore {
 
     try {
       const parsed = JSON.parse(saved);
-      // Применяем сохраненные значения
-      if (parsed.theme) this.#theme = parsed.theme;
-      if (parsed.lang) this.#lang = parsed.lang;
-      if (parsed.fontSize) this.#fontSize = parsed.fontSize;
-      if (parsed.toFix) this.#toFix = parsed.toFix;
-      if (parsed.historyLocal) this.#historyLocal = parsed.historyLocal;
-      if (parsed.installed) this.#installed = parsed.installed;
+      // Прямое присвоение в публичные свойства
+      if (parsed.theme) this.theme = parsed.theme;
+      if (parsed.lang) this.lang = parsed.lang;
+      if (parsed.fontSize) this.fontSize = parsed.fontSize;
+      if (parsed.toFix) this.toFix = parsed.toFix;
+      if (parsed.historyLocal) this.historyLocal = parsed.historyLocal;
+      if (parsed.installed) this.installed = parsed.installed;
 
       console.log('AppStore: Настройки успешно загружены из localStorage');
     } catch (err) {
@@ -78,41 +73,21 @@ class AppStore {
     }
   }
 
-  // Геттеры и сеттеры
-  get theme() { return this.#theme; }
-  set theme(v) { this.#theme = v; }
-
-  get lang() { return this.#lang; }
-  set lang(v) { this.#lang = v; }
-
-  get fontSize() { return this.#fontSize; }
-  set fontSize(v) { this.#fontSize = v; }
-
-  get toFix() { return this.#toFix; }
-  set toFix(v) { this.#toFix = v; }
-
-  get historyLocal() { return this.#historyLocal; }
-  set historyLocal(v) { this.#historyLocal = v; }
-
-  get canInstall() { return this.#canInstall; }
-  set canInstall(v) { this.#canInstall = v; }
-
-  get installed() { return this.#installed; }
-  set installed(v) { this.#installed = v; }
-
+  /** Сериализация состояния для сохранения */
   serialize() {
     return {
-      theme: this.#theme,
-      lang: this.#lang,
-      fontSize: this.#fontSize,
-      toFix: this.#toFix,
-      historyLocal: this.#historyLocal,
-      installed: this.#installed
+      theme: this.theme,
+      lang: this.lang,
+      fontSize: this.fontSize,
+      toFix: this.toFix,
+      historyLocal: this.historyLocal,
+      installed: this.installed
     };
   }
 
+  /** Устанавливает текущую дату установки в нужном формате */
   setInstalled() {
-    this.#installed = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+    this.installed = new Date().toISOString().split('T')[0].replace(/-/g, '.');
   }
 }
 

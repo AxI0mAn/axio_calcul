@@ -10,7 +10,7 @@
 
 <header class="home__header">
 	<div><NavBurger /></div>
-	<p class="appNameInHeader font-digits">axio mobile calculator</p>
+	<p class="appNameInHeader font-digits">amoca - a mobile calculator</p>
 	<div class="installReadyWrap"><LinkInstallReady customClass="mainHeaderInstallLink" /></div>
 </header>
 
