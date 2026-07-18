@@ -74,7 +74,7 @@
 
 	.header {
 		color: $clr-coral;
-		font-size: 5rem;
+		font-size: 3rem;
 		display: inline-block;
 		padding: 1rem 2rem;
 		margin-bottom: 2rem;
