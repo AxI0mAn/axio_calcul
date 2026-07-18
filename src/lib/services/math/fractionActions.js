@@ -1589,8 +1589,8 @@ export function evaluateFraction() {
 
     // === -📝=TODO=📝- ===
     // ===== ВРЕМЕННАЯ ОТЛАДКА =====
-    // console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
-    // console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
+    console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
+    console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
 
 

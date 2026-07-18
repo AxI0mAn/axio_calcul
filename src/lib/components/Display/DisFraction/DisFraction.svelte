@@ -88,8 +88,66 @@
 	<!-- Блок истории вычислений -->
 	<div class="history-section" bind:this={historyContain}>
 		{#each tokenizedHistory as entry}
-			{#if typeof entry === 'object' && entry.type === 'fractionSteps'}
-				<div class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}">
+			{#if typeof entry === 'string'}
+				<!-- ===== СТРОКОВЫЕ ЗАПИСИ (например, "значение → M1") ===== -->
+				{@const hasArrow = entry.includes('→')}
+				{@const leftPart = hasArrow ? entry.split('→')[0]?.trim() || '' : entry}
+				{@const rightPart = hasArrow ? '→ ' + (entry.split('→')[1]?.trim() || '') : ''}
+				{@const leftTokens =
+					hasArrow && (leftPart.includes('÷') || leftPart.includes('⥑'))
+						? parseExpressionToTokens(leftPart)
+						: null}
+
+				<div
+					class="history-steps-block"
+					use:longpress
+					onlongpress={() => btnMemo(null, true, entry)}
+				>
+					<div class="step-line">
+						{#if leftTokens && leftTokens.length > 0}
+							<!-- Рендерим дробь через токены -->
+							{#each leftTokens as token, tokenIdx (tokenIdx)}
+								{#if token.type === 'text'}
+									{#if token.value === '√'}
+										<div class="radical-wrapper">
+											<span class="radical-tick">√</span>
+										</div>
+									{:else}
+										<span class="math-text">{stripMarkers(token.value)}</span>
+									{/if}
+								{:else if token.type === 'superscript'}
+									<span class="super-exponent">{token.value}</span>
+								{:else if token.type === 'fraction'}
+									<div class="fraction-block">
+										{#if token.whole && token.whole !== '0'}
+											<span class="whole-part">{token.whole}</span>
+										{/if}
+										<div class="fraction-container">
+											<span class="num-part">{token.num}</span>
+											<span class="fraction-line"></span>
+											<span class="den-part">{token.den}</span>
+										</div>
+									</div>
+								{/if}
+							{/each}
+						{:else}
+							<!-- Если не удалось распарсить - показываем как есть -->
+							<span class="math-text">{leftPart}</span>
+						{/if}
+
+						{#if rightPart}
+							<span class="math-text memo-arrow">{rightPart}</span>
+						{/if}
+					</div>
+				</div>
+			{:else if typeof entry === 'object' && entry.type === 'fractionSteps'}
+				<!-- ===== ЗАПИСИ С ПОШАГОВЫМ РЕШЕНИЕМ ===== -->
+				{@const resultValue = entry.steps?.[entry.steps.length - 1] || ''}
+				<div
+					class="history-steps-block {entry.steps.length > 2 ? 'is-multistep' : ''}"
+					use:longpress
+					onlongpress={() => btnMemo(null, true, resultValue)}
+				>
 					{#if !appState.stepsFraction && entry.steps.length === 2}
 						<!-- ===== РЕЖИМ БЕЗ ПОШАГОВОГО РЕШЕНИЯ: 2 шага в одной строке ===== -->
 						<div class="step-line single-line">
@@ -375,7 +433,6 @@
 		border-right: 1px solid rgba($clr-mint-soft-rgb, 0.4);
 		border-bottom-right-radius: 0.5rem;
 	}
-
 	.step-line {
 		display: flex;
 		flex-flow: row wrap;
