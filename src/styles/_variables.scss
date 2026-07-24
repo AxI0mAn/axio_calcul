@@ -217,7 +217,7 @@ $grad-memo: linear-gradient(45deg, $clr-slate 0%, $clr-mint 50%, #4b5768 100%);
 $shadow-neon-mint: 0 0 8px var(--shd-mint-glow);
 $shadow-neon-coral: 0 0 8px var(--shd-coral-glow);
 $shadow-neon-blue: 0 0 8px var(--shd-blue-glow);
-$shd-blue-glow: var(--shd-blue-glow);
+$shd-blue-glow: 0 0 8px var(--shd-blue-glow);
 
 $shadow-card: var(--shadow-card-val);
 $shadow-deep: 0 25px 50px -12px rgba(0, 0, 0, 0.5);

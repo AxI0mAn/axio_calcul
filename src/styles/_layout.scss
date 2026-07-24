@@ -14,14 +14,13 @@
     grid-template-columns: 1fr 50vh 1fr;
     grid-template-areas:
       "left calc right"
-      ". instr ."
-      ". revi .";
+      "left instr ."
+      "left revi .";
 
 
     .field_left,
     .field_right {
-      grid-area: left; // Привязываем к первой колонке
-      position: sticky; // ВАЖНО: не fixed, а sticky
+      // position: sticky; // ВАЖНО: не fixed, а sticky
       top: 0;
       height: 100vh; // Теперь они занимают экран и "залипают" при скролле
       width: calc((100vw - 52vh) / 2); // ширина центральной части 50vh

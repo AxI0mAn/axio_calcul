@@ -13,7 +13,7 @@ class AppStore {
 
   /** выбор языка для интерфейсов и текстов
    * @type {'RU' | 'EN' | 'UA' | 'PT' | 'ES'} */
-  lang = $state('RU');
+  lang = $state('EN');
 
   /** размер шрифта rem
    * @type {number} */

@@ -538,7 +538,7 @@
 		padding-right: 0.5rem;
 	}
 	.num-part {
-		color: rgb(192, 235, 3);
+		color: rgb(65, 113, 2);
 		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- ЗАПРЕЩАЕМ ВЫВАЛИВАНИЕ СИМВОЛОВ НАВЕРХ

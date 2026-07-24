@@ -22,33 +22,36 @@
 
 	// Данные для меню с вложенной структурой
 	const menuItems = $state([
-		{ label: 'Home', href: `${base}/` },
+		// { label: 'Home', href: `${base}/` },
 		{
-			label: 'block (с вложениями)',
+			label: 'all options',
 			href: '/shared/block',
 			open: false,
 			children: [
-				{ label: 'textBlock', href: '/shared/block/textBlock' },
-				{ label: 'textNum', href: '/shared/block/textNum' },
 				{
-					label: 'widget (с вложениями)',
+					label: 'mathematics',
 					href: '#',
 					open: false,
 					children: [
-						{ label: 'cards', href: '/widget/cards' },
-						{ label: 'headers', href: '/widget/headers' }
+						{ label: 'basic', href: `${base}/basic` },
+						{ label: 'engineer', href: `${base}/engineer` },
+						{ label: 'trigonometry', href: `${base}/trigonometry` },
+						{ label: 'fraction', href: `${base}/fraction` }
 					]
-				},
-				{ label: 'old history', href: `${base}/history` }
+				}
+				// { label: 'old history', href: `${base}/history` }
 			]
 		},
 		{ label: 'old history', href: `${base}/history` },
-		{ label: 'settings', href: `${base}/settings` }
+		{ label: 'settings', href: `${base}/settings` },
+		{ label: 'install', href: `${base}/install` },
+		{ label: 'share', href: `${base}/share` },
+		{ label: 'about', href: `${base}/about` },
+		{ label: 'FAQ', href: `${base}/faq` },
+		{ label: 'privacy policy', href: `${base}/privacyPolicy` },
+		{ label: 'disclaimer', href: `${base}/disclaimer` },
+		{ label: 'contact us', href: `${base}/contactUs` }
 	]);
-
-	if (!appStore.installed) {
-		menuItems.push({ label: 'install', href: `${base}/install` });
-	}
 
 	/**
 	 * Переключает главное меню.
@@ -232,6 +235,10 @@
 	/* ОБЩИЕ СТИЛИ */
 	/* -------------------------------------- */
 	.burger-menu {
+		font-size: 1rem;
+		font-weight: 600;
+		// text-transform: uppercase;
+
 		width: 100%;
 		display: flex;
 		flex-flow: column nowrap;
@@ -346,6 +353,9 @@
 	}
 
 	.menu-label {
+		font-size: 1.25rem;
+		font-weight: 800;
+		text-transform: uppercase;
 		flex-grow: 1;
 		// Текст на коралловом фоне делаем темным, как в шапке
 		color: $clr-bg-darker;
@@ -383,7 +393,8 @@
 	@media (hover: hover) and (pointer: fine) {
 		.menu-button-wrapper:hover,
 		.menu-link:hover {
-			background-color: rgba(255, 255, 255, 0.2);
+			background-color: rgba(255, 255, 255, 0.5);
+			transition: all 0.5s;
 		}
 	}
 

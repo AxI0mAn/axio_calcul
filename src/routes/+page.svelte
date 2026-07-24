@@ -60,8 +60,8 @@
 	<main class="field_main catalog" id="catalogAllFeatures">
 		<div class="headerWrapper" id="top-anchor"><HomeHeader /></div>
 		<h1 class="slogan font-digits">
-			<span class="allFunc">50 functions</span> <span>in</span>
-			<span class="allCalc">4 calculators</span>
+			<span class="allFunc font-digits">One workspace.</span>
+			<span class="allCalc font-digits">Many possibilities.</span>
 		</h1>
 		<div class="groupCalcAll">
 			<details class="groupCalc" name="my-accordion">
@@ -145,7 +145,87 @@
 					</div>
 				</section>
 			</details>
+			<p class="inset">
+				Learn one interface once and use it across a growing collection of calculators without
+				learning a new workflow every time.
+			</p>
 			<!-- -->
+
+			<details class="groupCalc" name="my-accordion">
+				<summary>
+					<h2 class="groupCalc__title">2D geometry calculators</h2>
+				</summary>
+				<section class="group__catalog">
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон арифметического калькулятора"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>example</span></h3>
+						</a>
+					</div>
+				</section>
+			</details>
+			<details class="groupCalc" name="my-accordion">
+				<summary>
+					<h2 class="groupCalc__title">3D geometry calculators</h2>
+				</summary>
+				<section class="group__catalog">
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон арифметического калькулятора"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>example</span></h3>
+						</a>
+					</div>
+				</section>
+			</details>
+			<details class="groupCalc" name="my-accordion">
+				<summary>
+					<h2 class="groupCalc__title">house helpers</h2>
+				</summary>
+				<section class="group__catalog">
+					<div class="catalog__post">
+						<a href="{base}/settings" class="catalog__card">
+							<Picture
+								src={{
+									webp: `${srcExample_webp}`,
+									jpeg: `${srcExample_jpeg}`
+								}}
+								alt="Фон арифметического калькулятора"
+								class="catalog__card--content"
+								loading="eager"
+								decoding="sync"
+								//- только пиксели
+								// width={512}
+								// height={512}
+							/>
+							<h3 class="catalog__card--title"><span>proportions</span></h3>
+						</a>
+					</div>
+				</section>
+			</details>
 			<details class="groupCalc" name="my-accordion">
 				<summary>
 					<h2 class="groupCalc__title">converters</h2>
@@ -166,7 +246,7 @@
 								// width={512}
 								// height={512}
 							/>
-							<h3 class="catalog__card--title"><span>proportion</span></h3>
+							<h3 class="catalog__card--title"><span>weight</span></h3>
 						</a>
 					</div>
 					<div class="catalog__post">
@@ -227,7 +307,7 @@
 			</details>
 			<details class="groupCalc" name="my-accordion">
 				<summary>
-					<h2 class="groupCalc__title">geometry calculators</h2>
+					<h2 class="groupCalc__title">time & date</h2>
 				</summary>
 				<section class="group__catalog">
 					<div class="catalog__post">
@@ -245,54 +325,78 @@
 								// width={512}
 								// height={512}
 							/>
-							<h3 class="catalog__card--title"><span>example</span></h3>
-						</a>
-					</div>
-				</section>
-			</details>
-			<details class="groupCalc" name="my-accordion">
-				<summary>
-					<h2 class="groupCalc__title">house helpers</h2>
-				</summary>
-				<section class="group__catalog">
-					<div class="catalog__post">
-						<a href="{base}/settings" class="catalog__card">
-							<Picture
-								src={{
-									webp: `${srcExample_webp}`,
-									jpeg: `${srcExample_jpeg}`
-								}}
-								alt="Фон арифметического калькулятора"
-								class="catalog__card--content"
-								loading="eager"
-								decoding="sync"
-								//- только пиксели
-								// width={512}
-								// height={512}
-							/>
-							<h3 class="catalog__card--title"><span>proportions</span></h3>
+							<h3 class="catalog__card--title"><span>day after day</span></h3>
 						</a>
 					</div>
 				</section>
 			</details>
 		</div>
+		<h2 class="inset">Learn more</h2>
 	</main>
 	<article class="instruction" id="instruction">
 		<!-- текстовые блоки  и иллюстрации -->
-		<p>
-			Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquid aliquam, nobis perferendis
-			ipsum delectus corporis ad quos atque beatae quae nisi rerum id facere. Architecto molestias
-			eos reprehenderit magni nam.
-		</p>
+		<div class="card">
+			<h2>Calculators That Work Together</h2>
+			<p>
+				Compatible calculators have the same interface and can work together, allowing you to
+				continue calculations without starting over:
+			</p>
+		</div>
+
+		<div class="card">
+			<ul>
+				<li>Start with basic arithmetic.</li>
+				<li>Continue with engineering functions.</li>
+				<li>Switch to trigonometry.</li>
+				<li>Work with fractions.</li>
+				<li>Reuse previous results from calculation history.</li>
+				<li>Save important values into memory.</li>
+				<li>Keep working without retyping expressions.</li>
+			</ul>
+		</div>
+
+		<div class="card">
+			<h2>Four Memory Cell.</h2>
+			<p>Frequently used values can be saved into memory and reused later.</p>
+			<p>This makes solving larger problems much faster and more convenient.</p>
+		</div>
+
+		<div class="card">
+			<h2>History page with old calculations.</h2>
+			<p>
+				Right in the calculator, you have access to the history of current calculations in this
+				session.
+			</p>
+			<p>Previous calculations remain available in the calculation history.</p>
+		</div>
+
+		<div class="card">
+			<h2>More facts for this App.</h2>
+			<p>
+				The app can be installed directly from your browser and works like a native app on your
+				devices offline.
+			</p>
+			<p>
+				Thise app stores data locally only on your device - you remain in control of that
+				information.
+			</p>
+		</div>
+
+		<div class="card">
+			<ul>
+				<li><a href="{base}/install"><span>How install App.</span></a></li>
+				<li><a href="{base}/share"><span>How share App.</span></a></li>
+				<li><a href="{base}/about"><span>Learn More.</span></a></li>
+				<li><a href="{base}/faq"><span>FAQ</span></a></li>
+				<li><a href="{base}/privacyPolicy"><span>Privacy Policy</span></a></li>
+				<li><a href="{base}/disclaimer"><span>Disclaimer</span></a></li>
+				<li><a href="{base}/about"><span>About</span></a></li>
+				<li><a href="{base}/contactUs"><span>Contact Us</span></a></li>
+			</ul>
+		</div>
 	</article>
-	<section class="reviews__old">
-		<p>
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui libero harum incidunt saepe
-			eaque totam dicta eum nam omnis! Perferendis commodi magni deserunt officiis nisi sapiente
-			itaque corrupti ab ipsum?
-		</p>
-		<!-- текстовые блоки ОТДЕЛЬНОЙ СТРАНИЦЕЙ   ????-->
-	</section>
+
+	<section class="reviews__old"></section>
 	<aside class="field_right">
 		<!-- advertisement картинки и банеры -->
 	</aside>
@@ -304,6 +408,29 @@
 	.reviews__old,
 	.field_right {
 		color: $clr-mint-soft;
+	}
+
+	.instruction {
+		display: flex;
+		flex-flow: column;
+		gap: 0.8rem;
+		.card h2 {
+			text-align: center;
+		}
+		.card p {
+			text-align: left;
+			line-height: 1.4rem;
+		}
+		.card ul li {
+			line-height: 1.2rem;
+			a span {
+				font-size: 1.2rem;
+				&:hover {
+					color: $clr-coral;
+					transition: all 1s;
+				}
+			}
+		}
 	}
 	.field_main.catalog {
 		width: 100%;
@@ -324,20 +451,36 @@
 		z-index: 999;
 	}
 	.slogan {
+		width: 90%;
 		display: flex;
 		flex-flow: column wrap;
 		justify-content: center;
 		align-items: center;
 
 		margin-bottom: 2rem;
-
-		font-size: calc(2vh + 1rem); // 2.4rem;
+		line-height: calc(1.8vh + 1rem);
+		font-size: calc(1.2vh + 1rem); // 2.4rem;
 		text-align: center;
 		color: $clr-coral;
 		.allCalc {
 			color: $clr-mint-soft;
-			font-weight: 777;
+			font-weight: 100;
 		}
+	}
+
+	p {
+		max-width: 92%;
+		text-align: center;
+		letter-spacing: 0.25rem;
+		line-height: 1.4rem;
+		font-size: 1.2rem;
+		color: $clr-mint;
+		font-weight: 400;
+		margin-bottom: 1.4rem;
+	}
+	.inset {
+		color: $clr-bg;
+		text-shadow: 1px 1px 1px rgba($clr-text-main-rgb, 0.9);
 	}
 	// =============================================================
 	.groupCalcAll {
@@ -346,14 +489,14 @@
 		justify-content: flex-start;
 		align-items: center;
 		flex: 1;
+		gap: 1.6rem;
 	}
 	.groupCalc {
 		display: flex;
 		flex-flow: column nowrap;
 		justify-content: flex-start;
 		align-items: center;
-		gap: 1.618rem;
-		margin-bottom: 3.236rem;
+		gap: 1.6rem;
 	}
 	/* Убираем стандартный маркер у details*/
 	/* Для Chrome, Edge, Safari и Opera */
@@ -420,13 +563,13 @@
 		user-select: none;
 		touch-action: manipulation;
 
-		// @media (min-width: 768px) {
-		// 	width: 15vmin;
-		// }
+		@media screen and (min-width: 768px) {
+			width: 15vmin;
+		}
 
 		// --- РЕЖИМ:  TABLET PORTRAIT ---
 		@media screen and (max-width: 767px) {
-			min-width: 30vw;
+			min-width: 30vmin;
 		}
 		// --- РЕЖИМ:  mobile PORTRAIT ---
 		@media (orientation: portrait) and (max-width: 560px) {

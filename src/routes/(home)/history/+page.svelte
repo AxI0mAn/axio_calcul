@@ -39,6 +39,65 @@
 		if (typeof item === 'string') return item;
 		return String(item);
 	}
+
+	/**
+	 * Извлекает число после знака "=" из строки
+	 * @param {string} str - строка вида "выражение = число"
+	 * @returns {string|null} - извлеченное число или null
+	 */
+	function extractNumberAfterEquals(str) {
+		if (!str || typeof str !== 'string') return null;
+
+		// Ищем "=" и берем все после него
+		const eqIndex = str.lastIndexOf('=');
+		if (eqIndex === -1) return null;
+
+		const afterEquals = str.substring(eqIndex + 1).trim();
+
+		// Если после "=" ничего нет — не сохраняем
+		if (!afterEquals) return null;
+
+		// ===== ПРОВЕРЯЕМ, ЧТО ПОСЛЕ "=" ТОЛЬКО ОДНО ЧИСЛО =====
+		// Должно быть: число (целое или десятичное)
+		// Не должно быть: выражений с операторами (+, -, *, /, ^, ÷, скобки и т.д.)
+
+		// Проверяем, что строка состоит только из цифр, точки, минуса и дроби
+		// Разрешенные символы: цифры, точка, минус (только в начале), слэш (для дробей)
+		const numberPattern = /^[+-]?\d+(\.\d+)?(\/\d+)?$/;
+
+		if (!numberPattern.test(afterEquals)) {
+			return null; // Это не просто число, а выражение
+		}
+
+		return afterEquals;
+	}
+
+	/**
+	 * Проверяет, можно ли сохранить значение в память
+	 */
+	function canSaveToMemory(line) {
+		if (isFractionSteps(line)) {
+			return true;
+		}
+
+		if (typeof line === 'string') {
+			const value = extractNumberAfterEquals(line);
+			return value !== null;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Получает значение для сохранения в память из обычной строки
+	 */
+	function getMemoryValueFromString(line) {
+		if (typeof line === 'string') {
+			const value = extractNumberAfterEquals(line);
+			return value || line;
+		}
+		return String(line);
+	}
 </script>
 
 <header class="header">
@@ -130,8 +189,40 @@
 								</div>
 							</li>
 						{:else}
-							<!-- Обычные строки (не дроби) -->
-							<li>{getDisplayValue(line)}</li>
+							<!-- ===== ОБЫЧНЫЕ СТРОКИ (НЕ ДРОБИ) ===== -->
+							{@const displayLine = getDisplayValue(line)}
+							{@const memoryValue = getMemoryValueFromString(line)}
+							{@const canSave = canSaveToMemory(line)}
+							{@const hasEquals = typeof line === 'string' && line.includes('=')}
+							{@const parts = hasEquals ? line.split('=') : null}
+							{@const leftPart = hasEquals ? parts[0].trim() : line}
+							{@const rightPart = hasEquals ? parts.slice(1).join('=').trim() : ''}
+
+							<li
+								use:longpress
+								onlongpress={() => {
+									if (canSave) {
+										// ===== ПРИВОДИМ К ЧИСЛУ =====
+										const numValue = parseFloat(memoryValue);
+										if (!isNaN(numValue)) {
+											appState.pendingMemoryValue = numValue;
+											appState.isMemoModalOpen = true;
+										}
+									}
+								}}
+								class:has-memory={canSave}
+								class:no-memory={!canSave}
+							>
+								{#if hasEquals}
+									<!-- Строка с "=" -->
+									<span class="math-text left-part">{leftPart}</span>
+									<span class="math-text equal-prefix"> = </span>
+									<span class="math-text right-part">{rightPart}</span>
+								{:else}
+									<!-- Строка без "=" -->
+									<span class="math-text">{displayLine}</span>
+								{/if}
+							</li>
 						{/if}
 					{/each}
 				</ul>
@@ -338,7 +429,7 @@
 		padding-right: 0.5rem;
 	}
 	.num-part {
-		color: rgb(192, 235, 3);
+		color: rgb(65, 113, 2);
 		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- ЗАПРЕЩАЕМ ВЫВАЛИВАНИЕ СИМВОЛОВ НАВЕРХ
