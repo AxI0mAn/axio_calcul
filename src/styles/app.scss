@@ -34,6 +34,11 @@ a {
   -webkit-touch-callout: none;
 }
 
+strong {
+  color: $clr-sky;
+  padding: auto 2px;
+}
+
 // src/styles/app.scss 
 /* Fraction Дроби.Скрытие технических маркеров смешанных чисел и сложных скобок */
 .fraction-marker,

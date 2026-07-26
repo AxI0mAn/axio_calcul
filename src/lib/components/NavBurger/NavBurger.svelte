@@ -48,6 +48,7 @@
 		{ label: 'share', href: `${base}/share` },
 		{ label: 'about', href: `${base}/about` },
 		{ label: 'FAQ', href: `${base}/faq` },
+		{ label: 'instruction', href: `${base}/instructionAll` },
 		{ label: 'privacy policy', href: `${base}/privacyPolicy` },
 		{ label: 'disclaimer', href: `${base}/disclaimer` },
 		{ label: 'contact us', href: `${base}/contactUs` }

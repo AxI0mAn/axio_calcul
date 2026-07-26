@@ -58,6 +58,11 @@
 
   &:hover {
     box-shadow: $shadow-neon-mint;
+    transition: all .35s;
+    -webkit-transition: all .35s;
+    -moz-transition: all .35s;
+    -ms-transition: all .35s;
+    -o-transition: all .35s;
   }
 }
 

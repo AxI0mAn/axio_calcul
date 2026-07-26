@@ -7,7 +7,7 @@
 	// @ts-ignore
 	import { base } from '$app/paths';
 
-	//
+	// может быть открыт только один <details>
 	import { onMount } from 'svelte';
 	import { initAccordion } from '$lib/utils/initAccordion';
 
@@ -388,6 +388,7 @@
 				<li><a href="{base}/share"><span>How share App.</span></a></li>
 				<li><a href="{base}/about"><span>Learn More.</span></a></li>
 				<li><a href="{base}/faq"><span>FAQ</span></a></li>
+				<li><a href="{base}/instructionAll"><span>Instruction for App.</span></a></li>
 				<li><a href="{base}/privacyPolicy"><span>Privacy Policy</span></a></li>
 				<li><a href="{base}/disclaimer"><span>Disclaimer</span></a></li>
 				<li><a href="{base}/about"><span>About</span></a></li>

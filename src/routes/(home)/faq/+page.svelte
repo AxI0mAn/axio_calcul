@@ -1,8 +1,21 @@
 <script>
 	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
+
+	// кнопка ВВЕРХ
+	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
+
+	$effect(() => {
+		// Запускаем создание и сохраняем функцию удаления
+		const destroyButton = createScrollTopButton('top-anchor');
+
+		// Эта часть сработает, когда пользователь уйдет с этой страницы
+		return () => {
+			destroyButton();
+		};
+	});
 </script>
 
-<header class="header">
+<header class="header" id="top-anchor">
 	<BtnBack />
 	<h1 class="headerSlogan">FAQ</h1>
 </header>

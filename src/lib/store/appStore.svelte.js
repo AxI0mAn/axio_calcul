@@ -4,8 +4,6 @@
 // Используем это:
 const browser = typeof window !== 'undefined' && typeof document !== 'undefined';
 
-
-
 class AppStore {
   /** цветовая тема приложения
    * @type {'light' | 'dark'} */

@@ -52,7 +52,7 @@
 		</div>
 	</section>
 
-	<section class="setting-group">
+	<section class="setting-group" id="Accuracy_of_calculations">
 		<div class="label-row">
 			<span class="label">Accuracy of calculations</span>
 			<span class="value-badge">{appStore.toFix}</span>
