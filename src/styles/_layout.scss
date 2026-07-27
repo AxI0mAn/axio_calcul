@@ -58,8 +58,8 @@
     }
 
     .reviews__old {
-      background: linear-gradient(0deg, rgba($clr-coral-rgb, 0.05) 0%, rgba($clr-bg-darker-rgb, 0.8) 100%);
-      border-bottom: 1px solid rgba($clr-coral-rgb, 0.2);
+      background: linear-gradient(180deg, rgba($clr-coral-rgb, 0.01) 0%, rgba($clr-bg-darker-rgb, 0.8) 5%, rgba($clr-coral-rgb, 0.001) 100%);
+      // border-bottom: 1px solid rgba($clr-coral-rgb, 0.2);
       grid-area: revi;
       width: 50vh;
       min-height: 20vh;

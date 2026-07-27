@@ -16,15 +16,6 @@
 			destroyButton();
 		};
 	});
-
-	// может быть открыт только один <details>
-	import { onMount } from 'svelte';
-	import { initAccordion } from '$lib/utils/initAccordion';
-
-	onMount(() => {
-		// Код внутри onMount никогда не запустится на сервере
-		initAccordion(); // аккордеон из нескольких <details> для домашнего каталога
-	});
 </script>
 
 <header class="header" id="top-anchor">
@@ -33,104 +24,133 @@
 </header>
 
 <main class="homeTextPage faqPage">
-	<div class="card">
+	<div class="card" id="instr_MainKeypad">
+		<!--{base}/instructionGeneral#instr_MainKeypad-->
 		<h2>Main keypad: Entering and deleting numbers.</h2>
 		<div>
-			<p>Справа расположена клавиатура с цифрами и дополнительными кнопками:</p>
+			<p>The numeric keypad on the right includes the following buttons:</p>
 			<ul>
 				<li class="withIcon">
 					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} /> ... <BtnText
 						customClass="font-digits"
 						buttonText="9"
 						onclick={() => {}}
-					/> - кнопки для ввода цифр;
+					/> - Number keys.
 				</li>
 				<li class="withIcon">
-					<BtnText buttonText="." customClass="btn__op" onclick={() => {}} /> - кнопка для ввода разделительной
-					точки между целой и десятичной частью числа;
+					<BtnText buttonText="." customClass="btn__op" onclick={() => {}} /> - Decimal point.
 				</li>
 				<li class="withIcon">
-					<BtnText buttonText="+/-" customClass="btn__op" onclick={() => {}} /> - сменить знак числа;
+					<BtnText buttonText="+/-" customClass="btn__op" onclick={() => {}} /> - Change the sign of a
+					number.
 				</li>
 				<li class="withIcon">
-					<BtnText buttonText="⌫" customClass="backspace op-style btn__op" onclick={() => {}} /> - удалить
-					один символ с экрана калькулятора;
+					<BtnText buttonText="⌫" customClass="backspace op-style btn__op" onclick={() => {}} /> - Delete
+					the last digit.
 				</li>
 				<li class="withIcon">
-					<BtnText buttonText="C" customClass="clear-btn btn__op" onclick={() => {}} /> - очистить строку
-					ввода калькулятора;
-				</li>
-				<li>
-					Для очистки истории текущей сессии - проведите по сенсорному экрану сверху вниз. На
-					компьютере - перезагрузите страницу.
+					<BtnText buttonText="C" customClass="clear-btn btn__op" onclick={() => {}} /> - Clear the input
+					field.
 				</li>
 			</ul>
 		</div>
-		<a class="learnMore" href="{base}/settings">Click here to .......</a>
 	</div>
 
 	<div class="card">
 		<h2>Clearing the current calculation history.</h2>
 		<div>
-			<p></p>
-			<ul>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-			</ul>
+			<p>
+				To clear the current session history, swipe down from the top of the screen. On a computer,
+				simply refresh the page.
+			</p>
 		</div>
-		<a class="learnMore" href="{base}/settings">Click here to .......</a>
 	</div>
 
-	<div class="card">
+	<div class="card" id="instr_OperKeypad">
+		<!--{base}/instructionGeneral#instr_OperKeypad-->
 		<h2>Basic operator keypad: +, −, ×, ÷, =, and decimal point.</h2>
 		<div>
-			<p></p>
+			<p>
+				To perform a basic calculation, enter the first number, tap a basic operator, enter the
+				second number, then tap the <strong>=</strong> button.
+			</p>
 			<ul>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
+				<li class="withIcon">
+					<BtnText customClass="op" onclick={() => {}} buttonText="+" /> - Addition.
+				</li>
+				<li class="withIcon">
+					<BtnText customClass="op" onclick={() => {}} buttonText="-" /> - Subtraction.
+				</li>
+				<li class="withIcon">
+					<BtnText customClass="op" onclick={() => {}} buttonText="*" /> - Multiplication.
+				</li>
+				<li class="withIcon">
+					<BtnText customClass="op" onclick={() => {}} buttonText="/" /> - Division.
+				</li>
+				<li class="withIcon">
+					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" /> - Calculate the
+					result.
+				</li>
 			</ul>
 		</div>
-		<a class="learnMore" href="{base}/settings">Click here to .......</a>
 	</div>
 
-	<div class="card">
+	<div class="card" id="instr_MemoryKeypad">
+		<!--{base}/instructionGeneral#instr_MemoryKeypad-->
 		<h2>Memory buttons: Saving and recalling values.</h2>
 		<div>
-			<p></p>
-			<ul>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-			</ul>
+			<p>You have four memory slots available for storing values between calculations.</p>
+			<div class="row">
+				<BtnText buttonText="M1" customClass="btn btn__op btn__memo" onclick={() => {}} />
+				<BtnText buttonText="M2" customClass="btn btn__op btn__memo" onclick={() => {}} />
+				<BtnText buttonText="M3" customClass="btn btn__op  btn__memo" onclick={() => {}} />
+				<BtnText buttonText="M4" customClass="btn btn__op  btn__memo" onclick={() => {}} />
+			</div>
+			<p>Memory slot features:</p>
+
+			<ol>
+				<li>
+					Save the current input to a memory slot: tap a memory slot to store the value currently
+					entered.
+				</li>
+
+				<li>
+					Save a value from the current calculation history: press and hold the result you want to
+					save.
+				</li>
+
+				<li>
+					Save a value from a previous session: open the <strong>History</strong> page, then press and
+					hold the result you want to save.
+				</li>
+
+				<li>
+					Recall a value from a memory slot: tap the memory slot to insert the saved value into the
+					current calculation. The memory slot will then be cleared.
+				</li>
+
+				<li>Double-tap a memory slot to copy its value to the input field.</li>
+
+				<li>If all memory slots are full, you'll be prompted to choose which one to overwrite.</li>
+
+				<li>
+					You can see which value is stored in each memory slot in the current session history.
+				</li>
+
+				<li>
+					Fractions are handled differently in Fraction Calculator mode. A fraction is stored as a
+					fraction. When recalled in Fraction Calculator mode, it remains a fraction. When recalled
+					in other calculator modes, it is automatically converted to a decimal.
+				</li>
+			</ol>
 		</div>
-		<a class="learnMore" href="{base}/settings">Click here to .......</a>
 	</div>
 
 	<div class="card">
 		<h2>Sending a result to another calculator.</h2>
 		<div>
-			<p></p>
-			<ul>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-			</ul>
+			<p>To transfer a value between calculators, use a memory slot.</p>
 		</div>
-		<a class="learnMore" href="{base}/settings">Click here to .......</a>
 	</div>
 
 	<div class="navigatLink">
@@ -192,6 +212,10 @@
 		}
 	}
 
+	ol {
+		padding-left: 2rem;
+	}
+
 	li.withIcon {
 		margin-bottom: 0.75rem;
 		display: flex;
@@ -199,5 +223,19 @@
 		justify-content: start;
 		align-items: center;
 		gap: 0.5rem;
+	}
+
+	.row {
+		max-width: 200px;
+		padding: 8px;
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		grid-template-rows: 1fr;
+		gap: 4px;
+		height: 100%;
+		.btn {
+			min-width: 40;
+			aspect-ratio: 1/1;
+		}
 	}
 </style>

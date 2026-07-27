@@ -45,6 +45,8 @@
 	import srcExample_jpeg from '$lib/assets/iconPic/512/png_catalog.jpeg';
 	import srcExample_webp from '$lib/assets/iconPic/512/png_catalog.webp';
 
+	import srcLogo_webp from '$lib/assets/png_logo_transparent.png';
+
 	import srcBasic_jpeg from '$lib/assets/iconPic/512/png_math_basic.jpeg';
 	import srcBasic_webp from '$lib/assets/iconPic/512/png_math_basic.webp';
 	import srcEngineer_jpeg from '$lib/assets/iconPic/512/png_math_engineer.jpeg';
@@ -381,20 +383,6 @@
 				information.
 			</p>
 		</div>
-
-		<div class="card">
-			<ul>
-				<li><a href="{base}/install"><span>How install App.</span></a></li>
-				<li><a href="{base}/share"><span>How share App.</span></a></li>
-				<li><a href="{base}/about"><span>Learn More.</span></a></li>
-				<li><a href="{base}/faq"><span>FAQ</span></a></li>
-				<li><a href="{base}/instructionAll"><span>Instruction for App.</span></a></li>
-				<li><a href="{base}/privacyPolicy"><span>Privacy Policy</span></a></li>
-				<li><a href="{base}/disclaimer"><span>Disclaimer</span></a></li>
-				<li><a href="{base}/about"><span>About</span></a></li>
-				<li><a href="{base}/contactUs"><span>Contact Us</span></a></li>
-			</ul>
-		</div>
 	</article>
 
 	<section class="reviews__old"></section>
@@ -402,6 +390,40 @@
 		<!-- advertisement картинки и банеры -->
 	</aside>
 </div>
+
+<footer>
+	<ul>
+		<!-- <li><a href="{base}/install"><span>How install App.</span></a></li>
+		<li><a href="{base}/share"><span>How share App.</span></a></li>  -->
+		<li><a href="{base}/faq"><span>FAQ</span></a></li>
+		<li><a href="{base}/instructionAll"><span>Instruction for App.</span></a></li>
+		<li><p></p></li>
+		<li><a href="{base}/privacyPolicy"><span>Privacy Policy</span></a></li>
+		<li><a href="{base}/disclaimer"><span>Disclaimer</span></a></li>
+		<li><p></p></li>
+		<li><a href="{base}/about"><span>About</span></a></li>
+		<li><a href="{base}/contactUs"><span>Contact Us</span></a></li>
+	</ul>
+	<div class="footer_logo">
+		<Picture
+			src={{
+				webp: `${srcLogo_webp}`
+			}}
+			alt="Logo for this App"
+			class="catalog__card--content"
+			loading="eager"
+			decoding="sync"
+			//- только пиксели
+			// width={128}
+			// height={128}
+		/>
+	</div>
+	<h2 class="slogan">
+		<span class="allFunc">One familiar interface </span>
+		<span class="allCalc">for many Calculators</span>
+		<span class=""> that work together.</span>
+	</h2>
+</footer>
 
 <style lang="scss">
 	.field_left,
@@ -716,6 +738,49 @@
 		transition: all 0.35s;
 
 		transform: translateZ(0px);
+	}
+
+	footer {
+		padding: 1rem;
+		margin: 0 auto;
+		width: 100%;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: space-around;
+		align-items: center;
+		background-color: transparent;
+		padding-bottom: 1rem;
+		@media screen and (max-width: 500px) {
+			padding: 1rem;
+			flex-flow: column-reverse wrap;
+			gap: 0.5rem;
+		}
+		ul {
+			margin-bottom: 1rem;
+			@media screen and (max-width: 500px) {
+				margin-top: 1rem;
+			}
+		}
+		li {
+			color: $clr-white;
+			margin-bottom: 0.5rem;
+
+			&:hover {
+				color: $clr-coral;
+				transition: all 0.35s;
+			}
+
+			@media screen and (max-width: 500px) {
+				text-align: center;
+			}
+		}
+		.footer_logo {
+			max-height: 100px;
+			aspect-ratio: 1/1;
+		}
+		.slogan {
+			max-width: fit-content;
+		}
 	}
 
 	/* Состояние "Первого клика" для мобильных (через класс .isHovered ) */

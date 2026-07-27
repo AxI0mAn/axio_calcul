@@ -22,15 +22,6 @@
 			destroyButton();
 		};
 	});
-
-	// может быть открыт только один <details>
-	import { onMount } from 'svelte';
-	import { initAccordion } from '$lib/utils/initAccordion';
-
-	onMount(() => {
-		// Код внутри onMount никогда не запустится на сервере
-		initAccordion(); // аккордеон из нескольких <details> для домашнего каталога
-	});
 </script>
 
 <header class="header" id="top-anchor">
@@ -39,7 +30,8 @@
 </header>
 
 <main class="homeTextPage faqPage">
-	<div class="card">
+	<div class="card" id="instr_CalcPrecis">
+		<!--{base}/instructionInterface#instr_CalcPrecis-->
 		<h2>Adjusting calculation precision.</h2>
 		<div>
 			<p>
@@ -137,7 +129,8 @@
 		</div>
 		<a class="learnMore" href="{base}/basic">Try it now.</a>
 	</div>
-	<div class="card">
+	<div class="card" id="instr_QuickNav">
+		<!--{base}/instructionInterface#instr_QuickNav-->
 		<h2>Quick navigation throughout the app.</h2>
 		<div>
 			<p>On the calculator screen, you'll find a quick navigation bar below the numeric keypad.</p>

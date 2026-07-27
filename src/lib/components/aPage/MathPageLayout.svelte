@@ -6,6 +6,19 @@
 
 	let { buttons, ads, nowMode = 'amoca', display, btnDigit, btnBaseOp } = $props();
 
+	// кнопка ВВЕРХ
+	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
+
+	$effect(() => {
+		// Запускаем создание и сохраняем функцию удаления
+		const destroyButton = createScrollTopButton('top-anchor');
+
+		// Эта часть сработает, когда пользователь уйдет с этой страницы
+		return () => {
+			destroyButton();
+		};
+	});
+
 	// ------------- ссылки с учётом локализации в будущем
 	// @ts-ignore
 	import { base } from '$app/paths';
@@ -15,8 +28,6 @@
 
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
 	import LinkBlockNav from '$lib/components/Links/LinkBlockNav.svelte';
-
-	import FineFraction from '../Instruction/FineFraction.svelte';
 
 	// appState.now_mode = `${nowMode}`;
 	appState.setMode(`${nowMode}`);
@@ -52,6 +63,13 @@
 		return () => window.removeEventListener('keydown', onKeyDown);
 	});
 
+	// тексты для матем калькуляторов
+	import InstructionBasic from '../InstructionInPage/block/InstructionBasic.svelte';
+	import InstructionEngineer from '../InstructionInPage/block/InstructionEngineer.svelte';
+	import InstructionTrigonometry from '../InstructionInPage/block/InstructionTrigonometry.svelte';
+	import InstructionFraction from '../InstructionInPage/block/InstructionFraction.svelte';
+	import FaqInstructLink from '../InstructionInPage/element/FaqInstructLink.svelte';
+
 	// === -📝=TODO=📝- === ТЕСТИРОВАНИЕ ДРОБЕЙ
 	// import DevTestRunner from '$lib/components/testFraction/DevTestRunner.svelte';
 	// === -📝=TODO=📝- ===
@@ -60,7 +78,7 @@
 <div class="app-wrapper">
 	<aside class="field_left"></aside>
 	<main class="field_main basic">
-		<div class="field_displayPad">
+		<div class="field_displayPad" id="top-anchor">
 			{@render display()}
 		</div>
 		<div class="fieldBtn_page withScroll">
@@ -88,21 +106,19 @@
 	<!-- <DevTestRunner /> -->
 
 	<article class="instruction" id="instruction">
-		<!-- текстовые блоки  и иллюстрации -->
-		<h2 style="color:red">
-			в зависимости от appState.setMode подставляем один из компонентов из папки
-			src/lib/components/Instruction/block
-		</h2>
-		<p>
-			Выражение <FineFraction expr="3⥑4÷(5-2)⥏" /> интерпритируется, как
-			<strong>Смешанная дробь:</strong>
-			<FineFraction whole="3" num="4" den="(5-2)" />
-			= 3 + <FineFraction num="4" den="(5-2)" />, где между целой и дробной частью знак сложения.
-			Просто дробь <FineFraction expr="4÷5" />
-		</p>
+		{#if appState.now_mode === 'BASIC'}
+			<InstructionBasic />
+		{:else if appState.now_mode === 'ENGINEER'}
+			<InstructionEngineer />
+		{:else if appState.now_mode === 'TRIGONOMETRY'}
+			<InstructionTrigonometry />
+		{:else if appState.now_mode === 'FRACTION'}
+			<InstructionFraction />
+		{/if}
 	</article>
 	<section class="reviews__old">
-		<!-- текстовые блоки ОТДЕЛЬНОЙ СТРАНИЦЕЙ   ????-->
+		<!-- текстовые блоки ОТДЕЛЬНОЙ СТРАНИЦЕЙ   -->
+		<FaqInstructLink />
 	</section>
 	<aside class="field_right">
 		<!-- advertisement картинки и банеры -->
@@ -220,5 +236,12 @@
 				justify-content: center;
 			}
 		}
+	}
+	.instruction {
+		background: transparent; //linear-gradient(180deg, rgba($clr-mint-rgb, 0.05) 0%, rgba($clr-bg-darker-rgb, 0.8) 100%);
+		border-top: 1px solid rgba($clr-mint-rgb, 0.2);
+		min-width: 50vh;
+		min-height: 20vh;
+		padding: 2rem 0;
 	}
 </style>
