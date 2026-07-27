@@ -56,7 +56,7 @@
 
 <main class="homeTextPage faqPage">
 	<div class="card">
-		<h2>Main keypad: Entering and deleting numbers.</h2>
+		<h2>ers.</h2>
 		<div>
 			<p></p>
 			<ul>

@@ -2,13 +2,7 @@
 	// @ts-ignore
 	import { base } from '$app/paths';
 	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
-	import { historyStore } from '$lib/store/historyStore.svelte';
-
-	import Catalog from '$lib/assets/svgIcon/catalog.svg?raw';
-	import History from '$lib/assets/svgIcon/history.svg?raw';
-	import Info from '$lib/assets/svgIcon/info.svg?raw';
-	import Install from '$lib/assets/svgIcon/download.svg?raw';
-	import Share from '$lib/assets/svgIcon/share.svg?raw';
+	import BtnText from '$lib/components/Btn/BtnText.svelte';
 
 	// кнопка ВВЕРХ
 	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
@@ -42,14 +36,34 @@
 	<div class="card">
 		<h2>Main keypad: Entering and deleting numbers.</h2>
 		<div>
-			<p></p>
+			<p>Справа расположена клавиатура с цифрами и дополнительными кнопками:</p>
 			<ul>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
-				<li>Y</li>
+				<li class="withIcon">
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} /> ... <BtnText
+						customClass="font-digits"
+						buttonText="9"
+						onclick={() => {}}
+					/> - кнопки для ввода цифр;
+				</li>
+				<li class="withIcon">
+					<BtnText buttonText="." customClass="btn__op" onclick={() => {}} /> - кнопка для ввода разделительной
+					точки между целой и десятичной частью числа;
+				</li>
+				<li class="withIcon">
+					<BtnText buttonText="+/-" customClass="btn__op" onclick={() => {}} /> - сменить знак числа;
+				</li>
+				<li class="withIcon">
+					<BtnText buttonText="⌫" customClass="backspace op-style btn__op" onclick={() => {}} /> - удалить
+					один символ с экрана калькулятора;
+				</li>
+				<li class="withIcon">
+					<BtnText buttonText="C" customClass="clear-btn btn__op" onclick={() => {}} /> - очистить строку
+					ввода калькулятора;
+				</li>
+				<li>
+					Для очистки истории текущей сессии - проведите по сенсорному экрану сверху вниз. На
+					компьютере - перезагрузите страницу.
+				</li>
 			</ul>
 		</div>
 		<a class="learnMore" href="{base}/settings">Click here to .......</a>
