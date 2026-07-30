@@ -202,7 +202,7 @@ export function evaluateExpression(cleanExpression) {
       const num2 = parseInt(match[2]);
 
       // Дальнейшая логика вычисления делителей...
-      let commonDivisors = [];
+      let commonDivisors = [1];
       let limit = Math.min(num1, num2);
       for (let i = 2; i <= limit; i++) {
         if (num1 % i === 0 && num2 % i === 0) {
@@ -213,7 +213,7 @@ export function evaluateExpression(cleanExpression) {
     }
 
     // === ТРИГОНОМЕТРИЯ ===
-    // 1. Коэффициенты пересчета
+    // 1. Коэффициенты пересчета 
     const TO_RAD = { deg: Math.PI / 180, rad: 1, grad: Math.PI / 200 };
     const currentUnit = appState.corner;
 

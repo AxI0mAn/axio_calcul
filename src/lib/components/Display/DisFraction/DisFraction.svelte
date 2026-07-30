@@ -476,7 +476,7 @@
 			); //0.8rem; /* Немного уменьшаем размер, чтобы выглядело как индекс */
 			font-weight: 500;
 			line-height: 1;
-			color: $clr-white;
+			color: $clr-text-main;
 			// Базовый подъем для степени после скобок или обычных чисел
 			// transform: translateX(-0.4rem) translateY(-0.8em);
 			margin-left: 2px; /* Отступ от скобки, чтобы не липла */
@@ -533,12 +533,12 @@
 	}
 	.math-text,
 	.whole-part {
-		color: $clr-mint;
+		color: $clr-text-main;
 		font-size: calc(1.25 * $fontSize);
 		padding-right: 0.5rem;
 	}
 	.num-part {
-		color: rgb(65, 113, 2);
+		color: $clr-mint-soft;
 		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- ЗАПРЕЩАЕМ ВЫВАЛИВАНИЕ СИМВОЛОВ НАВЕРХ

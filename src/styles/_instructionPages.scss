@@ -1,0 +1,115 @@
+ @use "_variables.scss" as *;
+
+ .calcInstrPage {
+   width: 100%;
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+ }
+
+ .card {
+   width: 100%;
+   margin: 0 auto;
+   display: flex;
+   flex-flow: column nowrap;
+   justify-content: flex-start;
+   align-items: flex-start;
+   gap: 0.5rem;
+   margin-bottom: 1rem;
+   background-color: transparent;
+   line-height: 1.75rem;
+
+   div {
+     width: 100%;
+   }
+ }
+
+ .learnMore_goTo {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: center;
+   align-items: center;
+
+   padding: 0.5rem;
+
+   border-right: 2px solid $clr-sky;
+   border-bottom: 2px solid $clr-sky;
+   border-left: 1px solid rgba(255, 255, 255, 0.1);
+   border-top: 1px solid rgba(255, 255, 255, 0.1);
+   border-radius: 0.5rem;
+
+   &:hover {
+     background-color: $clr-bg-card;
+     background: $grad-btn-main;
+     background-size: cover;
+     background-position: center;
+
+     border-radius: 8px;
+
+     box-shadow:
+       1px 1px 4px 0px rgba($clr-bg-darker-rgb, 0.5),
+       inset 0px 0px 2px $clr-mint-soft;
+     color: $clr-sky;
+     border-right: 1px solid rgba(255, 255, 255, 0.1);
+     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+     border-left: 2px solid $clr-sky;
+     border-top: 2px solid $clr-sky;
+     transition: all 0.5s;
+   }
+
+   &:active {
+     -webkit-tap-highlight-color: transparent;
+     outline: none;
+     opacity: 0.8;
+     background-color: $clr-slate;
+     transform: scale(0.96) translateY(0.5px);
+     box-shadow:
+       0 0 2px $shd-blue-glow,
+       0 0 8px $clr-mint;
+   }
+ }
+
+ h2 {
+   line-height: 2.5rem;
+   color: $clr-coral;
+   text-align: center;
+   font-size: 2rem;
+ }
+
+ ol {
+   padding-left: 2rem;
+ }
+
+ ul {
+   padding: 0.25rem 0.5rem;
+ }
+
+ li.withIcon {
+   padding: 0rem 0.75rem;
+   margin-bottom: 0.75rem;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: start;
+   align-items: center;
+   gap: 0.5rem;
+
+   &.tenMore {
+     flex-flow: row wrap;
+   }
+ }
+
+ li.example {
+   border-top: 2px solid rgba($clr-sky-rgb, 0.33);
+ }
+
+ strong.answer {
+   font-weight: 600;
+ }
+
+ strong.example {
+   font-size: 1.6rem;
+ }
+
+ .optionCalc {
+   // стили  в '$lib/utils/initAccordion'
+ }

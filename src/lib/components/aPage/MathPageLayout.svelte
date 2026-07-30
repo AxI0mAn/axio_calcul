@@ -63,7 +63,7 @@
 		return () => window.removeEventListener('keydown', onKeyDown);
 	});
 
-	// тексты для матем калькуляторов
+	// тексты для страниц матем калькуляторов
 	import InstructionBasic from '../InstructionInPage/block/InstructionBasic.svelte';
 	import InstructionEngineer from '../InstructionInPage/block/InstructionEngineer.svelte';
 	import InstructionTrigonometry from '../InstructionInPage/block/InstructionTrigonometry.svelte';

@@ -21,6 +21,10 @@ class AppStore {
    *  @type {number} */
   toFix = $state(6);
 
+  /** точность вычислений для тригонометрии максимальная
+ *  @type {number} */
+  toFixTrigon = $state(12);
+
   /** количество элементов в истории с предыдущими вычислениями
    * @type {number} */
   historyLocal = $state(12);

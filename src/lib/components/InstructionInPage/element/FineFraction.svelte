@@ -24,27 +24,37 @@
 
 <p>
   <strong>Выражение:</strong>
-  <FineFraction expr="3+4÷5" />
+  with POW <FineFraction whole="3" num="4 ²" den="(5-2) ²²" />
+</p>
+
+<p>
+	Выражение <FineFraction expr="3⥑4÷(5-2)⥏" /> интерпритируется, как
+	<strong>Смешанная дробь:</strong>
+	<FineFraction whole="3" num="4" den="(5-2)" />
+	= 3 + <FineFraction num="4" den="(5-2)" />, где между целой и дробной частью знак сложения. Просто
+	дробь <FineFraction expr="4÷5" />
 </p>
 
 -->
 
 <!--
   Компонент для отображения красивых дробей в тексте инструкции.
-  Принимает строку с дробью и рендерит её в виде двухэтажной или смешанной дроби.
-
-  Использование:
-  <FineFraction expr="3(4÷(5-2))" />  → смешанная дробь
-  <FineFraction expr="4÷(5-2)" />     → двухэтажная дробь
-  <FineFraction expr="3+4÷(5-2)" />   → сумма с дробью
--->
-<!-- src/lib/components/FineFraction/FineFraction.svelte -->
-<!--
-  Компонент для отображения красивых дробей в тексте инструкции.
   Использует те же токены, что и DisFraction.
   Ничего не вычисляет, только отображает.
+
+	(3÷5)² — степень всей дроби <FineFraction expr="(3÷5)^2" />
+	Степень для знаменателя (например, 1 ÷ 5²) <FineFraction expr="1÷5^2" />
+	Смешанная дробь со степенью <FineFraction expr="2(1÷3)^2" />
+
+	√(16÷25) — корень из дроби <FineFraction expr="√(16÷25)" />
+	Корень из смешанной дроби <FineFraction expr="√(3(1÷4))" />
+
+	Полное выражение: (3÷5)² + √(16÷25) <FineFraction expr="(3÷5)^2 + √(16÷25)" />
+			
 -->
 <script>
+	// src/lib/components/FineFraction/FineFraction.svelte
+
 	import {
 		parseExpressionToTokens,
 		stripMarkers
@@ -107,13 +117,15 @@
 
 <style lang="scss">
 	.fine-fraction {
+		padding: 0 0.5rem;
 		display: inline-flex;
 		align-items: center;
 		flex-wrap: wrap;
 		font-family: 'Times New Roman', serif;
 		font-size: 1.2em;
 		vertical-align: middle;
-		gap: 1px;
+		gap: 0.5rem;
+		font-size: 1.6rem;
 	}
 
 	.math-text {
@@ -151,15 +163,6 @@
 		white-space: nowrap;
 	}
 
-	.num-part {
-		border-bottom: 2px solid #333;
-		padding-bottom: 1px;
-	}
-
-	.den-part {
-		padding-top: 1px;
-	}
-
 	.fraction-line {
 		display: none;
 	}
@@ -177,11 +180,11 @@
 	}
 
 	.whole-part {
-		color: $clr-mint;
+		color: $clr-text-main;
 		padding-right: 0.5rem;
 	}
 	.num-part {
-		color: rgb(65, 113, 2);
+		color: $clr-mint-soft;
 		text-align: center;
 		white-space: nowrap;
 	}
@@ -197,5 +200,8 @@
 		color: $clr-coral;
 		text-align: center;
 		white-space: nowrap;
+	}
+	.super-exponent {
+		color: $clr-text-main;
 	}
 </style>

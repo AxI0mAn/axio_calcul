@@ -51,7 +51,7 @@
 			</a>
 		</div>
 		<div class="card">
-			<a class="bigLink" href="{base}/instructionBasic">
+			<a class="bigLink" href="{base}/basic#instructionBasic">
 				<h2>Basic Calculator</h2>
 				<ul>
 					<li>Basic operations: +, −, ×, ÷, =, and the decimal point.</li>
@@ -72,7 +72,7 @@
 			</a>
 		</div>
 		<div class="card">
-			<a class="bigLink" href="{base}/instructionFraction">
+			<a class="bigLink" href="{base}/fraction#instructionFraction">
 				<h2>Calculator for Fraction</h2>
 				<ul>
 					<li>Basic fraction operations: +, −, ×, ÷, and =.</li>
@@ -97,7 +97,7 @@
 			</a>
 		</div>
 		<div class="card">
-			<a class="bigLink" href="{base}/instructionEngineer">
+			<a class="bigLink" href="{base}/engineer#instructionEngineer">
 				<h2>Scientific Calculator for Engineers</h2>
 				<ul>
 					<li>All basic operations and features from the Basic Calculator.</li>
@@ -119,7 +119,7 @@
 			</a>
 		</div>
 		<div class="card">
-			<a class="bigLink" href="{base}/instructionTrigonometry">
+			<a class="bigLink" href="{base}/trigonometry#instructionTrigonometry">
 				<h2>Trigonometry Calculator</h2>
 				<ul>
 					<li>All basic arithmetic operations.</li>

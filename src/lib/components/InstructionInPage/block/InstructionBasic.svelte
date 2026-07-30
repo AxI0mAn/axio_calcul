@@ -14,10 +14,10 @@
 </script>
 
 <header class="header">
-	<h1 class="headerSlogan">Basic Calculator</h1>
+	<h1 class="headerSlogan" id="instructionBasic">Basic Calculator</h1>
 </header>
 
-<main class="homeTextPage faqPage">
+<main class="homeTextPage calcInstrPage">
 	<div class="card">
 		<h2>Introduction</h2>
 		<h3>Fast Online Basic Calculator</h3>
@@ -100,7 +100,7 @@
 				</li>
 
 				<li class="withIcon">
-					Decimal rounding <BtnText buttonText="." customClass="btn__op" onclick={() => {}} />
+					Decimal separator <BtnText buttonText="." customClass="btn__op" onclick={() => {}} />
 				</li>
 				<li class="withIcon">
 					Change the sign of a number. <BtnText
@@ -113,12 +113,11 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="arithmeticExamples">
 		<h2>How to Use. Examples:</h2>
 		<div>
-			<p></p>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Addition</strong>
 				</li>
 				<li>125 + 85 = 210</li>
@@ -134,7 +133,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Subtraction</strong>
 				</li>
 				<li>400 − 175 = 225</li>
@@ -151,7 +150,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Multiplication</strong>
 				</li>
 				<li>25 * 12 = 300</li>
@@ -166,7 +165,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Division</strong>
 				</li>
 				<li>144 / 12 = 12</li>
@@ -182,7 +181,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Percentage of a Number</strong>
 				</li>
 				<li>150 * 20% = (150 * 0.2) = 30</li>
@@ -269,7 +268,7 @@
 				<li>180 ÷ 85% = 211.76</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Power</strong>
 				</li>
 				<li>5² = 25</li>
@@ -289,7 +288,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Square Root</strong>
 				</li>
 				<li>√64 = 8</li>
@@ -314,7 +313,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>y-th root </strong>
 				</li>
 				<li>⁴√81 = 3</li>
@@ -328,7 +327,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Reciprocal</strong>
 				</li>
 				<li>1 / 8 = 0.125</li>
@@ -340,7 +339,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Factorial</strong>
 				</li>
 				<li>6! = 720</li>
@@ -352,7 +351,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Round X to Y decimal places.</strong>
 				</li>
 				<li class="withIcon">
@@ -360,11 +359,11 @@
 					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="x,y" />
 					<BtnText customClass="font-digits" buttonText="3" onclick={() => {}} />
 					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
-					<strong class="answer font-digits">3.141</strong>
+					<strong class="answer font-digits">3.142</strong>
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Absolute value.</strong>
 				</li>
 				<li class="withIcon">
@@ -375,7 +374,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>Scientific notation.</strong>
 				</li>
 				<li class="withIcon">
@@ -387,7 +386,7 @@
 				</li>
 			</ul>
 			<ul>
-				<li>
+				<li class="example">
 					<strong>More Complex Calculations</strong>
 				</li>
 				<li>2+2*2 = 6</li>
@@ -440,75 +439,15 @@
 </main>
 
 <style lang="scss">
+	@use '../../../../styles/_instructionPages.scss';
+	@use '../../../../styles/_variables.scss' as *;
 	.card {
-		width: fit-content;
-		margin: 0 auto;
-		display: flex;
-		flex-flow: column nowrap;
-		justify-content: flex-start;
-		align-items: flex-start;
-		gap: 0.5rem;
-		margin-bottom: 1rem;
-		background-color: transparent;
-		line-height: 1.75rem;
 		&:hover {
 			box-shadow: $shd-blue-glow;
 		}
 	}
-	.learnMore {
-		align-self: flex-end;
 
-		padding: 0.5rem 2rem;
-
-		border-right: 2px solid rgba(255, 255, 255, 0.1);
-		border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-		border-radius: 0.5rem;
-		&:hover {
-			color: $clr-coral;
-			border-right: 1px double $clr-coral;
-			border-radius: 0.5rem;
-		}
-	}
-	.navigatLink {
-		margin-top: 6rem;
-		position: relative;
-		.nextLink {
-			position: absolute;
-			right: 2rem;
-			bottom: 1rem;
-
-			text-align: right;
-
-			padding: 0.5rem 2rem;
-
-			border-right: 2px solid rgba(255, 255, 255, 0.1);
-			border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-			border-radius: 0.5rem;
-
-			&:hover {
-				color: $clr-coral;
-				border-right: 1px solid $clr-coral;
-				border-radius: 0.5rem;
-				box-shadow: $shadow-neon-coral;
-				transition: all 0.5s;
-			}
-		}
-	}
-
-	ol {
-		padding-left: 2rem;
-	}
-
-	li.withIcon {
-		margin-bottom: 0.75rem;
-		display: flex;
-		flex-flow: row nowrap;
-		justify-content: start;
-		align-items: center;
-		gap: 0.5rem;
-	}
 	strong.answer {
-		font-size: 3rem;
-		font-weight: 600;
+		font-size: 2.6rem;
 	}
 </style>
