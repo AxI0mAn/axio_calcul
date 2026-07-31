@@ -18,7 +18,30 @@
 </header>
 
 <main class="homeTextPage calcInstrPage">
-	<div class="card">
+	<ul class="mainInstr">
+		<h2>Contents:</h2>
+		<li>
+			<a href="{base}/basic/#IntroductionBasic"> <h3>Introduction.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/basic/#FeaturesBasic"> <h3>Features.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/basic/#ExamplesBasic"> <h3>How to Use. Examples.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/basic#ConstantsBasic"> <h3>Mathematical Constants.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/basic/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+		</li>
+	</ul>
+
+	<div class="card" id="IntroductionBasic">
 		<h2>Introduction</h2>
 		<h3>Fast Online Basic Calculator</h3>
 		<div>
@@ -37,7 +60,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="FeaturesBasic">
 		<h2>Features</h2>
 		<div>
 			<h3>This calculator includes:</h3>
@@ -113,7 +136,7 @@
 		</div>
 	</div>
 
-	<div class="card" id="arithmeticExamples">
+	<div class="card" id="ExamplesBasic">
 		<h2>How to Use. Examples:</h2>
 		<div>
 			<ul>
@@ -418,7 +441,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ConstantsBasic">
 		<h2>Mathematical Constants</h2>
 		<div>
 			<p>The calculator provides quick access to two commonly used mathematical constants.</p>
@@ -441,6 +464,12 @@
 <style lang="scss">
 	@use '../../../../styles/_instructionPages.scss';
 	@use '../../../../styles/_variables.scss' as *;
+
+	// .mainInstr  in src/styles/app.scss
+	.mainInstr {
+		padding-left: 1rem;
+	}
+
 	.card {
 		&:hover {
 			box-shadow: $shd-blue-glow;

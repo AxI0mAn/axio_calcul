@@ -155,6 +155,68 @@
 			><strong>View calculation examples.</strong></a
 		>
 	</section>
+	<section class="card">
+		<h3>Worked Examples.</h3>
+		<p>
+			Learn how to solve everyday problems such as finding the area of a circle, the volume of a
+			cylinder, room dimensions, wall area, and many other calculations using the Scientific
+			Calculator.
+		</p>
+		<ul class="mainInstr">
+			<h2>More than 12 real-world calculation examples:</h2>
+			<li>
+				<a href="{base}/engineer/#instructionEngineerExamples"> Circumference of a Circle.</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#AreaCircle"> Area of a Circle.</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#ArcLengthCircle"> Arc Length of a Circle.</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer#AreaRectangle"> Area of a Rectangle (or Square).</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#PerimeterRectangle"> Perimeter of a Rectangle (or Square).</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#AreaTriangle"> Area of a Triangle.</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#AreaTrapezoid"> Area of a Trapezoid.</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#VolumeRectPrism">
+					Volume of a Rectangular Prism (Room or Aquarium).</a
+				>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#VolumeCylinder"> Volume of a Cylinder.</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#ArithmeticMean"> Arithmetic Mean (Average).</a>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#SurfAreaRectPrism">
+					Surface Area of a Rectangular Prism (Walls, Floor, and Ceiling).</a
+				>
+			</li>
+
+			<li>
+				<a href="{base}/engineer/#Calculating the Number of Wallpaper Rolls"> CalcWallRolls.</a>
+			</li>
+		</ul>
+	</section>
 
 	<h2>Fractions</h2>
 	<section class="card">
@@ -263,14 +325,25 @@
 		border-right: 2px solid rgba(255, 255, 255, 0.1);
 		border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 		border-radius: 0.5rem;
+		strong {
+			color: $clr-text-main;
+		}
 		&:hover {
 			strong {
-				color: $clr-text-main;
+				color: $clr-coral;
 			}
 			border-right: 1px double $clr-text-main;
 			border-bottom: 1px double $clr-text-main;
 			border-radius: 0.5rem;
 			transition: all 0.35;
 		}
+	}
+	.mainInstr {
+		h2 {
+			font-size: 1.2rem;
+		}
+		display: flex;
+		flex-flow: column wrap;
+		gap: 0px;
 	}
 </style>

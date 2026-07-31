@@ -3,7 +3,7 @@
 	import { base } from '$app/paths';
 </script>
 
-<ul class="mainInstr">
+<ul class="mainInstr" id="mainInstr">
 	<h2>Still Have Questions? Learn More Below:</h2>
 	<li>
 		<a href="{base}/instructionInterface#instr_CalcPrecis">
@@ -45,38 +45,5 @@
 </ul>
 
 <style lang="scss">
-	.mainInstr {
-		padding: 1rem;
-		margin: 0 auto;
-		width: 100%;
-		display: flex;
-		flex-flow: column wrap;
-		justify-content: space-around;
-		align-items: flex-start;
-		gap: 0.5rem;
-		background-color: transparent;
-		padding-bottom: 1rem;
-		@media screen and (max-width: 500px) {
-			padding: 1rem;
-			align-items: center;
-		}
-		h2 {
-			color: $clr-coral;
-			margin-bottom: 1.5rem;
-			font-size: 1.25rem;
-		}
-		li {
-			color: $clr-white;
-			margin-bottom: 0.5rem;
-
-			&:hover {
-				color: $clr-coral;
-				transition: all 0.35s;
-			}
-
-			@media screen and (max-width: 500px) {
-				text-align: center;
-			}
-		}
-	}
+	// .mainInstr  in src/styles/app.scss
 </style>

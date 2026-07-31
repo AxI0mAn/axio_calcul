@@ -16,18 +16,39 @@
 	import AccordionDetails from '$lib/components/aBlock/AccordionDetails.svelte';
 </script>
 
-<!-- <AccordionDetails castomClass="optionCalc" name="my-accordion">
-  {#snippet summary()} 
-  {/snippet}
- 
-</AccordionDetails> -->
-
 <header class="header">
 	<h1 class="headerSlogan" id="instructionTrigonometry">Trigonometry Calculator</h1>
 </header>
 
 <main class="homeTextPage calcInstrPage">
-	<div class="card">
+	<ul class="mainInstr">
+		<h2>Contents:</h2>
+		<li>
+			<a href="{base}/trigonometry/#IntroductionTrigonometry"> <h3>Introduction.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/trigonometry/#FeaturesTrigonometry"> <h3>Features.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/trigonometry/#AngleUnitsTrigonometry"> <h3>Angle Units.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/trigonometry/#HowtoUseTrigonometry"> <h3>How to Use.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/trigonometry/#ExamplesTrigonometry"> <h3>Examples.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/trigonometry/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+		</li>
+	</ul>
+
+	<div class="card" id="IntroductionTrigonometry">
 		<h2>Introduction</h2>
 		<h3>Online/<strong>Offline</strong> Trigonometry Calculator</h3>
 		<div>
@@ -53,7 +74,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="AngleUnitsTrigonometry">
 		<h2>Angle Units</h2>
 		<p>The calculator supports the three most commonly used angular measurement systems.</p>
 
@@ -94,7 +115,8 @@
 			</ul>
 		</div>
 	</div>
-	<div class="card">
+
+	<div class="card" id="FeaturesTrigonometry">
 		<h2>Features</h2>
 		<p>The calculator includes:</p>
 		<AccordionDetails castomClass="optionCalc" name="my-accordion">
@@ -295,9 +317,9 @@
 		</AccordionDetails>
 	</div>
 
-	<div class="card">
+	<div class="card" id="HowtoUseTrigonometry">
 		<h2>How to Use</h2>
-		<h3>Fast Online Basic Calculator</h3>
+		<h3>Fast Online Trigonometry Calculator</h3>
 		<div>
 			<ol>
 				<li>
@@ -319,7 +341,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ExamplesTrigonometry">
 		<h2>Examples:</h2>
 		<div>
 			<ul>
@@ -576,6 +598,11 @@
 <style lang="scss">
 	@use '../../../../styles/_instructionPages.scss';
 	@use '../../../../styles/_variables.scss' as *;
+
+	// .mainInstr  in src/styles/app.scss
+	.mainInstr {
+		padding-left: 1rem;
+	}
 
 	.card {
 		&:hover {

@@ -28,7 +28,53 @@
 </header>
 
 <main class="homeTextPage calcInstrPage">
-	<div class="card">
+	<ul class="mainInstr">
+		<h2>Contents:</h2>
+		<li>
+			<a href="{base}/fraction/#IntroductionFraction"> <h3>Introduction.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/fraction/#FeaturesFraction"> <h3>Features.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/fraction/#ExpressionBuilder"> <h3>Expression Builder.</h3></a>
+		</li>
+		<li>
+			<ul>
+				<li><a href="{base}/fraction/#ProperFraction"> <h3>Proper Fraction.</h3></a></li>
+				<li><a href="{base}/fraction/#ImproperFraction"> <h3>Improper Fraction.</h3></a></li>
+				<li><a href="{base}/fraction/#MixedNumber"> <h3>Mixed Number.</h3></a></li>
+			</ul>
+		</li>
+
+		<li>
+			<a href="{base}/fraction/#ExamplesFraction"> <h3>Examples.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/fraction/#StepMode"> <h3>How to Use Step-by-Step Mode.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/fraction/#EvCoExFraction">
+				<h3>Examples for Complex Expressions with Fractions.</h3></a
+			>
+		</li>
+
+		<li>
+			<a href="{base}/fraction/#AvoidThComMistakesFraction">
+				<h3>⚠️ Avoid These Common Mistakes.</h3></a
+			>
+		</li>
+
+		<li>
+			<a href="{base}/fraction/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+		</li>
+	</ul>
+
+	<div class="card" id="IntroductionFraction">
 		<h2>Introduction</h2>
 		<h3>Advanced Fraction Calculator</h3>
 		<div>
@@ -71,7 +117,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="FeaturesFraction">
 		<h2>Features</h2>
 		<p>The calculator supports:</p>
 
@@ -180,7 +226,7 @@
 		</AccordionDetails>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ExpressionBuilder">
 		<h2>Expression Builder</h2>
 		<div>
 			<p>
@@ -201,7 +247,7 @@
 	</div>
 
 	<h2>Intuitive fraction entry using parentheses.</h2>
-	<div class="card">
+	<div class="card" id="ProperFraction">
 		<h2>Proper Fraction</h2>
 		<div>
 			<p>
@@ -231,7 +277,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ImproperFraction">
 		<h2>Improper Fraction</h2>
 		<div>
 			<p>
@@ -261,7 +307,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="MixedNumber">
 		<h2>Mixed Number</h2>
 		<div>
 			<p>
@@ -297,7 +343,8 @@
 			</ul>
 		</div>
 	</div>
-	<div class="card">
+
+	<div class="card" id="ExamplesFraction">
 		<h2>Examples:</h2>
 		<div>
 			<ul>
@@ -627,7 +674,7 @@
 				<li class="example">
 					<strong>Square Root for Denominator</strong>
 				</li>
-				<li><FineFraction expr="81÷√(100)" /></li>
+				<li><FineFraction expr="81/√(100)" /></li>
 				<li>Enter into the calculator:</li>
 				<li class="withIcon tenMore">
 					<BtnText buttonText="8" customClass="font-digits" onclick={() => {}} />
@@ -651,7 +698,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="StepMode">
 		<h2>Step-by-Step Mode</h2>
 		<h2>
 			<BtnText
@@ -802,7 +849,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="EvCoExFraction">
 		<h2>Evaluate Complex Expressions with Fractions.</h2>
 		<div>
 			<div class="example">
@@ -832,7 +879,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="AvoidThComMistakesFraction">
 		<h2>⚠️ Avoid These Common Mistakes.</h2>
 		<div>
 			<ul>
@@ -853,6 +900,11 @@
 <style lang="scss">
 	@use '../../../../styles/_instructionPages.scss';
 	@use '../../../../styles/_variables.scss' as *;
+
+	// .mainInstr  in src/styles/app.scss
+	.mainInstr {
+		padding-left: 1rem;
+	}
 
 	.card {
 		&:hover {

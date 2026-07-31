@@ -27,7 +27,36 @@
 </header>
 
 <main class="homeTextPage calcInstrPage">
-	<div class="card">
+	<ul class="mainInstr">
+		<h2>Contents:</h2>
+		<li>
+			<a href="{base}/engineer/#IntroductionEngineer"> <h3>Introduction.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/engineer/#FeaturesEngineer"> <h3>Features.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/engineer/#ExamplesEngineer"> <h3>How to Use.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/engineer#ConstantsEngineer"> <h3>Mathematical Constants.</h3></a>
+		</li>
+
+		<li>
+			<a href="{base}/engineer/#instructionEngineerExamples">
+				<h3>More than 12 real-world calculation examples.</h3></a
+			>
+		</li>
+
+		<li>
+			<a href="{base}/engineer/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+		</li>
+	</ul>
+
+	<div class="card" id="IntroductionEngineer">
 		<h2>Introduction</h2>
 		<h3>Advanced Scientific and Engineering Calculator</h3>
 		<div>
@@ -46,7 +75,8 @@
 			</p>
 		</div>
 	</div>
-	<div class="card">
+
+	<div class="card" id="FeaturesEngineer">
 		<h2>Features</h2>
 		<p>The calculator includes the following functions:</p>
 
@@ -286,12 +316,12 @@
 		</AccordionDetails>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ExamplesEngineer">
 		<h2>How to Use. Examples:</h2>
 		<div>
-			<a class="learnMore_goTo" href="{base}/basic#arithmeticExamples"
-				><span>View arithmetic examples</span><span> on the Basic Calculator page.</span></a
-			>
+			<a class="learnMore_goTo" href="{base}/basic#ExamplesBasic">
+				View arithmetic examples on the Basic Calculator page.
+			</a>
 			<ul>
 				<li class="example">
 					<strong>Powers</strong>
@@ -540,7 +570,7 @@
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ConstantsEngineer">
 		<h2>Mathematical Constants</h2>
 		<div>
 			<p>The calculator provides quick access to several widely used mathematical constants.</p>
@@ -629,7 +659,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="AreaCircle">
 		<ul>
 			<li class="example">
 				<h2>Area of a Circle</h2>
@@ -647,9 +677,7 @@
 				<BtnText customClass="op" onclick={() => {}} buttonText="*" />
 				<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
 				<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-				<BtnText customClass="op" onclick={() => {}} buttonText="*" />
-				<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
-				<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+				<BtnText buttonText="x^2" customClass="op btn__func" onclick={() => {}} />
 				<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
 				<strong class="answer font-digits">314.16</strong>
 			</li>
@@ -663,8 +691,7 @@
 				<BtnText customClass="op btn__func constanta" onclick={() => {}} buttonText="π" />
 				<BtnText customClass="op" onclick={() => {}} buttonText="*" />
 				<BtnText customClass="font-digits" buttonText="3" onclick={() => {}} />
-				<BtnText customClass="op" onclick={() => {}} buttonText="*" />
-				<BtnText customClass="font-digits" buttonText="3" onclick={() => {}} />
+				<BtnText buttonText="x^2" customClass="op btn__func" onclick={() => {}} />
 				<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
 				<strong class="answer font-digits">28.27</strong>
 			</li>
@@ -672,7 +699,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="AreaRectangle">
 		<ul>
 			<li class="example">
 				<h2>Area of a Rectangle (or Square)</h2>
@@ -712,7 +739,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="PerimeterRectangle">
 		<ul>
 			<li class="example">
 				<h2>Perimeter of a Rectangle (or Square)</h2>
@@ -761,7 +788,8 @@
 			<li>Answer:<strong class="example font-digits">18 m</strong></li>
 		</ul>
 	</div>
-	<div class="card">
+
+	<div class="card" id="AreaTriangle">
 		<ul>
 			<li class="example">
 				<h2>Area of a Triangle</h2>
@@ -813,7 +841,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="AreaTrapezoid">
 		<ul>
 			<li class="example">
 				<h2>Area of a Trapezoid</h2>
@@ -869,7 +897,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="VolumeRectPrism">
 		<ul>
 			<li class="example">
 				<h2>Volume of a Rectangular Prism (Room or Aquarium)</h2>
@@ -916,7 +944,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ArithmeticMean">
 		<ul>
 			<li class="example">
 				<h2>Arithmetic Mean (Average)</h2>
@@ -982,7 +1010,8 @@
 			<li>Answer:<strong class="example font-digits">6.1 L/100 km</strong></li>
 		</ul>
 	</div>
-	<div class="card">
+
+	<div class="card" id="SurfAreaRectPrism">
 		<ul>
 			<li class="example">
 				<h2>Surface Area of a Rectangular Prism (Walls, Floor, and Ceiling)</h2>
@@ -1067,7 +1096,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="ArcLengthCircle">
 		<ul>
 			<li class="example">
 				<h2>Arc Length of a Circle</h2>
@@ -1130,7 +1159,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="VolumeCylinder">
 		<ul>
 			<li class="example">
 				<h2>Volume of a Cylinder</h2>
@@ -1154,10 +1183,7 @@
 				<BtnText buttonText="1" customClass="font-digits" onclick={() => {}} />
 				<BtnText buttonText="." customClass="btn__op" onclick={() => {}} />
 				<BtnText buttonText="5" customClass="font-digits" onclick={() => {}} />
-				<BtnText buttonText="*" customClass="op" onclick={() => {}} />
-				<BtnText buttonText="1" customClass="font-digits" onclick={() => {}} />
-				<BtnText buttonText="." customClass="btn__op" onclick={() => {}} />
-				<BtnText buttonText="5" customClass="font-digits" onclick={() => {}} />
+				<BtnText buttonText="x^2" customClass="op btn__func" onclick={() => {}} />
 				<BtnText buttonText="*" customClass="op" onclick={() => {}} />
 				<BtnText buttonText="4" customClass="font-digits" onclick={() => {}} />
 				<BtnText buttonText="=" customClass="equal-btn btn__op" onclick={() => {}} />
@@ -1175,10 +1201,7 @@
 				<BtnText buttonText="0" customClass="font-digits" onclick={() => {}} />
 				<BtnText buttonText="." customClass="btn__op" onclick={() => {}} />
 				<BtnText buttonText="5" customClass="font-digits" onclick={() => {}} />
-				<BtnText buttonText="*" customClass="op" onclick={() => {}} />
-				<BtnText buttonText="0" customClass="font-digits" onclick={() => {}} />
-				<BtnText buttonText="." customClass="btn__op" onclick={() => {}} />
-				<BtnText buttonText="5" customClass="font-digits" onclick={() => {}} />
+				<BtnText buttonText="x^2" customClass="op btn__func" onclick={() => {}} />
 				<BtnText buttonText="*" customClass="op" onclick={() => {}} />
 				<BtnText buttonText="2" customClass="font-digits" onclick={() => {}} />
 				<BtnText buttonText="=" customClass="equal-btn btn__op" onclick={() => {}} />
@@ -1188,7 +1211,7 @@
 		</ul>
 	</div>
 
-	<div class="card">
+	<div class="card" id="CalcWallRolls">
 		<ul>
 			<li class="example">
 				<h2>Calculating the Number of Wallpaper Rolls</h2>
@@ -1297,6 +1320,11 @@
 <style lang="scss">
 	@use '../../../../styles/_instructionPages.scss';
 	@use '../../../../styles/_variables.scss' as *;
+
+	// .mainInstr  in src/styles/app.scss
+	.mainInstr {
+		padding-left: 1rem;
+	}
 
 	.card {
 		&:hover {
