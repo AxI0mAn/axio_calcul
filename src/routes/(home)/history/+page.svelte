@@ -122,6 +122,7 @@
 	{#if Object.keys(historyStore.all).length === 0}
 		<p>История пуста или еще не загружена.</p>
 	{:else}
+		<h2>⭐ Tap and hold a calculation result in your history to quickly save it.</h2>
 		{#each Object.entries(historyStore.all).sort((a, b) => new Date(b[1].updatedAt).getTime() - new Date(a[1].updatedAt).getTime()) as [id, record]}
 			<div class="history-item {record.type}">
 				<div class="history-header">
@@ -319,6 +320,13 @@
 		&:last-child {
 			border-bottom: none;
 		}
+	}
+
+	h2 {
+		line-height: 2rem;
+		color: $clr-text-main;
+		font-size: 1.4rem;
+		margin: 1rem auto;
 	}
 
 	.history-steps-block {

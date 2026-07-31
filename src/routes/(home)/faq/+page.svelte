@@ -1,4 +1,6 @@
 <script>
+	// @ts-ignore
+	import { base } from '$app/paths';
 	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
 
 	// кнопка ВВЕРХ
@@ -60,12 +62,20 @@
 			<h3>Does the Application work offline?</h3>
 			<p>Yes.</p>
 			<p>
-				As a Progressive Web App (PWA), many calculators continue working even without an Internet
-				connection.
+				Once installed as a Progressive Web App (PWA), many functions remain available without an
+				Internet connection.
 			</p>
 		</section>
 	</div>
 	<h2>Calculations</h2>
+	<section class="card">
+		<h3>Can I enter numbers, parentheses, and operators directly from my computer keyboard?</h3>
+		<p>Yes.</p>
+		<p>
+			You can use your PC or laptop keyboard to enter numbers, parentheses, and operators directly
+			into the calculator.
+		</p>
+	</section>
 	<section class="card">
 		<h3>Are my calculations saved?</h3>
 		<p>Yes.</p>
@@ -123,6 +133,29 @@
 		<p>All calculations remain on the device where they were created.</p>
 	</section>
 
+	<h2>Scientific and Engineer</h2>
+	<section class="card">
+		<h3>What can the Scientific Calculator do?</h3>
+		<p>
+			The Scientific Calculator includes all basic calculator features plus advanced scientific and
+			engineering functions.
+		</p>
+		<p>See the Scientific Calculator Guide for a complete list of features and examples.</p>
+		<a class="learnMore" href="{base}/engineer#instructionEngineer"
+			><strong>Scientific Calculator Guide</strong></a
+		>
+	</section>
+	<section class="card">
+		<h3>Can I evaluate long expressions?</h3>
+		<p>
+			Yes. The Scientific Calculator can evaluate long and complex expressions in a single line. Be
+			sure to use parentheses to ensure the correct order of operations.
+		</p>
+		<a class="learnMore" href="{base}/engineer#instructionEngineerExamples"
+			><strong>View calculation examples.</strong></a
+		>
+	</section>
+
 	<h2>Fractions</h2>
 	<section class="card">
 		<h3>How is the Fraction Calculator different?</h3>
@@ -131,6 +164,10 @@
 			denominator, this calculator allows you to create complete expressions directly from the
 			calculator's keyboard.
 		</p>
+		<p>See calculation examples in the Fraction Calculator Guide.</p>
+		<a class="learnMore" href="{base}/fraction#instructionFraction"
+			><strong>Fraction Calculator Guide.</strong></a
+		>
 	</section>
 
 	<h2>Accuracy</h2>
@@ -216,6 +253,24 @@
 
 		&:hover {
 			box-shadow: $shadow-neon-coral;
+		}
+	}
+	.learnMore {
+		align-self: flex-end;
+
+		padding: 0.5rem 2rem;
+
+		border-right: 2px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+		border-radius: 0.5rem;
+		&:hover {
+			strong {
+				color: $clr-text-main;
+			}
+			border-right: 1px double $clr-text-main;
+			border-bottom: 1px double $clr-text-main;
+			border-radius: 0.5rem;
+			transition: all 0.35;
 		}
 	}
 </style>

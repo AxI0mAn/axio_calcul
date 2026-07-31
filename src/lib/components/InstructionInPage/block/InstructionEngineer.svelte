@@ -583,7 +583,7 @@
 
 	<h2>Calculate in one line!</h2>
 
-	<div class="card">
+	<div class="card" id="instructionEngineerExamples">
 		<ul>
 			<li class="example">
 				<h2>Circumference of a Circle</h2>

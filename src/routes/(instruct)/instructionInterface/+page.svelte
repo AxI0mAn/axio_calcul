@@ -165,6 +165,7 @@
 			box-shadow: $shd-blue-glow;
 		}
 	}
+
 	.learnMore {
 		align-self: flex-end;
 

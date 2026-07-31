@@ -63,6 +63,7 @@ export function addOperator(op) {
     return;
   }
 
+
   // 3. СТАНДАРТНЫЕ ОПЕРАТОРЫ (+, -, *, /, ^)
 
   if (appState.expression === '' && appState.display !== '0') {
@@ -86,11 +87,17 @@ export function performCalculation() {
   let finalExpr = '';
 
   // 2. Формируем финальное выражение для вычисления
-  if (appState.isNewInput && appState.expression !== '') {
-    // Случай "5 + =" -> берем просто "5"
+  // Проверяем, заканчивается ли выражение на оператор (+, -, *, /, ^)
+  // Если да, то это случай "5 + =" -> берем число без оператора
+  const lastChar = appState.expression.slice(-1);
+  const isOperator = /[-+*/^]/.test(lastChar);
+
+  if (appState.isNewInput && appState.expression !== '' && isOperator) {
+    // Случай "5 + =" -> берем просто "5" (удаляем последний оператор)
     finalExpr = appState.expression.slice(0, -1);
   } else {
     // Стандартная склейка: "10+" + "5" или "8ⁿ√3"
+    // Или "10^2" + "" (для степеней, где display пустой)
     finalExpr = appState.expression + appState.display;
   }
 
@@ -200,21 +207,3 @@ function autoCloseBrackets(str) {
   const close = (str.match(/\)/g) || []).length;
   return str + ')'.repeat(Math.max(0, open - close));
 }
-
-
-
-
-
-// console.log('История обновлена, текущая длина:', appState.historySession.length);
-// console.log(`show appState:`)
-// console.log({
-//   'display': appState.display,
-//   'M1 ': appState.M1,
-//   'M2': appState.M2,
-//   'M3 ': appState.M3,
-//   'M4 ': appState.M4,
-//   'historySession': $state.snapshot(appState.historySession), // ПРИМЕНЯЕМ snapshot Т.К. МУТИРУЕМ МАССИВ  appState.historySession.push(toHistory);
-//   'isNewInput': appState.isNewInput,
-//   'expression': appState.expression,
-//   'numToFix': appStore.toFix,
-// })
