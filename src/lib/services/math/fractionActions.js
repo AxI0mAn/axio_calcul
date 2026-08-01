@@ -1438,6 +1438,7 @@ export function evaluateFraction() {
     return;
   }
 
+
   // ---- Сбрасываем режим степени перед вычислением ----
   isPowerMode = false;
   powerDepth = 0;
@@ -1450,6 +1451,8 @@ export function evaluateFraction() {
 
   // Собираем полное выражение
   let fullExpr = (appState.expression || '') + (appState.display || '');
+  // СОХРАНЯЕМ ОРИГИНАЛ С МАРКЕРАМИ ДЛЯ ИСТОРИИ
+  const originalWithMarkers = fullExpr;
   fullExpr = autoCompleteEmptyBrackets(fullExpr);
 
   // === АВТОЗАКРЫТИЕ МАРКЕРОВ (оставляем как есть) ===
@@ -1496,6 +1499,7 @@ export function evaluateFraction() {
   // Затем сворачиваем смешанные дроби: "число+(дробь)" → "число(дробь)"
   historyDisplayExpr = historyDisplayExpr.replace(/(\d+)\+\(([^)]+)\)/g, '$1($2)');
 
+
   // ===== ЛЕВОАССОЦИАТИВНОГО ДЕЛЕНИЯ ===== 
   fullExpr = fixLeftAssociativeDivision(fullExpr);
 
@@ -1503,7 +1507,6 @@ export function evaluateFraction() {
   fullExpr = insertImplicitMultiplication(fullExpr);
   fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
   fullExpr = insertImplicitMultiplication(fullExpr);
-
 
   // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
   // Считаем количество открывающих и закрывающих скобок во всей строке
@@ -1520,16 +1523,17 @@ export function evaluateFraction() {
   }
 
   // ======== ОПРЕДЕЛЕНИЕ СЛОЖНОСТИ И ФЛАГА stepsFraction =====
+  // не работает - нет шагов решения!!
   //Если режим steps не включен
-  if (!appState.stepsFraction) {
-    // Проверяем: есть ли в выражении смешанные дроби, несколько операторов,
-    // степени, корни или цепочки делений
-    const isComplex = isComplexExpression(fullExpr);
+  // if (!appState.stepsFraction) {
+  // Проверяем: есть ли в выражении смешанные дроби, несколько операторов,
+  // степени, корни или цепочки делений
+  // const isComplex = isComplexExpression(fullExpr);
 
-    // Устанавливаем флаг для пошагового режима
-    // Если выражение сложное — включаем steps, иначе отключаем
-    appState.stepsFraction = isComplex;
-  }
+  // Устанавливаем флаг для пошагового режима
+  // Если выражение сложное — включаем steps, иначе отключаем
+  // appState.stepsFraction = isComplex;
+  // }
 
   try {
     // 8. Переносим целые части в числитель дроби
@@ -1584,7 +1588,8 @@ export function evaluateFraction() {
 
     if (appState.stepsFraction) {
       // Генерируем подробную цепочку шагов, передавая подготовленное cleanExpr и готовый результат
-      finalStepsArray = generateSteps(cleanExpr, resultFraction);
+      // Передаем оригинал с маркерами для первого шага
+      finalStepsArray = generateSteps(originalWithMarkers, resultFraction);
     }
 
     // === -📝=TODO=📝- ===

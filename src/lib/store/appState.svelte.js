@@ -4,7 +4,7 @@
 
 // import { appStore } from "./appStore.svelte";
 import { historyStore } from "./historyStore.svelte";
-import { convertFractionToDecimalIfNeeded } from '$lib/utils/convertFractionToDecimalIfNeeded';
+import { convertFractionToDecimalIfNeeded } from "$lib/utils/convertFractionToDecimalIfNeeded";
 
 class AppState {
   /** @type {string} */

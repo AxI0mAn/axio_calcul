@@ -294,9 +294,10 @@ function stepPowersAndRoots(expr) {
 
           if (left && right) {
             try {
-              const leftFrac = evaluateFractionExpression(left);
-              const rightFrac = evaluateFractionExpression(right);
-              const resultFrac = leftFrac.pow(rightFrac);
+              // ИСПОЛЬЗУЕМ evaluateFractionExpression ДЛЯ ТОЧНОГО ВЫЧИСЛЕНИЯ
+              // Создаем выражение: (left)^(right)
+              const powExpr = `(${left})^(${right})`;
+              const resultFrac = evaluateFractionExpression(powExpr);
               const resultStr = formatFraction(resultFrac.num, resultFrac.den);
 
               const leftStart = result.indexOf(left, i - left.length);
@@ -307,7 +308,7 @@ function stepPowersAndRoots(expr) {
                 break;
               }
             } catch (e) {
-              console.error('  Ошибка при вычислении ^:', e);
+              console.warn('[stepPowersAndRoots] Error computing power:', e);
             }
           }
         } else if (ch === '√') {
@@ -379,6 +380,7 @@ function stepBrackets(expr) {
 
   return result;
 }
+
 
 /**
  * ШАГ 3: Преобразование смешанных дробей в неправильные.
@@ -483,17 +485,31 @@ function stepMultiplyFractions(expr) {
         const right = extractOperand(result, i, 'right');
 
         if (isFraction(left) && isFraction(right)) {
-          const leftParts = left.split('÷');
-          const rightParts = right.split('÷');
+          // ИСПОЛЬЗУЕМ evaluateFractionExpression ДЛЯ ТОЧНОГО ВЫЧИСЛЕНИЯ
+          try {
+            // Создаем выражение для умножения: (left)*(right)
+            const mulExpr = `(${left})*(${right})`;
+            const fracResult = evaluateFractionExpression(mulExpr);
+            const newFrac = formatFraction(fracResult.num, fracResult.den);
 
-          if (leftParts.length === 2 && rightParts.length === 2) {
-            const newNum = parseInt(leftParts[0], 10) * parseInt(rightParts[0], 10);
-            const newDen = parseInt(leftParts[1], 10) * parseInt(rightParts[1], 10);
-            const newFrac = formatFraction(newNum, newDen);
             const newExpr = result.slice(0, i - left.length) + newFrac + result.slice(i + 1 + right.length);
             result = normalizeExpr(newExpr);
             changed = true;
             break;
+          } catch (e) {
+            // Если evaluateFractionExpression не сработал, используем старую логику
+            console.warn('[stepMultiplyFractions] Fallback to parseInt:', e);
+            const leftParts = left.split('÷');
+            const rightParts = right.split('÷');
+            if (leftParts.length === 2 && rightParts.length === 2) {
+              const newNum = parseInt(leftParts[0], 10) * parseInt(rightParts[0], 10);
+              const newDen = parseInt(leftParts[1], 10) * parseInt(rightParts[1], 10);
+              const newFrac = formatFraction(newNum, newDen);
+              const newExpr = result.slice(0, i - left.length) + newFrac + result.slice(i + 1 + right.length);
+              result = normalizeExpr(newExpr);
+              changed = true;
+              break;
+            }
           }
         }
       }
@@ -687,7 +703,10 @@ export function generateSteps(expression, resultFraction) {
   }
 
   // ===== ШАГ 1: Исходное выражение =====
-  // Очищаем от маркеров и добавляем неявные операторы
+  // Сохраняем оригинал для отображения (с маркерами)
+  const originalForDisplay = expression.trim();
+
+  // Очищаем от маркеров и добавляем неявные операторы для вычислений
   let currentExpr = expression.trim();
   // Заменяем маркеры на обычные скобки для отображения
   currentExpr = currentExpr.replace(/⥾/g, '(').replace(/⥿/g, ')');
@@ -696,7 +715,15 @@ export function generateSteps(expression, resultFraction) {
   // Добавляем неявные операторы для читаемости
   currentExpr = insertImplicitMultiplication(currentExpr);
 
-  const steps = [currentExpr];
+  // Первый шаг - используем оригинал с маркерами, но с заменой на скобки
+  // НЕ применяем insertImplicitMultiplication к первому шагу!
+  let firstStep = originalForDisplay
+    .replace(/⥾/g, '(')
+    .replace(/⥿/g, ')')
+    .replace(/⥑/g, '(')
+    .replace(/⥏/g, ')');
+
+  const steps = [firstStep, currentExpr];
 
   try {
     // ===== ШАГ 1.1: Степени и корни =====

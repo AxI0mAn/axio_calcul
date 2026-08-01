@@ -516,6 +516,14 @@
 		}
 	}
 
+	.history-steps-block.is-multistep {
+		.step-line {
+			.math-text + .super-exponent {
+				transform: translateX(-0.7rem) translateY(-0.7rem);
+			}
+		}
+	}
+
 	// стили к контейнеру .num-part и .den-part, для решения Проблема: юникодные символы верхнего индекса ¹²³ отображаются корректно, а ⁴⁵⁶⁷⁸⁹⁰ – ниже и менее жирно.
 
 	.fraction-block {
