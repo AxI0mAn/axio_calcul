@@ -184,6 +184,77 @@ function evaluateSubExpression(expr) {
   }
 }
 
+
+
+/**
+ * Преобразует смешанные дроби в неправильные.
+ * Поддерживает форматы:
+ * - "3+1÷8" → "25÷8"
+ * - "3+(1÷8)" → "25÷8"
+ * - "-3+1÷8" → "-25÷8"
+ * - "3+1÷8+2÷5" → "25÷8+2÷5" (только смешанные дроби)
+ * 
+ * @param {string} expr - выражение с смешанными дробями
+ * @returns {string} - выражение с неправильными дробями
+ */
+export function convertMixedToImproperInExpression(expr) {
+  if (!expr) return expr;
+
+  let result = expr;
+
+  // ===== ПАТТЕРН 1: число+маркер⥾числитель÷знаменатель⥿ =====
+  // Пример: "3+⥾1÷8⥿" → "25÷8"
+  result = result.replace(/(\d+)\+⥾(\d+)÷(\d+)⥿/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 2: -число+маркер⥾числитель÷знаменатель⥿ =====
+  result = result.replace(/-(\d+)\+⥾(\d+)÷(\d+)⥿/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 3: число+маркер⥑числитель÷знаменатель⥏ =====
+  result = result.replace(/(\d+)\+⥑(\d+)÷(\d+)⥏/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 4: -число+маркер⥑числитель÷знаменатель⥏ =====
+  result = result.replace(/-(\d+)\+⥑(\d+)÷(\d+)⥏/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 5: число+числитель÷знаменатель (БЕЗ скобок) =====
+  result = result.replace(/(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 6: -число+числитель÷знаменатель =====
+  result = result.replace(/-(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 7: число+(числитель÷знаменатель) (со скобками) =====
+  result = result.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 8: -число+(числитель÷знаменатель) =====
+  result = result.replace(/-(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  return result;
+}
+
+
 // ============================================================
 // ФУНКЦИИ ПРОВЕРКИ НЕОБХОДИМОСТИ ШАГОВ
 // ============================================================
@@ -381,39 +452,40 @@ function stepBrackets(expr) {
   return result;
 }
 
-
 /**
  * ШАГ 3: Преобразование смешанных дробей в неправильные.
- * Использует функции из fractionActions.js
+ * Сначала ищет маркеры (⥑/⥏ и ⥾/⥿), затем преобразует уже раскрытые смешанные дроби.
+ * Использует функции из fractionActions.js и дополнительную конвертацию.
  */
-function stepMixedToImproper(expr) {
+export function stepMixedToImproper(expr) {
   if (!expr || !hasMixedFractions(expr)) {
+    // Даже если нет маркеров, проверяем, нет ли раскрытых смешанных дробей
+    if (expr && /\d+\+\d+÷\d+/.test(expr)) {
+      const result = convertMixedToImproperInExpression(expr);
+      return result;
+    }
     return expr;
   }
 
   let result = expr;
 
-  // Используем существующие функции из fractionActions
+  // 1. Обработка маркеров целой части (⥑...⥏)
   result = transformMixedNumberWithoutDivision(result);
+
+  // 2. Обработка отрицательных смешанных чисел с маркерами
   result = transformNegativeMixedNumber(result);
+
+  // 3. Обработка сложных скобок (⥾...⥿)
   result = transformMixedNumberWithComplexBrackets(result);
+
+  // 4. Обработка смешанных дробей с делением после скобок
   result = transformMixedFractionWithDivision(result);
 
-  // Дополнительная обработка для паттерна число(дробь)
-  result = result.replace(/(\d+)\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    const newExpr = `${improperNum}÷${den}`;
-    return newExpr;
-  });
+  // 5. КОНВЕРТАЦИЯ РАСКРЫТЫХ СМЕШАННЫХ ДРОБЕЙ В НЕПРАВИЛЬНЫЕ
+  // После преобразования маркеров могли получиться выражения вида "3+(1÷8)"
+  // Их нужно преобразовать в "25÷8"
+  result = convertMixedToImproperInExpression(result);
 
-  // Обработка отрицательных смешанных дробей
-  result = result.replace(/-(\d+)\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    const newExpr = `-(${improperNum}÷${den})`;
-    return newExpr;
-  });
-
-  result = normalizeExpr(result);
   return result;
 }
 
@@ -662,18 +734,46 @@ function stepReduceAndExtract(expr) {
   if (parts.length === 2) {
     let num = parseInt(parts[0], 10);
     let den = parseInt(parts[1], 10);
+    // === -📝=TODO=📝- ===
+
+    // ===== ВРЕМЕННЫЙ ДЕБАГ =====
+    console.log('[DEBUG stepReduceAndExtract]:');
+    console.log('  ВХОДНЫЕ ДАННЫЕ:');
+    console.log('    expr:', expr);
+    console.log('    num:', num);
+    console.log('    den:', den);
+    // ============================
 
     if (!isNaN(num) && !isNaN(den) && den !== 0) {
       const g = gcd(Math.abs(num), Math.abs(den));
+      // === -📝=TODO=📝- ===
+      // ===== ВРЕМЕННЫЙ ДЕБАГ =====
+      console.log('    gcd:', g);
+      // ============================
       if (g > 1) {
         num /= g;
         den /= g;
         result = formatFraction(num, den);
       }
+      // === -📝=TODO=📝- ===
+      // ===== ВРЕМЕННЫЙ ДЕБАГ =====
+      console.log('    ПОСЛЕ СОКРАЩЕНИЯ:');
+      console.log('      num:', num);
+      console.log('      den:', den);
+      console.log('      result:', result);
+      // ============================
 
       if (den !== 1) {
         const whole = Math.floor(num / den);
         const remainder = num % den;
+
+        // === -📝=TODO=📝- ===
+        // ===== ВРЕМЕННЫЙ ДЕБАГ =====
+        console.log('    ВЫДЕЛЕНИЕ ЦЕЛОЙ ЧАСТИ:');
+        console.log('      whole:', whole);
+        console.log('      remainder:', remainder);
+        // ============================
+
         if (whole > 0 && remainder !== 0) {
           result = `${whole}${MARKERS.WHOLE_START}${remainder}÷${den}${MARKERS.WHOLE_END}`;
         } else if (whole > 0) {
@@ -684,6 +784,11 @@ function stepReduceAndExtract(expr) {
       }
     }
   }
+
+  // === -📝=TODO=📝- ===
+  // ===== ВРЕМЕННЫЙ ДЕБАГ =====
+  console.log('[DEBUG stepReduceAndExtract] ВЫХОД:', result);
+  // ============================
   return result;
 }
 
@@ -712,8 +817,10 @@ export function generateSteps(expression, resultFraction) {
   currentExpr = currentExpr.replace(/⥾/g, '(').replace(/⥿/g, ')');
   currentExpr = currentExpr.replace(/⥑/g, '(').replace(/⥏/g, ')');
 
+
   // Добавляем неявные операторы для читаемости
   currentExpr = insertImplicitMultiplication(currentExpr);
+
 
   // Первый шаг - используем оригинал с маркерами, но с заменой на скобки
   // НЕ применяем insertImplicitMultiplication к первому шагу!
@@ -726,6 +833,31 @@ export function generateSteps(expression, resultFraction) {
   const steps = [firstStep, currentExpr];
 
   try {
+    // ===== ШАГ 3: Смешанные дроби → неправильные =====
+    // ВАЖНО: преобразуем ВСЕ смешанные дроби в неправильные
+    // Это включает как маркеры (⥑/⥏, ⥾/⥿), так и уже раскрытые "число+(дробь)"
+
+
+    const step3 = stepMixedToImproper(currentExpr);
+
+    if (step3 === 'ERROR') {
+      steps.push('ERROR');
+      return steps;
+    }
+    if (step3 !== currentExpr) {
+      currentExpr = step3;
+      steps.push(currentExpr);
+    } else {
+      // Даже если stepMixedToImproper вернул то же значение,
+      // проверяем, есть ли еще не преобразованные смешанные дроби
+      // вида "число+(дробь)" (могли появиться после предыдущих шагов)
+      const manualCheck = convertMixedToImproperInExpression(currentExpr);
+      if (manualCheck !== currentExpr) {
+        currentExpr = manualCheck;
+        steps.push(currentExpr);
+      }
+    }
+
     // ===== ШАГ 1.1: Степени и корни =====
     const step1_1 = stepPowersAndRoots(currentExpr);
     if (step1_1 === 'ERROR') {
@@ -748,16 +880,6 @@ export function generateSteps(expression, resultFraction) {
       steps.push(currentExpr);
     }
 
-    // ===== ШАГ 3: Смешанные дроби → неправильные =====
-    const step3 = stepMixedToImproper(currentExpr);
-    if (step3 === 'ERROR') {
-      steps.push('ERROR');
-      return steps;
-    }
-    if (step3 !== currentExpr) {
-      currentExpr = step3;
-      steps.push(currentExpr);
-    }
 
     // ===== ШАГ 4: Деление → умножение =====
     const step4 = stepDivisionToMultiplication(currentExpr);

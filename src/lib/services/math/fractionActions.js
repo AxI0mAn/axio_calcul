@@ -9,7 +9,7 @@
 import { appState } from '$lib/store/appState.svelte.js';
 import { Fraction, evaluateFractionExpression } from './fractionCore.js';
 import { MARKERS, getUnclosedMarkersStack, stripMarkers } from './fractionVisualParser.js';
-import { generateSteps } from './fractionSteps.js';
+import { generateSteps, convertMixedToImproperInExpression } from './fractionSteps.js';
 import { toSuperscript, fromSuperscript } from "$lib/utils/toSuperscript";
 import FractionJS from 'fraction.js';
 
@@ -607,6 +607,9 @@ export function autoCompleteEmptyBrackets(expr) {
 export function insertImplicitMultiplication(expr) {
   if (!expr) return expr;
 
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG insertImplicitMultiplication] ВХОД:', expr);
+
   // Вспомогательная функция: найти парную закрывающую скобку
   function findMatchingClose(str, openPos) {
     let depth = 1;
@@ -713,6 +716,9 @@ export function insertImplicitMultiplication(expr) {
 
   // Проход 2: вставка '*' между ')' и числом (например, (1÷4)3...)
   result = result.replace(/\)(\d+)/g, ')*$1');
+
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG insertImplicitMultiplication] ВЫХОД:', result);
 
   return result;
 }
@@ -1180,7 +1186,7 @@ export function transformNegativeMixedNumber(expr) {
  * 
  * Правило 1: число⥾дробь⥿ → число+дробь (без дополнительных скобок)
  * 
- * Пример: 4⥾⥾4-3⥿÷3⥿ → 4+((4-3)÷3)
+ * Пример: 4⥾⥾4-3⥿÷3+1⥿ → 4+((4-3)÷(3+1))
  * 
  * @param {string} expr - выражение с маркерами
  * @returns {string} - преобразованное выражение
@@ -1285,34 +1291,28 @@ export function wrapMixedNumberWithOperator(expr) {
   if (!expr) return expr;
 
   let result = expr;
-  let i = 0;
 
-  while (i < result.length) {
-    // ===== ИСПРАВЛЕНИЕ: Ищем паттерн число*число+(выражение) =====
-    // Пример: 2*3+(4÷5) → 2*(3+(4÷5))
-    // Ищем: цифры, затем оператор (*, /, +, -), затем цифры, затем +(выражение)
-    const match = result.slice(i).match(/(\d+)([*/÷+\-])(\d+)\+\(([^)]+)\)/);
-    if (match) {
-      const firstNumber = match[1];      // 2
-      const operator = match[2];          // *
-      const secondNumber = match[3];      // 3
-      const fractionPart = match[4];      // 4÷5
-      const fullMatch = match[0];         // 2*3+(4÷5)
+  // ===== ЗАЩИТА: Если выражение содержит ÷, не обрабатываем =====
+  // Это предотвращает ошибку, когда 1÷8+3+(1÷8) превращается в 8+...
+  if (expr.includes('÷')) {
+    return expr;
+  }
 
-      // Проверяем, что внутри скобок есть ровно одна операция ÷
-      const divCount = (fractionPart.match(/÷/g) || []).length;
-      const hasOtherOps = /[\+\-\*]/.test(fractionPart.replace(/÷/g, ''));
+  // Ищем паттерн: число*число+(выражение)
+  // Пример: 2*3+(4÷5) → 2*(3+(4÷5))
+  const match = result.match(/(\d+)\*(\d+)\+\(([^)]+)\)/);
+  if (match) {
+    const first = match[1];
+    const second = match[2];
+    const fraction = match[3];
+    const fullMatch = match[0];
 
-      if (divCount === 1 && !hasOtherOps) {
-        // Это смешанная дробь → оборачиваем второе число и дробь в скобки
-        // 2*3+(4÷5) → 2*(3+(4÷5))
-        const replacement = firstNumber + operator + '(' + secondNumber + '+' + '(' + fractionPart + ')' + ')';
-        result = result.slice(0, i) + replacement + result.slice(i + fullMatch.length);
-        i = i + replacement.length;
-        continue;
-      }
+    // Проверяем, что внутри скобок ровно одна ÷
+    const divCount = (fraction.match(/÷/g) || []).length;
+    if (divCount === 1) {
+      const replacement = first + '*' + '(' + second + '+' + '(' + fraction + ')' + ')';
+      result = result.replace(fullMatch, replacement);
     }
-    i++;
   }
 
   return result;
@@ -1327,6 +1327,8 @@ export function wrapMixedNumberWithOperator(expr) {
  */
 function formatHistoryExpr(expr) {
   if (!expr) return expr;
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG formatHistoryExpr] ВХОД:', expr);
 
   const OPEN = MARKERS.COMPLEX_NUM_START;   // '⥾'
   const CLOSE = MARKERS.COMPLEX_END;        // '⥿'
@@ -1368,7 +1370,8 @@ function formatHistoryExpr(expr) {
     result += expr[i];
     i++;
   }
-
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG formatHistoryExpr] ВЫХОД:', result);
   // Заменяем маркеры на обычные скобки
   return result
     .replace(/⥾/g, '(')
@@ -1382,11 +1385,49 @@ function formatHistoryExpr(expr) {
  * Пример: "4+(3÷4)" → "(4*4+3)÷4" → "19÷4"
  */
 export function convertMixedToImproper(expr) {
+  if (!expr) return expr;
+
+  // ===== ИСПРАВЛЕНИЕ: преобразуем ТОЛЬКО смешанные дроби =====
   // Ищем паттерн: число+(числитель÷знаменатель)
-  return expr.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    return `(${improperNum}÷${den})`;
-  });
+  // НО не преобразуем, если перед числом стоит '(' (это дробь в скобках)
+  let result = expr;
+  let changed = true;
+  let guard = 0;
+
+  while (changed && guard < 10) {
+    changed = false;
+    guard++;
+
+    result = result.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den, offset) => {
+      // Проверяем, что перед match нет '('
+      // Если перед match есть '(', значит это дробь в скобках, а не смешанная дробь
+      const before = result.substring(0, offset);
+      const lastChar = before.trim().slice(-1);
+
+      // Если перед match стоит '(', пропускаем
+      if (lastChar === '(') {
+        changed = false;
+        return match;
+      }
+
+      // Проверяем, что перед match нет '÷' (это не часть другой дроби)
+      if (before.includes('÷')) {
+        const lastDivIndex = before.lastIndexOf('÷');
+        const afterLastDiv = before.substring(lastDivIndex + 1);
+        // Если после последнего ÷ только пробелы, то это не смешанная дробь
+        if (afterLastDiv.trim() === '') {
+          return match;
+        }
+      }
+
+      // Это смешанная дробь — преобразуем
+      changed = true;
+      const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+      return `${improperNum}÷${den}`;
+    });
+  }
+
+  return result;
 }
 
 /**
@@ -1443,6 +1484,15 @@ export function evaluateFraction() {
   isPowerMode = false;
   powerDepth = 0;
 
+  // === -📝=TODO=📝- ===
+  // ===== ВРЕМЕННЫЙ ДЕБАГ: СОСТОЯНИЕ ПЕРЕД ВЫЧИСЛЕНИЕМ =====
+  console.log('[DEBUG evaluateFraction] СОСТОЯНИЕ:');
+  console.log('  appState.expression:', appState.expression);
+  console.log('  appState.display:', appState.display);
+  console.log('  appState.isNewInput:', appState.isNewInput);
+  // ========================================================
+
+
   // === АВТОДОПОЛНЕНИЕ ПУСТЫХ СКОБОК ===
   const fixedDisplay = autoCompleteEmptyBrackets(appState.display);
   if (fixedDisplay !== appState.display) {
@@ -1468,59 +1518,114 @@ export function evaluateFraction() {
     closeWhole++;
   }
 
-
   // === ТРАНСФОРМАЦИИ (все существующие) === 
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG] НАЧАЛО ТРАНСФОРМАЦИЙ:');
+  console.log('  fullExpr ДО:', fullExpr);
+
   // 1. Обрабатываем смешанные числа с маркерами целой части (⥑...⥏)
   fullExpr = transformMixedNumberWithoutDivision(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  1. transformMixedNumberWithoutDivision:', fullExpr);
+
   // 2. Обрабатываем отрицательные смешанные числа
   fullExpr = transformNegativeMixedNumber(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  2. transformNegativeMixedNumber:', fullExpr);
+
   // 3. Обрабатываем смешанные дроби с оператором ÷ после скобок
   fullExpr = transformMixedFractionWithDivision(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  3. transformMixedFractionWithDivision:', fullExpr);
+
   // 4. Обрабатываем сложные скобки ⥾...⥿ (Правило 1: число+дробь)
   fullExpr = transformMixedNumberWithComplexBrackets(fullExpr);
-  // 6. Преобразуем маркеры в обычные скобки
-  fullExpr = stripMarkers(fullExpr);
-  // 5. Обрабатываем случаи с оператором перед смешанной дробью (Правило 2: оператор(число+дробь))
-  fullExpr = wrapMixedNumberWithOperator(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  4. transformMixedNumberWithComplexBrackets:', fullExpr);
 
-  // ===== ИСПРАВЛЕНИЕ ШАГА 3: Обработка деления смешанной дроби =====
-  // После stripMarkers, выражение вида "2+(3÷6)÷7" должно стать "(2+(3÷6))÷7"
-  // Ищем паттерн: число+(выражение)÷число
-  const mixedDivisionPattern = /(\d+)\+\(([^)]+)\)÷(\d+)/g;
-  fullExpr = fullExpr.replace(mixedDivisionPattern, (match, whole, fraction, divisor) => {
+
+  // 8. Преобразуем смешанные дроби в неправильные
+  // Пример: "3+(1÷8)" → "25÷8"
+  fullExpr = fullExpr.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+  // === -📝=TODO=📝- ===
+  console.log('  8. convertMixedToImproper (simple):', fullExpr);
+
+  // 5. Преобразуем маркеры в обычные скобки
+  fullExpr = stripMarkers(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  5. stripMarkers:', fullExpr);
+
+  // 6. Обрабатываем случаи с оператором перед смешанной дробью (Правило 2: оператор(число+дробь))
+  // Пример: 2*3+(4÷5) → 2*(3+(4÷5))
+  // ДО преобразования в неправильную дробь!
+  fullExpr = wrapMixedNumberWithOperator(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  6. wrapMixedNumberWithOperator:', fullExpr);
+
+  // 7. Обработка деления смешанной дроби: число+(дробь)÷число → (число+дробь)÷число
+  // Пример: 2+(4÷5)÷3 → (2+(4÷5))÷3
+  fullExpr = fullExpr.replace(/(\d+)\+\(([^)]+)\)÷(\d+)/g, (match, whole, fraction, divisor) => {
     return '(' + whole + '+' + fraction + ')÷' + divisor;
   });
+  // === -📝=TODO=📝- ===
+  console.log('  7. mixedDivisionPattern:', fullExpr);
 
-  // Форматирование истории с компактным видом смешанных дробей =====
+  // 9. Левоассоциативное деление: a÷b÷c → (a÷b)÷c
+  fullExpr = fixLeftAssociativeDivision(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  9. fixLeftAssociativeDivision:', fullExpr);
+
+  // 10. Вставляем неявные операторы для оставшихся случаев
+  fullExpr = insertImplicitMultiplication(fullExpr);
+  // === -📝=TODO=📝- ===
+  console.log('  10. insertImplicitMultiplication (1):', fullExpr);
+
+  fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
+  // === -📝=TODO=📝- ===
+  console.log('  11. replace /)(\\d+)/:', fullExpr);
+
+  fullExpr = insertImplicitMultiplication(fullExpr);
+  console.log('  12. insertImplicitMultiplication (2):', fullExpr);
+
+  // === -📝=TODO=📝- ===
+  console.log('  fullExpr КОНЕЦ ОСНОВНЫХ ТРАНСФОРМАЦИЙ:', fullExpr);
+
+  // ===== СПЕЦИАЛЬНЫЕ СЛУЧАИ (ПОСЛЕ ВСЕХ ОСНОВНЫХ ТРАНСФОРМАЦИЙ) =====
+
+  // 13. Форматирование истории с компактным видом смешанных дробей
   // Преобразуем "4+(3÷4)" → "4(3÷4)" для истории
   let historyDisplayExpr = fullExpr;
-  // Сначала заменяем маркеры на скобки (если они есть)
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG] ДО formatHistoryExpr:', fullExpr);
   historyDisplayExpr = formatHistoryExpr(historyDisplayExpr);
-  // Затем сворачиваем смешанные дроби: "число+(дробь)" → "число(дробь)"
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG] ПОСЛЕ formatHistoryExpr:', historyDisplayExpr);
   historyDisplayExpr = historyDisplayExpr.replace(/(\d+)\+\(([^)]+)\)/g, '$1($2)');
-
-
-  // ===== ЛЕВОАССОЦИАТИВНОГО ДЕЛЕНИЯ ===== 
-  fullExpr = fixLeftAssociativeDivision(fullExpr);
-
-  // 7. Вставляем неявные операторы для оставшихся случаев (Правила 3, 4, 5)
-  fullExpr = insertImplicitMultiplication(fullExpr);
-  fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
-  fullExpr = insertImplicitMultiplication(fullExpr);
-
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG] ПОСЛЕ replace в historyDisplayExpr:', historyDisplayExpr);
+  console.log('  historyDisplayExpr:', historyDisplayExpr);
+  console.log('[DEBUG] ДО автозакрытия fullExpr:', fullExpr);
   // === АВТОЗАКРЫТИЕ ВСЕХ НЕЗАКРЫТЫХ СКОБОК ===
-  // Считаем количество открывающих и закрывающих скобок во всей строке
   const openBrackets = (fullExpr.match(/\(/g) || []).length;
   const closeBrackets = (fullExpr.match(/\)/g) || []).length;
 
-  // Если есть незакрытые скобки (например, при вводе вложенных корней вида "√(√(64"),
-  // калькулятор автоматически дописывает их в конец строки перед расчетом
   if (openBrackets > closeBrackets) {
     const missingCount = openBrackets - closeBrackets;
     const bracketsToAdd = ')'.repeat(missingCount);
-
     fullExpr += bracketsToAdd;
+    // === -📝=TODO=📝- ===
+    console.log('  Добавлено закрывающих скобок:', bracketsToAdd);
   }
+
+  // === -📝=TODO=📝- ===
+  console.log('[DEBUG] ПОСЛЕ автозакрытия fullExpr:', fullExpr);
+  console.log('  fullExpr КОНЕЦ ВСЕХ ТРАНСФОРМАЦИЙ:', fullExpr);
+  console.log('  fullExpr КОДЫ СИМВОЛОВ (КОНЕЦ):',
+    fullExpr.split('').map((ch, i) => `${i}:${ch}(${ch.charCodeAt(0)})`).join(' '));
+
 
   // ======== ОПРЕДЕЛЕНИЕ СЛОЖНОСТИ И ФЛАГА stepsFraction =====
   // не работает - нет шагов решения!!
@@ -1536,12 +1641,23 @@ export function evaluateFraction() {
   // }
 
   try {
-    // 8. Переносим целые части в числитель дроби
+    // 8. Переносим целые части в числитель дроби 
     fullExpr = convertMixedToImproper(fullExpr);
 
+    // === -📝=TODO=📝- ===
+    // ===== ВРЕМЕННЫЙ ДЕБАГ: ПРОВЕРКА fullExpr =====
+    console.log('[DEBUG evaluateFraction] fullExpr ДО fromSuperscript:', fullExpr);
+    // ===============================================
+    console.log('[DEBUG evaluateFraction] fullExpr ДО fromSuperscript:', fullExpr);
+    console.log('[DEBUG evaluateFraction] fullExpr КОДЫ СИМВОЛОВ (ДО):',
+      fullExpr.split('').map((ch, i) => `${i}:${ch}(${ch.charCodeAt(0)})`).join(' '));
     // 1. Переводим всю строку в чистый текстовый вид для математического ядра
     // (например, конвертируем superscript-символы степени: "2^³" -> "2^3")
     let cleanExpr = fromSuperscript(fullExpr);
+    // === -📝=TODO=📝- ===
+    // ===== ВРЕМЕННЫЙ ДЕБАГ: ПРОВЕРКА cleanExpr =====
+    console.log('[DEBUG evaluateFraction] ПЕРВЫЙ cleanExpr:', cleanExpr);
+    // ================================================
 
     // 2. ИЗОЛЯЦИЯ ПРИОРИТЕТОВ СТЕПЕНИ ДЛЯ ЯДРА
     // Если пользователь ввел "1÷4^2", ядро без скобок посчитает это как (1÷4)^2.
@@ -1550,6 +1666,14 @@ export function evaluateFraction() {
 
     // Убираем возможные дубликаты двойных скобок вокруг степеней, если они случайно возникли
     cleanExpr = cleanExpr.replace(/\^\(\(([^)]+)\)\)/g, '^($1)');
+
+    // === -📝=TODO=📝- ===
+    // ===== ВРЕМЕННЫЙ ДЕБАГ: ПОСЛЕ ЗАМЕНЫ =====
+    console.log('[DEBUG evaluateFraction] ПОСЛЕ ЗАМЕНЫ cleanExpr:', cleanExpr);
+    // ===== ВРЕМЕННЫЙ ДЕБАГ ПЕРЕД ВЫЧИСЛЕНИЕМ =====
+    console.log('[DEBUG] ПЕРЕД evaluateFractionExpression:');
+    console.log('  cleanExpr:', cleanExpr);
+    // =============================================
 
     // console.log("Строка, отправляемая в ядро (ФИКС СКОБОК):", cleanExpr);
 
@@ -1594,8 +1718,8 @@ export function evaluateFraction() {
 
     // === -📝=TODO=📝- ===
     // ===== ВРЕМЕННАЯ ОТЛАДКА =====
-    // console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
-    // console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
+    console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
+    console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
 
 
@@ -1730,6 +1854,7 @@ export function backspaceFraction() {
     appState.isNewInput = true;
   }
 }
+
 
 
 
