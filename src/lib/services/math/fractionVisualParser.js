@@ -199,7 +199,7 @@ export function parseExpressionToTokens(expression) {
       }
     }
 
-    // 2. Числа, простые дроби и смешанные дроби с динамическим окном (Случай 1)
+    // 2. Числа, простые дроби и смешанные дроби с динамическим окном  
     if (ch.match(/\d/) || (ch === '-' && (i === 0 || '+*/=([√÷'.includes(expression[i - 1])))) {
       let j = i;
       while (j < len && (
@@ -231,14 +231,86 @@ export function parseExpressionToTokens(expression) {
         }
       }
 
-      // === LOOKAHEAD ОКНО ДЛЯ СЛУЧАЯ 1 (Незакрытые скобки) ===
+      // ===  ОКНО ДЛЯ СЛУЧАЯ (Незакрытые скобки) ===
       // Если сразу за числом идёт открывающая скобка '('
       if (j < len && expression[j] === '(') {
 
-        // Крах двойной скобки здесь устранен, так как она вынесена наверх в начало главного цикла.
-        // Оставляем логику для одиночной скобки из Шага 1, 3 и защиты Шага 5:
+        // ===== ПРОВЕРКА: есть ли закрывающая скобка =====
+        let closeParenIndex = -1;
+        let depth = 0;
+        for (let idx = j; idx < len; idx++) {
+          if (expression[idx] === '(') depth++;
+          if (expression[idx] === ')') {
+            depth--;
+            if (depth === 0) {
+              closeParenIndex = idx;
+              break;
+            }
+          }
+        }
 
-        // === ЗАЩИТА ШАГА 5 (Случай 6: Пустые скобки или мгновенный обрыв) ===
+        // ===== ЕСЛИ НЕТ ЗАКРЫВАЮЩЕЙ СКОБКИ =====
+        if (closeParenIndex === -1) {
+          // Пытаемся распарсить как незавершённую дробь
+          let k = j + 1;
+          let bracketContent = '';
+          let openCount = 1;
+
+          while (k < len) {
+            if (expression[k] === '(') openCount++;
+            if (expression[k] === ')') {
+              openCount--;
+              if (openCount === 0) { k++; break; }
+            }
+            bracketContent += expression[k];
+            k++;
+          }
+
+          const hasSingleDiv = (bracketContent.match(/÷/g) || []).length === 1;
+          const hasOtherOps = /[\+\-\*\/]/.test(bracketContent);
+
+          if (hasSingleDiv && !hasOtherOps && bracketContent.length > 0) {
+            // Это незавершённая смешанная дробь: 2(4÷7
+            const parts = bracketContent.split('÷');
+            const cleanNum = parts[0].replace(/[\(\)]/g, '').trim();
+            const cleanDen = parts[1] ? parts[1].replace(/[\(\)]/g, '').trim() : '?';
+            const wholePart = expression.substring(i, j);
+
+            // ===== НОВЫЙ ПОДХОД: скобка между целой частью и дробной =====
+            // Добавляем целую часть как текст
+            tokens.push({ type: 'text', value: wholePart });
+
+            // Добавляем открывающую скобку как текст
+            tokens.push({ type: 'text', value: '(' });
+
+            // Добавляем дробь БЕЗ целой части
+            tokens.push({
+              type: 'fraction',
+              whole: undefined,
+              num: cleanNum,
+              den: cleanDen
+            });
+
+            i = k;
+            continue;
+          } else {
+            // Это не дробь — выводим как обычный текст
+            const baseNum = expression.substring(i, j);
+            tokens.push({ type: 'text', value: baseNum });
+            tokens.push({ type: 'text', value: '(' });
+            // Добавляем остальное как текст
+            let rest = expression.substring(j + 1);
+            for (let idx = 0; idx < rest.length; idx++) {
+              tokens.push({ type: 'text', value: rest[idx] });
+            }
+            i = len;
+            continue;
+          }
+        }
+
+        // ===== ЕСТЬ ЗАКРЫВАЮЩАЯ СКОБКА — СТАНДАРТНАЯ ЛОГИКА =====
+
+        // ===  (Случай: Пустые скобки или мгновенный обрыв) ===
         if (j + 1 >= len || (expression[j + 1] === ')' && (j + 2 >= len || !expression.includes('÷')))) {
           const baseNum = expression.substring(i, j);
           tokens.push({ type: 'text', value: baseNum });
@@ -252,7 +324,6 @@ export function parseExpressionToTokens(expression) {
           }
           continue;
         }
-        // === КОНЕЦ ЗАЩИТЫ ШАГА 5 ===
 
         let k = j + 1;
         let bracketContent = '';
@@ -272,7 +343,6 @@ export function parseExpressionToTokens(expression) {
         const hasOtherOps = /[\+\-\*\/]/.test(bracketContent);
 
         if (hasSingleDiv && !hasOtherOps) {
-          // === КЕЙС ШАГА 1 ===
           const parts = bracketContent.split('÷');
           const cleanNum = parts[0].replace(/[\(\)]/g, '').trim();
           const cleanDen = parts[1].replace(/[\(\)]/g, '').trim();
@@ -287,17 +357,14 @@ export function parseExpressionToTokens(expression) {
 
           i = k;
           continue;
-        }
-        else if (hasOtherOps || (bracketContent.match(/÷/g) || []).length > 1) {
-          // === КЕЙС ШАГА 3 (Случай 3: Сложное выражение в скобках) ===
+        } else if (hasOtherOps || (bracketContent.match(/÷/g) || []).length > 1) {
+          // === (Случай: Сложное выражение в скобках) ===
           const multiplier = expression.substring(i, j);
           tokens.push({ type: 'text', value: multiplier });
-          // tokens.push({ type: 'text', value: '' }); // если value: '*' }); то при вводе смешанной дроби, до ввода знаменателя есть * между целой частью и скобкой от дробной части
           i = j;
           continue;
         }
       }
-      // === КОНЕЦ LOOKAHEAD ОКНО ===
 
       if (j < len && expression[j] === MARKERS.WHOLE_START) {
         const endIdx = expression.indexOf(MARKERS.WHOLE_END, j);
@@ -367,12 +434,12 @@ export function parseExpressionToTokens(expression) {
         !candidate.includes(MARKERS.COMPLEX_NUM_START)) {
 
         // ===== Блокируем парсинг как дробь =====
-        // Случай 1: "число÷(" — заканчивается на ÷ и следующий символ (
+        // Случай: "число÷(" — заканчивается на ÷ и следующий символ (
         const endsWithDiv = candidate.endsWith(MARKERS.DIV);
         const nextChar = j < len ? expression[j] : '';
         const isFollowedByOpenParen = nextChar === '(';
 
-        // Случай 2: "(число÷(" — содержит паттерн ÷( 
+        // Случай: "(число÷(" — содержит паттерн ÷( 
         const hasDivFollowedByParen = candidate.includes(MARKERS.DIV + '(');
 
         // Если это признаки оператора деления со скобками, а не дроби
@@ -400,7 +467,7 @@ export function parseExpressionToTokens(expression) {
       if (isNumber(candidate)) {
         tokens.push({ type: 'text', value: candidate });
 
-        // === LOOKAHEAD ДЛЯ СЛУЧАЯ 2 (Скрытое умножение перед скобкой) ===
+        // ===   ДЛЯ СЛУЧАЯ (Скрытое умножение перед скобкой) ===
         if (candidate !== '-' && j < len && expression[j] === '(') {
           let k = j + 1;
           let bracketContent = '';
@@ -420,7 +487,6 @@ export function parseExpressionToTokens(expression) {
             // tokens.push({ type: 'text', value: '' }); // если value: '*' }); то при вводе смешанной дроби, до ввода знаменателя есть * между целой частью и скобкой от дробной части
           }
         }
-        // === КОНЕЦ LOOKAHEAD ДЛЯ СЛУЧАЯ 2 ===
 
         i = j;
         continue;

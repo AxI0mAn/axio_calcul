@@ -734,45 +734,18 @@ function stepReduceAndExtract(expr) {
   if (parts.length === 2) {
     let num = parseInt(parts[0], 10);
     let den = parseInt(parts[1], 10);
-    // === -📝=TODO=📝- ===
-
-    // ===== ВРЕМЕННЫЙ ДЕБАГ =====
-    console.log('[DEBUG stepReduceAndExtract]:');
-    console.log('  ВХОДНЫЕ ДАННЫЕ:');
-    console.log('    expr:', expr);
-    console.log('    num:', num);
-    console.log('    den:', den);
-    // ============================
 
     if (!isNaN(num) && !isNaN(den) && den !== 0) {
       const g = gcd(Math.abs(num), Math.abs(den));
-      // === -📝=TODO=📝- ===
-      // ===== ВРЕМЕННЫЙ ДЕБАГ =====
-      console.log('    gcd:', g);
-      // ============================
       if (g > 1) {
         num /= g;
         den /= g;
         result = formatFraction(num, den);
       }
-      // === -📝=TODO=📝- ===
-      // ===== ВРЕМЕННЫЙ ДЕБАГ =====
-      console.log('    ПОСЛЕ СОКРАЩЕНИЯ:');
-      console.log('      num:', num);
-      console.log('      den:', den);
-      console.log('      result:', result);
-      // ============================
 
       if (den !== 1) {
         const whole = Math.floor(num / den);
         const remainder = num % den;
-
-        // === -📝=TODO=📝- ===
-        // ===== ВРЕМЕННЫЙ ДЕБАГ =====
-        console.log('    ВЫДЕЛЕНИЕ ЦЕЛОЙ ЧАСТИ:');
-        console.log('      whole:', whole);
-        console.log('      remainder:', remainder);
-        // ============================
 
         if (whole > 0 && remainder !== 0) {
           result = `${whole}${MARKERS.WHOLE_START}${remainder}÷${den}${MARKERS.WHOLE_END}`;
@@ -785,10 +758,6 @@ function stepReduceAndExtract(expr) {
     }
   }
 
-  // === -📝=TODO=📝- ===
-  // ===== ВРЕМЕННЫЙ ДЕБАГ =====
-  console.log('[DEBUG stepReduceAndExtract] ВЫХОД:', result);
-  // ============================
   return result;
 }
 
