@@ -884,16 +884,36 @@
 		<div>
 			<ul>
 				<li class="example">
-					5*1÷4 - This is multiplication, <strong>not</strong> a mixed number. <FineFraction
+					5*(1÷4) - This is multiplication, <strong>not</strong> a mixed number. <FineFraction
 						expr=" 5*1÷4"
 					/>
 				</li>
 				<li class="example">5(1÷4) - This is a mixed number.<FineFraction expr=" 5(1÷4)" /></li>
-				<li class="example">3÷4÷5 - Left-associative division can produce unexpected results.</li>
-				<li class="example">(3÷4)÷5 - <strong> Use parentheses to avoid ambiguity.</strong></li>
-				<li class="example">Break complex expressions into simpler parts.</li>
+
+				<li>
+					Enter mixed numbers as a whole number followed by the fraction in parentheses: <strong
+						>5(1÷4)</strong
+					>.
+				</li>
+				<li class="example">
+					1÷2÷3÷4÷5 - Left-associative division can produce unexpected results.
+				</li>
+				<li>💡 Use parentheses in chained division expressions: <strong>((1÷2)÷3)÷4</strong>.</li>
+				<li class="example">💡 <strong> Use parentheses to avoid ambiguity.</strong></li>
+				<li class="example">
+					💡 When multiplying by an expression in parentheses, always use the <strong>*</strong>
+					operator explicitly:
+				</li>
+				<li><strong>2*((3+4)÷5)</strong>.</li>
+				<li class="example">💡 Break complex expressions with powers into simpler parts.</li>
+				<li class="example">💡 Break complex expressions into simpler parts.</li>
+				<li class="example">
+					If an error occurs, check that your parentheses are balanced and correctly placed.
+				</li>
 			</ul>
 		</div>
+
+		<h2>Enjoy using the fraction calculator! 🎉</h2>
 	</div>
 </main>
 
