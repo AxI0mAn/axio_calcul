@@ -387,7 +387,11 @@
 
 	<section class="reviews__old"></section>
 	<aside class="field_right">
-		<!-- advertisement картинки и банеры -->
+		<!-- advertisement картинки и банеры ?? -->
+		<!-- <div class="realExamples">
+			<h2>Real-World Examples</h2>
+			<h2>Solve everyday math problems with practical examples.</h2>
+		</div> -->
 	</aside>
 </div>
 

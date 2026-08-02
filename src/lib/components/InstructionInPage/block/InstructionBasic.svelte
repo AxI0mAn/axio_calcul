@@ -21,23 +21,29 @@
 	<ul class="mainInstr">
 		<h2>Contents:</h2>
 		<li>
-			<a href="{base}/basic/#IntroductionBasic"> <h3>Introduction.</h3></a>
+			<a class="learnMore_goTo" href="{base}/basic/#IntroductionBasic"> <h3>Introduction.</h3></a>
 		</li>
 
 		<li>
-			<a href="{base}/basic/#FeaturesBasic"> <h3>Features.</h3></a>
+			<a class="learnMore_goTo" href="{base}/basic/#FeaturesBasic"> <h3>Features.</h3></a>
 		</li>
 
 		<li>
-			<a href="{base}/basic/#ExamplesBasic"> <h3>How to Use. Examples.</h3></a>
+			<a class="learnMore_goTo" href="{base}/basic/#ExamplesBasic">
+				<h3>How to Use. Examples.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/basic#ConstantsBasic"> <h3>Mathematical Constants.</h3></a>
+			<a class="learnMore_goTo" href="{base}/basic#ConstantsBasic">
+				<h3>Mathematical Constants.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/basic/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+			<a class="learnMore_goTo" href="{base}/basic/#mainInstr">
+				<h3>Lern more about Interface.</h3></a
+			>
 		</li>
 	</ul>
 

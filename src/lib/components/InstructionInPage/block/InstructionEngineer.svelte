@@ -30,29 +30,35 @@
 	<ul class="mainInstr">
 		<h2>Contents:</h2>
 		<li>
-			<a href="{base}/engineer/#IntroductionEngineer"> <h3>Introduction.</h3></a>
+			<a class="learnMore_goTo" href="{base}/engineer/#IntroductionEngineer">
+				<h3>Introduction.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/engineer/#FeaturesEngineer"> <h3>Features.</h3></a>
+			<a class="learnMore_goTo" href="{base}/engineer/#FeaturesEngineer"> <h3>Features.</h3></a>
 		</li>
 
 		<li>
-			<a href="{base}/engineer/#ExamplesEngineer"> <h3>How to Use.</h3></a>
+			<a class="learnMore_goTo" href="{base}/engineer/#ExamplesEngineer"> <h3>How to Use.</h3></a>
 		</li>
 
 		<li>
-			<a href="{base}/engineer#ConstantsEngineer"> <h3>Mathematical Constants.</h3></a>
+			<a class="learnMore_goTo" href="{base}/engineer#ConstantsEngineer">
+				<h3>Mathematical Constants.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/engineer/#instructionEngineerExamples">
+			<a class="learnMore_goTo" href="{base}/engineer/#instructionEngineerExamples">
 				<h3>More than 12 real-world calculation examples.</h3></a
 			>
 		</li>
 
 		<li>
-			<a href="{base}/engineer/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+			<a class="learnMore_goTo" href="{base}/engineer/#mainInstr">
+				<h3>Lern more about Interface.</h3></a
+			>
 		</li>
 	</ul>
 

@@ -31,46 +31,70 @@
 	<ul class="mainInstr">
 		<h2>Contents:</h2>
 		<li>
-			<a href="{base}/fraction/#IntroductionFraction"> <h3>Introduction.</h3></a>
+			<a class="learnMore_goTo" href="{base}/fraction/#IntroductionFraction">
+				<h3>Introduction.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/fraction/#FeaturesFraction"> <h3>Features.</h3></a>
+			<a class="learnMore_goTo" href="{base}/fraction/#FeaturesFraction"> <h3>Features.</h3></a>
 		</li>
 
 		<li>
-			<a href="{base}/fraction/#ExpressionBuilder"> <h3>Expression Builder.</h3></a>
+			<a class="learnMore_goTo" href="{base}/fraction/#ExpressionBuilder">
+				<h3>Expression Builder.</h3></a
+			>
 		</li>
 		<li>
 			<ul>
-				<li><a href="{base}/fraction/#ProperFraction"> <h3>Proper Fraction.</h3></a></li>
-				<li><a href="{base}/fraction/#ImproperFraction"> <h3>Improper Fraction.</h3></a></li>
-				<li><a href="{base}/fraction/#MixedNumber"> <h3>Mixed Number.</h3></a></li>
+				<li>
+					<a class="learnMore_goTo" href="{base}/fraction/#ProperFraction">
+						<h3>Proper Fraction.</h3></a
+					>
+				</li>
+				<li>
+					<a class="learnMore_goTo" href="{base}/fraction/#ImproperFraction">
+						<h3>Improper Fraction.</h3></a
+					>
+				</li>
+				<li>
+					<a class="learnMore_goTo" href="{base}/fraction/#MixedNumber"> <h3>Mixed Number.</h3></a>
+				</li>
 			</ul>
 		</li>
 
 		<li>
-			<a href="{base}/fraction/#ExamplesFraction"> <h3>Examples.</h3></a>
+			<a class="learnMore_goTo" href="{base}/fraction/#ExamplesFraction"> <h3>Examples.</h3></a>
 		</li>
 
 		<li>
-			<a href="{base}/fraction/#StepMode"> <h3>How to Use Step-by-Step Mode.</h3></a>
+			<a class="learnMore_goTo" href="{base}/fraction/#StepMode">
+				<h3>How to Use Step-by-Step Mode.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/fraction/#EvCoExFraction">
+			<a class="learnMore_goTo" href="{base}/fraction/#EvCoExFraction">
 				<h3>Examples for Complex Expressions with Fractions.</h3></a
 			>
 		</li>
 
 		<li>
-			<a href="{base}/fraction/#AvoidThComMistakesFraction">
+			<a class="learnMore_goTo" href="{base}/fraction/#AvoidThComMistakesFraction">
 				<h3>⚠️ Avoid These Common Mistakes.</h3></a
 			>
 		</li>
 
 		<li>
-			<a href="{base}/fraction/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+			<a class="learnMore_goTo" href="{base}/fraction/#instructionFractiionExamples">
+				<h3>Use fraction in real-world!.</h3></a
+			>
+		</li>
+
+		<li>
+			<a class="learnMore_goTo" href="{base}/fraction/#mainInstr">
+				<h3>Lern more about Interface.</h3></a
+			>
 		</li>
 	</ul>
 
@@ -915,6 +939,294 @@
 
 		<h2>Enjoy using the fraction calculator! 🎉</h2>
 	</div>
+
+	<h2>Use fraction in real-world!!</h2>
+
+	<div class="card" id="instructionFractiionExamples">
+		<ul>
+			<li class="example">
+				<h2>🍳 1. Cooking & Baking (Recipe Scaling).</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				You found the perfect chocolate chip cookie recipe that makes <strong>24 cookies</strong>,
+				but you only want to bake <strong>8 cookies</strong> for a small gathering. The recipe calls
+				for
+				<FineFraction expr="3÷4" /> cup of sugar and
+				<FineFraction expr="1÷2" /> teaspoon of vanilla extract.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>How much sugar and vanilla do you need for <strong>8</strong> cookies?</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				To make <strong>8</strong> cookies instead of <strong>24</strong>, divide the recipe by
+				<strong>3</strong>:
+				<FineFraction expr="8 / 24 = 1÷3" />. You need one-third of each ingredient.
+			</li>
+			<li>
+				Sugar:
+				<FineFraction expr="3÷4 * 1÷3 = (3*1) / (4*3) = 3÷12 = 1÷4" />
+				cup.
+			</li>
+			<li>
+				Vanilla:
+				<FineFraction expr="1÷2 * 1÷3 = (1*1) / (2*3) = 1÷6" />
+				teaspoon.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				Measure <FineFraction expr="1÷4" /> cup of sugar and
+				<FineFraction expr="1÷6" /> teaspoon of vanilla extract.
+			</li>
+		</ul>
+
+		<ul>
+			<li class="example">
+				<h2>🛠️ 2. Home Improvement (Joining Boards).</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				You are building a wooden shelf. You need to join two boards end to end to make one longer
+				board. The first board is <FineFraction expr="12(5÷8)" /> inches long, and the second board is
+				<FineFraction expr="8(3÷4)" /> inches long. The joint (overlap) reduces the total length by <FineFraction
+					expr="1÷2"
+				/> inch.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>What will be the final length of the assembled shelf?</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				First, add the lengths:
+				<FineFraction expr="12(5÷8) + 8(3÷4)" />. Convert to a common denominator of 8:
+				<FineFraction expr="8(3÷4) = 8(6÷8)" />.
+			</li>
+			<li>
+				<FineFraction expr="12(5÷8) + 8(6÷8) = 20(11÷8) = 21(3÷8)" /> inches.
+			</li>
+			<li>
+				Now subtract the overlap:
+				<FineFraction expr="1÷2 = 4÷8" />.
+			</li>
+			<li>
+				<FineFraction expr="21(3÷8) - 4÷8 = 20(7÷8)" /> inches.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				The finished shelf will be <FineFraction expr="20(7÷8)" /> inches long.
+			</li>
+		</ul>
+
+		<ul>
+			<li class="example">
+				<h2>🔨 3. DIY (Hanging Pictures).</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				You have a wall that is 80 inches long. You want to hang three identical pictures, each <FineFraction
+					expr="10(1÷2)"
+				/> inches wide, with equal spacing between the pictures and between the pictures and the edges
+				of the wall.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>How wide should each gap be?</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				Find the total width of the pictures:
+				<FineFraction expr="10(1÷2) * 3 = 31(1÷2)" /> inches.
+			</li>
+			<li>
+				Subtract the picture width from the wall length:
+				<FineFraction expr="80 - 31(1÷2) = 48(1÷2)" /> inches.
+			</li>
+			<li>There are four equal gaps (left, between the pictures, and right).</li>
+			<li>
+				Divide the remaining space by 4:
+				<FineFraction expr="48(1÷2) / 4 = 97÷2 / 4 = 97÷8 = 12(1÷8)" /> inches.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				Each gap should be <FineFraction expr="12(1÷8)" /> inches wide.
+			</li>
+		</ul>
+
+		<ul>
+			<li class="example">
+				<h2>💰 4. Sales and Discounts (Black Friday).</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				A store is offering a <FineFraction expr="1÷3" /> discount on all electronics. You want to buy
+				a printer for <strong>$240</strong> and headphones for
+				<strong>$90</strong>.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>How much money will you save if you buy both items?</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				Find the total cost:
+				<strong>$240 + $90 = $330</strong>.
+			</li>
+			<li>
+				The discount is
+				<FineFraction expr="1÷3" />
+				of the total price:
+				<strong><FineFraction expr="330÷3" /> = $110</strong>.
+			</li>
+			<li>
+				Alternatively, calculate the discount for each item:
+				<strong>$<FineFraction expr="240÷3" /> = $80</strong>,
+				<strong>$<FineFraction expr="90÷3" /> = $30</strong>, then add them together:
+				<strong>$80 + $30 = $110</strong>.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				You will save <strong>$110</strong>.
+			</li>
+		</ul>
+
+		<ul>
+			<li class="example">
+				<h2>🛒 5. Grocery Shopping (Deli Counter).</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				You are shopping at the deli counter. Turkey costs <strong>$12 per pound</strong>, and you
+				want <FineFraction expr="3÷4" /> lb. Cheese costs
+				<strong>$8 per pound</strong>, and you want
+				<FineFraction expr="1÷2" /> lb.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>How much will your purchase cost?</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				Turkey:
+				<FineFraction expr="12 * 3÷4 = 36÷4 = 9" /> dollars.
+			</li>
+			<li>
+				Cheese:
+				<FineFraction expr="8 * 1÷2 = 8÷2 = 4" /> dollars.
+			</li>
+			<li>
+				Add the costs:
+				<strong>$9 + $4 = $13</strong>.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				The total cost is <strong>$13</strong>.
+			</li>
+		</ul>
+
+		<ul>
+			<li class="example">
+				<h2>⛽ 6. Fuel Tank and Trip Planning.</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				Your pickup truck has a <strong>24-gallon</strong> fuel tank. The fuel gauge shows
+				<FineFraction expr="1÷4" /> of a tank remaining. Your commute is
+				<strong>30 miles</strong>, and your truck gets
+				<strong>15 miles per gallon</strong>.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>Do you have enough fuel to get to work without refueling?</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				Fuel currently in the tank:
+				<FineFraction expr="24 * 1÷4 = 6" /> gallons.
+			</li>
+			<li>
+				Fuel needed for the trip:
+				<FineFraction expr="30÷15 = 2 " /> gallons.
+			</li>
+			<li>
+				Compare the amounts:
+				<strong>6 &gt; 2</strong>.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				Yes. You have enough fuel to reach work, with
+				<strong>4 gallons</strong> remaining.
+			</li>
+		</ul>
+
+		<ul>
+			<li class="example">
+				<h2>⏱️ 7. Time Planning (Cooking Schedule).</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				You put a chicken in the oven at <strong>12:45 PM</strong>. The recipe says to bake it for <FineFraction
+					expr="1(1÷2)"
+				/> hours. After baking, the chicken should rest for
+				<FineFraction expr="1÷4" /> hour before serving.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>What time will the chicken be ready to serve?</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				Add <FineFraction expr="1(1÷2)" /> hours to <strong>12:45 PM</strong>:
+				<strong>12:45 PM + 1:30 = 2:15 PM</strong>.
+			</li>
+			<li>
+				Convert
+				<FineFraction expr="1÷4" />
+				hour to minutes:
+				<strong>15 minutes</strong>.
+			</li>
+			<li>
+				Add the resting time:
+				<strong>2:15 PM + 15 minutes = 2:30 PM</strong>.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				The chicken will be ready to serve at <strong>2:30 PM</strong>.
+			</li>
+		</ul>
+
+		<ul>
+			<li class="example">
+				<h2>📦 8. Medicine Dosage (Liquid Syrup).</h2>
+			</li>
+			<li class="example"><strong>Situation:</strong></li>
+			<li>
+				A doctor prescribes
+				<FineFraction expr="3÷4" />
+				teaspoon (tsp) of syrup twice a day for a child. The bottle contains
+				<strong>15 teaspoons</strong> of syrup. Your measuring syringe is marked in fractions:
+				<FineFraction expr="1÷4" />,
+				<FineFraction expr="1÷2" />,
+				<FineFraction expr="3÷4" />, and <strong>1</strong>.
+			</li>
+			<li class="example"><strong>Question:</strong></li>
+			<li>
+				How many full days will one bottle last, and which mark on the syringe should you use for
+				each dose?
+			</li>
+			<li class="example"><strong>Solution:</strong></li>
+			<li>
+				Daily dose:
+				<FineFraction expr="3÷4 * 2 = 6÷4 = 1 1÷2" />
+				teaspoons per day.
+			</li>
+			<li>
+				Number of days:
+				<FineFraction expr="15÷1.5 = 10" /> days.
+			</li>
+			<li>
+				Each dose is
+				<FineFraction expr="3÷4" />
+				teaspoon, so use the
+				<FineFraction expr="3÷4" />
+				mark on the syringe.
+			</li>
+			<li class="example"><strong>Answer:</strong></li>
+			<li>
+				One bottle will last exactly <strong>10 full days</strong>. Use the
+				<FineFraction expr="3÷4" />
+				teaspoon mark for each dose.
+			</li>
+		</ul>
+	</div>
 </main>
 
 <style lang="scss">
@@ -924,6 +1236,16 @@
 	// .mainInstr  in src/styles/app.scss
 	.mainInstr {
 		padding-left: 1rem;
+		justify-content: flex-start;
+		align-items: center;
+		li {
+			width: 92%;
+			.learnMore_goTo {
+				display: block;
+				h3 {
+				}
+			}
+		}
 	}
 
 	.card {

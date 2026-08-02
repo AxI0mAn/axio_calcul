@@ -24,27 +24,39 @@
 	<ul class="mainInstr">
 		<h2>Contents:</h2>
 		<li>
-			<a href="{base}/trigonometry/#IntroductionTrigonometry"> <h3>Introduction.</h3></a>
+			<a class="learnMore_goTo" href="{base}/trigonometry/#IntroductionTrigonometry">
+				<h3>Introduction.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/trigonometry/#FeaturesTrigonometry"> <h3>Features.</h3></a>
+			<a class="learnMore_goTo" href="{base}/trigonometry/#FeaturesTrigonometry">
+				<h3>Features.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/trigonometry/#AngleUnitsTrigonometry"> <h3>Angle Units.</h3></a>
+			<a class="learnMore_goTo" href="{base}/trigonometry/#AngleUnitsTrigonometry">
+				<h3>Angle Units.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/trigonometry/#HowtoUseTrigonometry"> <h3>How to Use.</h3></a>
+			<a class="learnMore_goTo" href="{base}/trigonometry/#HowtoUseTrigonometry">
+				<h3>How to Use.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/trigonometry/#ExamplesTrigonometry"> <h3>Examples.</h3></a>
+			<a class="learnMore_goTo" href="{base}/trigonometry/#ExamplesTrigonometry">
+				<h3>Examples.</h3></a
+			>
 		</li>
 
 		<li>
-			<a href="{base}/trigonometry/#mainInstr"> <h3>Lern more about Interface.</h3></a>
+			<a class="learnMore_goTo" href="{base}/trigonometry/#mainInstr">
+				<h3>Lern more about Interface.</h3></a
+			>
 		</li>
 	</ul>
 

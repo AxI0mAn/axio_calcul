@@ -39,16 +39,14 @@
    border-radius: 0.5rem;
 
    &:hover {
-     background-color: $clr-bg-card;
-     background: $grad-btn-main;
-     background-size: cover;
-     background-position: center;
+     //  background-color: $clr-bg-card;
+     //  background: $grad-btn-main;
+     //  background-size: cover;
+     //  background-position: center;
 
      border-radius: 8px;
 
-     box-shadow:
-       1px 1px 4px 0px rgba($clr-bg-darker-rgb, 0.5),
-       inset 0px 0px 2px $clr-mint-soft;
+     box-shadow: $shadow-inset;
      color: $clr-sky;
      border-right: 1px solid rgba(255, 255, 255, 0.1);
      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -112,4 +110,20 @@
 
  .optionCalc {
    // стили  в '$lib/utils/initAccordion'
+ }
+
+ .mainInstr {
+   padding-left: 1rem;
+   justify-content: flex-start;
+   align-items: center;
+
+   li {
+     width: 92%;
+
+     .learnMore_goTo {
+       display: block;
+
+       h3 {}
+     }
+   }
  }
