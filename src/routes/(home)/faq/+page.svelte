@@ -213,7 +213,7 @@
 			</li>
 
 			<li>
-				<a href="{base}/engineer/#Calculating the Number of Wallpaper Rolls"> CalcWallRolls.</a>
+				<a href="{base}/engineer/#CalcWallRolls">Calculating the Number of Wallpaper Rolls.</a>
 			</li>
 		</ul>
 	</section>
