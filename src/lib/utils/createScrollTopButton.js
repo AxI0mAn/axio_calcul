@@ -56,6 +56,25 @@ export function createScrollTopButton(anchorId) {
     outline: 'none'
   });
 
+  // Эффект наведения (аналог &:hover)
+  btn.addEventListener('mouseenter', () => {
+    btn.style.backgroundColor = 'transparent';
+    const svg = btn.querySelector('svg');
+    if (svg) {
+      svg.style.stroke = 'var(--clr-coral, #ff6b6b)'; // Подставь свой цвет или переменную
+      svg.style.fill = 'transparent';
+    }
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.backgroundColor = '#0284c7';
+    const svg = btn.querySelector('svg');
+    if (svg) {
+      svg.style.stroke = ''; // Возвращаем дефолт
+      svg.style.fill = '';
+    }
+  });
+
   const hideBtn = () => {
     btn.style.opacity = '0';
     btn.style.visibility = 'hidden';

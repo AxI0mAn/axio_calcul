@@ -14,14 +14,13 @@
     grid-template-columns: 1fr 50vh 1fr;
     grid-template-areas:
       "left calc right"
-      ". instr ."
-      ". revi .";
+      "left instr ."
+      "left revi .";
 
 
     .field_left,
     .field_right {
-      grid-area: left; // Привязываем к первой колонке
-      position: sticky; // ВАЖНО: не fixed, а sticky
+      // position: sticky; // ВАЖНО: не fixed, а sticky
       top: 0;
       height: 100vh; // Теперь они занимают экран и "залипают" при скролле
       width: calc((100vw - 52vh) / 2); // ширина центральной части 50vh
@@ -59,8 +58,8 @@
     }
 
     .reviews__old {
-      background: linear-gradient(0deg, rgba($clr-coral-rgb, 0.05) 0%, rgba($clr-bg-darker-rgb, 0.8) 100%);
-      border-bottom: 1px solid rgba($clr-coral-rgb, 0.2);
+      background: linear-gradient(180deg, rgba($clr-coral-rgb, 0.01) 0%, rgba($clr-bg-darker-rgb, 0.8) 5%, rgba($clr-coral-rgb, 0.001) 100%);
+      // border-bottom: 1px solid rgba($clr-coral-rgb, 0.2);
       grid-area: revi;
       width: 50vh;
       min-height: 20vh;

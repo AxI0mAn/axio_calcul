@@ -78,6 +78,25 @@ export class Fraction {
   }
 
   pow(other) {
+    // Проверяем, является ли степень целым числом
+    if (other.den === 1) {
+      const power = other.num;
+      if (power >= 0) {
+        // Положительная целая степень: возводим числитель и знаменатель
+        const newNum = Math.pow(this.num, power);
+        const newDen = Math.pow(this.den, power);
+        return new Fraction(newNum, newDen);
+      } else {
+        // Отрицательная целая степень: переворачиваем дробь
+        const positivePower = Math.abs(power);
+        const newNum = Math.pow(this.den, positivePower);
+        const newDen = Math.pow(this.num, positivePower);
+        return new Fraction(newNum, newDen);
+      }
+    }
+
+    // Для дробной степени используем десятичное вычисление с высокой точностью
+    // (например, (1÷7)^(2÷3) - такие случаи редки)
     const base = this.num / this.den;
     const exponent = other.num / other.den;
     const resultAsDecimal = Math.pow(base, exponent);
@@ -374,6 +393,7 @@ function tokenizeFractionExpression(expr) {
               const numFrac = Fraction.fromDecimal(numerator);
               const denFrac = Fraction.fromDecimal(denominator);
               const result = numFrac.div(denFrac);
+
               tokens.push({ type: 'fraction', value: result });
               i = j;
               continue;
@@ -592,7 +612,6 @@ export function evaluateFractionExpression(expression) {
       const a = stack.pop(); // Левый операнд
       if (a === undefined || b === undefined) throw new Error('Invalid expression structure');
 
-
       let result;
       switch (item) {
         case '+': result = applyOperator('+', a, b); break;
@@ -645,7 +664,8 @@ export function evaluateFractionExpression(expression) {
 
         default: throw new Error(`Unknown operator: ${item}`);
       }
-      stack.push(result);
+      stack.push(result)
+
     }
   }
 

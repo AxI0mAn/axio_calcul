@@ -1,6 +1,7 @@
 <script>
 	// @ts-ignore
 	import { base } from '$app/paths';
+	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
 	import { historyStore } from '$lib/store/historyStore.svelte';
 	import { appState } from '$lib/store/appState.svelte.js';
 	import { longpress } from '$lib/actions/longpress.js';
@@ -38,14 +39,90 @@
 		if (typeof item === 'string') return item;
 		return String(item);
 	}
+
+	/**
+	 * Извлекает число после знака "=" из строки
+	 * @param {string} str - строка вида "выражение = число"
+	 * @returns {string|null} - извлеченное число или null
+	 */
+	function extractNumberAfterEquals(str) {
+		if (!str || typeof str !== 'string') return null;
+
+		// Ищем "=" и берем все после него
+		const eqIndex = str.lastIndexOf('=');
+		if (eqIndex === -1) return null;
+
+		const afterEquals = str.substring(eqIndex + 1).trim();
+
+		// Если после "=" ничего нет — не сохраняем
+		if (!afterEquals) return null;
+
+		// ===== ПРОВЕРЯЕМ, ЧТО ПОСЛЕ "=" ТОЛЬКО ОДНО ЧИСЛО =====
+		// Должно быть: число (целое или десятичное)
+		// Не должно быть: выражений с операторами (+, -, *, /, ^, ÷, скобки и т.д.)
+
+		// Проверяем, что строка состоит только из цифр, точки, минуса и дроби
+		// Разрешенные символы: цифры, точка, минус (только в начале), слэш (для дробей)
+		const numberPattern = /^[+-]?\d+(\.\d+)?(\/\d+)?$/;
+
+		if (!numberPattern.test(afterEquals)) {
+			return null; // Это не просто число, а выражение
+		}
+
+		return afterEquals;
+	}
+
+	/**
+	 * Проверяет, можно ли сохранить значение в память
+	 */
+	function canSaveToMemory(line) {
+		if (isFractionSteps(line)) {
+			return true;
+		}
+
+		if (typeof line === 'string') {
+			const value = extractNumberAfterEquals(line);
+			return value !== null;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Получает значение для сохранения в память из обычной строки
+	 */
+	function getMemoryValueFromString(line) {
+		if (typeof line === 'string') {
+			const value = extractNumberAfterEquals(line);
+			return value || line;
+		}
+		return String(line);
+	}
+
+	// кнопка ВВЕРХ
+	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
+
+	$effect(() => {
+		// Запускаем создание и сохраняем функцию удаления
+		const destroyButton = createScrollTopButton('top-anchor');
+
+		// Эта часть сработает, когда пользователь уйдет с этой страницы
+		return () => {
+			destroyButton();
+		};
+	});
 </script>
 
-<h1 class="header">history of calculated</h1>
+<header class="header" id="top-anchor">
+	<BtnBack />
+	<h1 class="headerSlogan">history of calculated</h1>
+</header>
 
 <div class="history-container">
 	{#if Object.keys(historyStore.all).length === 0}
 		<p>История пуста или еще не загружена.</p>
 	{:else}
+		<h2>⭐ Tap and hold a calculation result in your history to quickly save it.</h2>
 		{#each Object.entries(historyStore.all).sort((a, b) => new Date(b[1].updatedAt).getTime() - new Date(a[1].updatedAt).getTime()) as [id, record]}
 			<div class="history-item {record.type}">
 				<div class="history-header">
@@ -126,8 +203,40 @@
 								</div>
 							</li>
 						{:else}
-							<!-- Обычные строки (не дроби) -->
-							<li>{getDisplayValue(line)}</li>
+							<!-- ===== ОБЫЧНЫЕ СТРОКИ (НЕ ДРОБИ) ===== -->
+							{@const displayLine = getDisplayValue(line)}
+							{@const memoryValue = getMemoryValueFromString(line)}
+							{@const canSave = canSaveToMemory(line)}
+							{@const hasEquals = typeof line === 'string' && line.includes('=')}
+							{@const parts = hasEquals ? line.split('=') : null}
+							{@const leftPart = hasEquals ? parts[0].trim() : line}
+							{@const rightPart = hasEquals ? parts.slice(1).join('=').trim() : ''}
+
+							<li
+								use:longpress
+								onlongpress={() => {
+									if (canSave) {
+										// ===== ПРИВОДИМ К ЧИСЛУ =====
+										const numValue = parseFloat(memoryValue);
+										if (!isNaN(numValue)) {
+											appState.pendingMemoryValue = numValue;
+											appState.isMemoModalOpen = true;
+										}
+									}
+								}}
+								class:has-memory={canSave}
+								class:no-memory={!canSave}
+							>
+								{#if hasEquals}
+									<!-- Строка с "=" -->
+									<span class="math-text left-part">{leftPart}</span>
+									<span class="math-text equal-prefix"> = </span>
+									<span class="math-text right-part">{rightPart}</span>
+								{:else}
+									<!-- Строка без "=" -->
+									<span class="math-text">{displayLine}</span>
+								{/if}
+							</li>
 						{/if}
 					{/each}
 				</ul>
@@ -149,11 +258,24 @@
 	}
 
 	.header {
-		color: $clr-coral;
-		font-size: 3rem;
-		display: inline-block;
-		padding: 1rem 2rem;
-		margin-bottom: 2rem;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+		align-items: center;
+		padding: 2rem;
+		gap: 2rem;
+
+		.headerSlogan {
+			color: $clr-coral;
+			font-size: 3rem;
+			display: inline-block;
+		}
+	}
+	@media (max-height: 500px) and (orientation: landscape),
+		(max-width: 500px) and (orientation: portrait) {
+		.headerSlogan {
+			font-size: 2rem;
+		}
 	}
 
 	.history-item {
@@ -200,11 +322,11 @@
 		}
 	}
 
-	@media (max-height: 500px) and (orientation: landscape),
-		(max-width: 500px) and (orientation: portrait) {
-		.header {
-			font-size: 2rem;
-		}
+	h2 {
+		line-height: 2rem;
+		color: $clr-text-main;
+		font-size: 1.4rem;
+		margin: 1rem auto;
 	}
 
 	.history-steps-block {
@@ -328,7 +450,7 @@
 		padding-right: 0.5rem;
 	}
 	.num-part {
-		color: rgb(192, 235, 3);
+		color: rgb(65, 113, 2);
 		font-size: $fontSize;
 		text-align: center;
 		white-space: nowrap; // <--- ЗАПРЕЩАЕМ ВЫВАЛИВАНИЕ СИМВОЛОВ НАВЕРХ

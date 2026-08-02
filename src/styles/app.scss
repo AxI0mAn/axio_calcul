@@ -5,6 +5,7 @@
 @use "_typography.scss";
 @use "_variables.scss";
 @use '_layout.scss';
+@use '_homePages.scss';
 
 // Устанавливаются глобальные стили 
 
@@ -33,6 +34,11 @@ a {
   -webkit-touch-callout: none;
 }
 
+strong {
+  color: $clr-sky;
+  padding: auto 2px;
+}
+
 // src/styles/app.scss 
 /* Fraction Дроби.Скрытие технических маркеров смешанных чисел и сложных скобок */
 .fraction-marker,
@@ -45,4 +51,42 @@ a {
   margin: 0;
   padding: 0;
   letter-spacing: -1ch;
+}
+
+.mainInstr {
+  padding: 1rem;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background-color: transparent;
+  padding-bottom: 1rem;
+
+  @media screen and (max-width: 500px) {
+    padding: 1rem;
+    align-items: center;
+  }
+
+  h2 {
+    color: $clr-coral;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+  }
+
+  li {
+    color: $clr-white;
+    margin-bottom: 0.5rem;
+
+    &:hover {
+      color: $clr-coral;
+      transition: all 0.35s;
+    }
+
+    @media screen and (max-width: 500px) {
+      text-align: center;
+    }
+  }
 }

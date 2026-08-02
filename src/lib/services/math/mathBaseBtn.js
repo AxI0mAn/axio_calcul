@@ -95,6 +95,12 @@ export function float_toFixed(num) {
   // 4. Стандартное форматирование для обычных чисел
   let result = correctedNum.toFixed(appStore.toFix);
 
+  // точность вычислений для тригонометрии максимальная  
+  if (appState.now_mode === 'TRIGONOMETRY') {
+    result = correctedNum.toFixed(appStore.toFixTrigon);
+  }
+
+
   // Убирает нули после точки, а если останется точка в конце — убирает и её
   return result.replace(/(\.0+|(\.[0-9]*[1-9])0+)$/, '$2');
 }

@@ -7,6 +7,7 @@ import { appState } from "$lib/store/appState.svelte";
 import { float_toFixed } from "./mathBaseBtn";
 import { showConstanta } from "$lib/utils/showConstanta";
 import { performCalculation } from "./mathActions";
+import { isLastCharOperator } from "./mathActions";
 
 //=======================================
 /**
@@ -357,33 +358,35 @@ export function toPower2() {
 }
 
 /**
- * Возведение в третью степень (куб)
- * 4 -> x^3 -> получаем 64
+ * Возведение в третью степень (куб) как оператор
+ * Работает аналогично x^y: добавляет ^3 в выражение
+ * Пример: 3.14*10 + x^3 -> 3.14*10^3 -> = 3140
+ * 
+ * ВАЖНО: display устанавливается в '', а не '0',
+ * чтобы избежать склейки с нулем при нажатии =
  */
 export function toPower3() {
-  const val = parseFloat(appState.display);
+  const currentVal = appState.display;
 
-  // Если на экране 0 и ничего не вводилось, ничего не делаем
-  if (val === 0 && appState.isNewInput && appState.expression === '') return;
+  // Если дисплей пустой или "0", и в выражении ничего нет, 
+  // возводить в степень нечего
+  if (currentVal === '0' && appState.expression === '') return;
 
-  try {
-    const result = val ** 3;
-
-    // 1. Формируем красивую запись для истории 
-    appState.historySession.push(`${val}^3 = ${float_toFixed(result)}`);
-
-    // 2. Обновляем дисплей результатом
-    appState.display = String(float_toFixed(result));
-
-    // 3. Важно: сбрасываем выражение и ставим флаг нового ввода,
-    // чтобы результат можно было сразу использовать в новых вычислениях
-    appState.expression = '';
-    appState.isNewInput = true;
-
-  } catch (e) {
-    console.error("Power3 Error:", e);
-    appState.display = "ERROR";
+  // Логика добавления оператора ^3 (аналогично toPower)
+  if (appState.expression === '' && currentVal !== '0') {
+    appState.expression = currentVal + '^3';
+  } else if (isLastCharOperator(appState.expression) && appState.isNewInput) {
+    // Если пользователь передумал и нажал x^3 после оператора
+    appState.expression = appState.expression.slice(0, -1) + '^3';
+  } else {
+    appState.expression += currentVal + '^3';
   }
+
+  // Очищаем экран для ввода следующего числа
+  // Используем пустую строку, чтобы при склейке в performCalculation
+  // не добавлялся лишний ноль (3.14*10^3 + '' = 3.14*10^3)
+  appState.display = '';
+  appState.isNewInput = true;
 }
 
 /**    

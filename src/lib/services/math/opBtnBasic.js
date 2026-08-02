@@ -5,7 +5,7 @@
 */
 import { appState } from "$lib/store/appState.svelte";
 import { isLastCharOperator } from "./mathActions";
-import { float_toFixed } from "./mathBaseBtn";
+// import { float_toFixed } from "./mathBaseBtn";
 import { showConstanta } from "$lib/utils/showConstanta";
 
 
@@ -177,35 +177,35 @@ export function percentage() {
 }
 
 /**
- * Возведение во вторую степень (квадрат)
- * 8 -> x^2 -> получаем 64
+ * Возведение во вторую степень (квадрат) как оператор
+ * Работает аналогично x^y: добавляет ^2 в выражение
+ * Пример: 3.14*10 + x^2 -> 3.14*10^2 -> = 314
+ * 
+ * ВАЖНО: display устанавливается в '', а не '0',
+ * чтобы избежать склейки с нулем при нажатии =
  */
 export function toPower2() {
-  const val = parseFloat(appState.display);
+  const currentVal = appState.display;
 
-  // Если на экране 0 и ничего не вводилось, ничего не делаем
-  if (val === 0 && appState.isNewInput && appState.expression === '') return;
+  // Если дисплей пустой или "0", и в выражении ничего нет, 
+  // возводить в степень нечего
+  if (currentVal === '0' && appState.expression === '') return;
 
-  try {
-    const result = val ** 2;
-
-    // 1. Формируем запись для истории
-    // Если это было просто число 8, будет "8^2 = 64"
-    // Если это был результат выражения (например 10+5), будет "15^2 = 225"
-    appState.historySession.push(`${val}^2 = ${float_toFixed(result)}`);
-
-    // 2. Обновляем дисплей результатом
-    appState.display = String(float_toFixed(result));
-
-    // 3. Важно: сбрасываем выражение и ставим флаг нового ввода,
-    // чтобы результат можно было сразу использовать в новых вычислениях
-    appState.expression = '';
-    appState.isNewInput = true;
-
-  } catch (e) {
-    console.error("Power2 Error:", e);
-    appState.display = "ERROR";
+  // Логика добавления оператора ^2 (аналогично toPower)
+  if (appState.expression === '' && currentVal !== '0') {
+    appState.expression = currentVal + '^2';
+  } else if (isLastCharOperator(appState.expression) && appState.isNewInput) {
+    // Если пользователь передумал и нажал x^2 после оператора
+    appState.expression = appState.expression.slice(0, -1) + '^2';
+  } else {
+    appState.expression += currentVal + '^2';
   }
+
+  // Очищаем экран для ввода следующего числа
+  // Используем пустую строку, чтобы при склейке в performCalculation
+  // не добавлялся лишний ноль (3.14*10^2 + '' = 3.14*10^2)
+  appState.display = '';
+  appState.isNewInput = true;
 }
 
 /**

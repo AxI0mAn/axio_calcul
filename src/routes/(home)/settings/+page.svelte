@@ -1,19 +1,24 @@
 <script>
+	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
 	import { appStore } from '$lib/store/appStore.svelte';
 
 	// Константы для выбора
-	const languages = ['RU', 'EN', 'UA', 'PT', 'ES'];
+	const languages = ['EN']; //, 'RU', 'UA', 'PT', 'ES'];
 	const fontSizes = [
-		{ label: 'Mini', value: 14 },
-		{ label: 'Norm', value: 16 },
-		{ label: 'Max', value: 18 }
+		//	{ label: 'Mini', value: 14 },
+		{ label: 'Norm', value: 16 }
+		//	{ label: 'Max', value: 18 }
 	];
 </script>
 
-<h1 class="header">settings</h1>
+<header class="header">
+	<BtnBack />
+	<h1 class="headerSlogan">settings</h1>
+</header>
+
 <div class="settings-page">
 	<section class="setting-group">
-		<span class="label">Цветовая тема</span>
+		<span class="label">Color theme</span>
 		<div class="radio-group">
 			<label class="radio-item">
 				<input type="radio" bind:group={appStore.theme} value="light" />
@@ -27,7 +32,7 @@
 	</section>
 
 	<section class="setting-group">
-		<span class="label">Язык интерфейса</span>
+		<span class="label">Interface language</span>
 		<select bind:value={appStore.lang} class="custom-select">
 			{#each languages as l}
 				<option value={l}>{l}</option>
@@ -36,7 +41,7 @@
 	</section>
 
 	<section class="setting-group">
-		<span class="label">Размер текста</span>
+		<span class="label">Text size</span>
 		<div class="radio-group">
 			{#each fontSizes as fs}
 				<label class="radio-item">
@@ -47,9 +52,9 @@
 		</div>
 	</section>
 
-	<section class="setting-group">
+	<section class="setting-group" id="Accuracy_of_calculations">
 		<div class="label-row">
-			<span class="label">Точность знаков</span>
+			<span class="label">Accuracy of calculations</span>
 			<span class="value-badge">{appStore.toFix}</span>
 		</div>
 		<input type="range" min="0" max="12" bind:value={appStore.toFix} class="custom-range" />
@@ -57,7 +62,7 @@
 
 	<section class="setting-group">
 		<div class="label-row">
-			<span class="label">Лимит истории</span>
+			<span class="label">Number of entries in history</span>
 			<span class="value-badge">{appStore.historyLocal}</span>
 		</div>
 		<input type="range" min="1" max="20" bind:value={appStore.historyLocal} class="custom-range" />
@@ -73,11 +78,24 @@
 	}
 
 	.header {
-		color: $clr-coral;
-		font-size: 3rem;
-		display: inline-block;
-		padding: 1rem 2rem;
-		margin-bottom: 2rem;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+		align-items: center;
+		padding: 2rem;
+		gap: 2rem;
+
+		.headerSlogan {
+			color: $clr-coral;
+			font-size: 3rem;
+			display: inline-block;
+		}
+	}
+	@media (max-height: 500px) and (orientation: landscape),
+		(max-width: 500px) and (orientation: portrait) {
+		.headerSlogan {
+			font-size: 2rem;
+		}
 	}
 
 	.setting-group {

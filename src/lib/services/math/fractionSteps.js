@@ -184,6 +184,77 @@ function evaluateSubExpression(expr) {
   }
 }
 
+
+
+/**
+ * Преобразует смешанные дроби в неправильные.
+ * Поддерживает форматы:
+ * - "3+1÷8" → "25÷8"
+ * - "3+(1÷8)" → "25÷8"
+ * - "-3+1÷8" → "-25÷8"
+ * - "3+1÷8+2÷5" → "25÷8+2÷5" (только смешанные дроби)
+ * 
+ * @param {string} expr - выражение с смешанными дробями
+ * @returns {string} - выражение с неправильными дробями
+ */
+export function convertMixedToImproperInExpression(expr) {
+  if (!expr) return expr;
+
+  let result = expr;
+
+  // ===== ПАТТЕРН 1: число+маркер⥾числитель÷знаменатель⥿ =====
+  // Пример: "3+⥾1÷8⥿" → "25÷8"
+  result = result.replace(/(\d+)\+⥾(\d+)÷(\d+)⥿/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 2: -число+маркер⥾числитель÷знаменатель⥿ =====
+  result = result.replace(/-(\d+)\+⥾(\d+)÷(\d+)⥿/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 3: число+маркер⥑числитель÷знаменатель⥏ =====
+  result = result.replace(/(\d+)\+⥑(\d+)÷(\d+)⥏/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 4: -число+маркер⥑числитель÷знаменатель⥏ =====
+  result = result.replace(/-(\d+)\+⥑(\d+)÷(\d+)⥏/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 5: число+числитель÷знаменатель (БЕЗ скобок) =====
+  result = result.replace(/(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 6: -число+числитель÷знаменатель =====
+  result = result.replace(/-(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 7: число+(числитель÷знаменатель) (со скобками) =====
+  result = result.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `${improperNum}÷${den}`;
+  });
+
+  // ===== ПАТТЕРН 8: -число+(числитель÷знаменатель) =====
+  result = result.replace(/-(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
+    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+    return `-${improperNum}÷${den}`;
+  });
+
+  return result;
+}
+
+
 // ============================================================
 // ФУНКЦИИ ПРОВЕРКИ НЕОБХОДИМОСТИ ШАГОВ
 // ============================================================
@@ -294,9 +365,10 @@ function stepPowersAndRoots(expr) {
 
           if (left && right) {
             try {
-              const leftFrac = evaluateFractionExpression(left);
-              const rightFrac = evaluateFractionExpression(right);
-              const resultFrac = leftFrac.pow(rightFrac);
+              // ИСПОЛЬЗУЕМ evaluateFractionExpression ДЛЯ ТОЧНОГО ВЫЧИСЛЕНИЯ
+              // Создаем выражение: (left)^(right)
+              const powExpr = `(${left})^(${right})`;
+              const resultFrac = evaluateFractionExpression(powExpr);
               const resultStr = formatFraction(resultFrac.num, resultFrac.den);
 
               const leftStart = result.indexOf(left, i - left.length);
@@ -307,7 +379,7 @@ function stepPowersAndRoots(expr) {
                 break;
               }
             } catch (e) {
-              console.error('  Ошибка при вычислении ^:', e);
+              console.warn('[stepPowersAndRoots] Error computing power:', e);
             }
           }
         } else if (ch === '√') {
@@ -382,36 +454,46 @@ function stepBrackets(expr) {
 
 /**
  * ШАГ 3: Преобразование смешанных дробей в неправильные.
- * Использует функции из fractionActions.js
+ * Сначала ищет маркеры (⥑/⥏ и ⥾/⥿), затем преобразует уже раскрытые смешанные дроби.
+ * Использует функции из fractionActions.js и дополнительную конвертацию.
  */
-function stepMixedToImproper(expr) {
+export function stepMixedToImproper(expr) {
   if (!expr || !hasMixedFractions(expr)) {
+    // Даже если нет маркеров, проверяем, нет ли раскрытых смешанных дробей
+    if (expr && /\d+\+\d+÷\d+/.test(expr)) {
+      const result = convertMixedToImproperInExpression(expr);
+      return result;
+    }
+    return expr;
+  }
+
+  // Проверяем, есть ли маркеры ⥑ или ⥾
+  const hasMarkers = expr.includes(MARKERS.WHOLE_START) || expr.includes(MARKERS.COMPLEX_NUM_START);
+
+  // Если нет маркеров — это уже неправильная дробь, пропускаем
+  if (!hasMarkers) {
     return expr;
   }
 
   let result = expr;
 
-  // Используем существующие функции из fractionActions
+  // 1. Обработка маркеров целой части (⥑...⥏)
   result = transformMixedNumberWithoutDivision(result);
+
+  // 2. Обработка отрицательных смешанных чисел с маркерами
   result = transformNegativeMixedNumber(result);
+
+  // 3. Обработка сложных скобок (⥾...⥿)
   result = transformMixedNumberWithComplexBrackets(result);
+
+  // 4. Обработка смешанных дробей с делением после скобок
   result = transformMixedFractionWithDivision(result);
 
-  // Дополнительная обработка для паттерна число(дробь)
-  result = result.replace(/(\d+)\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    const newExpr = `${improperNum}÷${den}`;
-    return newExpr;
-  });
+  // 5. КОНВЕРТАЦИЯ РАСКРЫТЫХ СМЕШАННЫХ ДРОБЕЙ В НЕПРАВИЛЬНЫЕ
+  // После преобразования маркеров могли получиться выражения вида "3+(1÷8)"
+  // Их нужно преобразовать в "25÷8"
+  result = convertMixedToImproperInExpression(result);
 
-  // Обработка отрицательных смешанных дробей
-  result = result.replace(/-(\d+)\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    const newExpr = `-(${improperNum}÷${den})`;
-    return newExpr;
-  });
-
-  result = normalizeExpr(result);
   return result;
 }
 
@@ -440,14 +522,39 @@ function stepDivisionToMultiplication(expr) {
         const left = extractOperand(result, i, 'left');
         const right = extractOperand(result, i, 'right');
 
-        if (isFraction(left) && isFraction(right)) {
-          const rightParts = right.split('÷');
-          if (rightParts.length === 2) {
-            const flipped = `${rightParts[1]}÷${rightParts[0]}`;
-            const newExpr = result.slice(0, i - left.length) + left + '*' + flipped + result.slice(i + 1 + right.length);
-            result = normalizeExpr(newExpr);
-            changed = true;
-            break;
+        if (left && right) {
+          // Проверяем, является ли левый операнд смешанной дробью (число(дробь))
+          // или правый операнд смешанной дробью
+          const leftIsMixed = /^\d+\(/.test(left);
+          const rightIsMixed = /^\d+\(/.test(right);
+
+          // Если есть смешанная дробь, используем evaluateFractionExpression
+          if (leftIsMixed || rightIsMixed) {
+            try {
+              const divExpr = `(${left})÷(${right})`;
+              const resultFrac = evaluateFractionExpression(divExpr);
+              const resultStr = formatFraction(resultFrac.num, resultFrac.den);
+
+              const leftStart = result.indexOf(left, i - left.length);
+              if (leftStart !== -1) {
+                const rightEnd = i + 1 + right.length;
+                result = result.slice(0, leftStart) + resultStr + result.slice(rightEnd);
+                changed = true;
+                break;
+              }
+            } catch (e) {
+              console.warn('[stepDivisionToMultiplication] Error:', e);
+            }
+          } else if (isFraction(left) && isFraction(right)) {
+            // Стандартная логика для простых дробей
+            const rightParts = right.split('÷');
+            if (rightParts.length === 2) {
+              const flipped = `${rightParts[1]}÷${rightParts[0]}`;
+              const newExpr = result.slice(0, i - left.length) + left + '*' + flipped + result.slice(i + 1 + right.length);
+              result = normalizeExpr(newExpr);
+              changed = true;
+              break;
+            }
           }
         }
       }
@@ -482,18 +589,40 @@ function stepMultiplyFractions(expr) {
         const left = extractOperand(result, i, 'left');
         const right = extractOperand(result, i, 'right');
 
-        if (isFraction(left) && isFraction(right)) {
-          const leftParts = left.split('÷');
-          const rightParts = right.split('÷');
+        if (left && right) {
+          // Проверяем, является ли левый или правый операнд смешанной дробью
+          const leftIsMixed = /^\d+\(/.test(left);
+          const rightIsMixed = /^\d+\(/.test(right);
 
-          if (leftParts.length === 2 && rightParts.length === 2) {
-            const newNum = parseInt(leftParts[0], 10) * parseInt(rightParts[0], 10);
-            const newDen = parseInt(leftParts[1], 10) * parseInt(rightParts[1], 10);
-            const newFrac = formatFraction(newNum, newDen);
-            const newExpr = result.slice(0, i - left.length) + newFrac + result.slice(i + 1 + right.length);
-            result = normalizeExpr(newExpr);
-            changed = true;
-            break;
+          if (leftIsMixed || rightIsMixed) {
+            try {
+              const mulExpr = `(${left})*(${right})`;
+              const resultFrac = evaluateFractionExpression(mulExpr);
+              const resultStr = formatFraction(resultFrac.num, resultFrac.den);
+
+              const leftStart = result.indexOf(left, i - left.length);
+              if (leftStart !== -1) {
+                const rightEnd = i + 1 + right.length;
+                result = result.slice(0, leftStart) + resultStr + result.slice(rightEnd);
+                changed = true;
+                break;
+              }
+            } catch (e) {
+              console.warn('[stepMultiplyFractions] Error:', e);
+            }
+          } else if (isFraction(left) && isFraction(right)) {
+            // Стандартная логика для простых дробей
+            try {
+              const mulExpr = `(${left})*(${right})`;
+              const fracResult = evaluateFractionExpression(mulExpr);
+              const newFrac = formatFraction(fracResult.num, fracResult.den);
+              const newExpr = result.slice(0, i - left.length) + newFrac + result.slice(i + 1 + right.length);
+              result = normalizeExpr(newExpr);
+              changed = true;
+              break;
+            } catch (e) {
+              console.warn('[stepMultiplyFractions] Fallback:', e);
+            }
           }
         }
       }
@@ -658,6 +787,7 @@ function stepReduceAndExtract(expr) {
       if (den !== 1) {
         const whole = Math.floor(num / den);
         const remainder = num % den;
+
         if (whole > 0 && remainder !== 0) {
           result = `${whole}${MARKERS.WHOLE_START}${remainder}÷${den}${MARKERS.WHOLE_END}`;
         } else if (whole > 0) {
@@ -668,6 +798,7 @@ function stepReduceAndExtract(expr) {
       }
     }
   }
+
   return result;
 }
 
@@ -687,18 +818,55 @@ export function generateSteps(expression, resultFraction) {
   }
 
   // ===== ШАГ 1: Исходное выражение =====
-  // Очищаем от маркеров и добавляем неявные операторы
+  // Сохраняем оригинал для отображения (с маркерами)
+  const originalForDisplay = expression.trim();
+
+  // Очищаем от маркеров и добавляем неявные операторы для вычислений
   let currentExpr = expression.trim();
   // Заменяем маркеры на обычные скобки для отображения
   currentExpr = currentExpr.replace(/⥾/g, '(').replace(/⥿/g, ')');
   currentExpr = currentExpr.replace(/⥑/g, '(').replace(/⥏/g, ')');
 
+
   // Добавляем неявные операторы для читаемости
   currentExpr = insertImplicitMultiplication(currentExpr);
 
-  const steps = [currentExpr];
+
+  // Первый шаг - используем оригинал с маркерами, но с заменой на скобки
+  // НЕ применяем insertImplicitMultiplication к первому шагу!
+  let firstStep = originalForDisplay
+    .replace(/⥾/g, '(')
+    .replace(/⥿/g, ')')
+    .replace(/⥑/g, '(')
+    .replace(/⥏/g, ')');
+
+  const steps = [firstStep, currentExpr];
 
   try {
+    // ===== ШАГ 3: Смешанные дроби → неправильные =====
+    // ВАЖНО: преобразуем ВСЕ смешанные дроби в неправильные
+    // Это включает как маркеры (⥑/⥏, ⥾/⥿), так и уже раскрытые "число+(дробь)"
+
+    const step3 = stepMixedToImproper(currentExpr);
+
+    if (step3 === 'ERROR') {
+      steps.push('ERROR');
+      return steps;
+    }
+    if (step3 !== currentExpr) {
+      currentExpr = step3;
+      steps.push(currentExpr);
+    } else {
+      // Даже если stepMixedToImproper вернул то же значение,
+      // проверяем, есть ли еще не преобразованные смешанные дроби
+      // вида "число+(дробь)" (могли появиться после предыдущих шагов)
+      const manualCheck = convertMixedToImproperInExpression(currentExpr);
+      if (manualCheck !== currentExpr) {
+        currentExpr = manualCheck;
+        steps.push(currentExpr);
+      }
+    }
+
     // ===== ШАГ 1.1: Степени и корни =====
     const step1_1 = stepPowersAndRoots(currentExpr);
     if (step1_1 === 'ERROR') {
@@ -721,16 +889,6 @@ export function generateSteps(expression, resultFraction) {
       steps.push(currentExpr);
     }
 
-    // ===== ШАГ 3: Смешанные дроби → неправильные =====
-    const step3 = stepMixedToImproper(currentExpr);
-    if (step3 === 'ERROR') {
-      steps.push('ERROR');
-      return steps;
-    }
-    if (step3 !== currentExpr) {
-      currentExpr = step3;
-      steps.push(currentExpr);
-    }
 
     // ===== ШАГ 4: Деление → умножение =====
     const step4 = stepDivisionToMultiplication(currentExpr);

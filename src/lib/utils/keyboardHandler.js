@@ -73,7 +73,9 @@ export function handleCalculatorKey(e, actions) {
     '+': '+',
     '-': '-',
     '*': '*',
-    '/': '/'
+    '/': '/',
+    '(': '(',
+    ')': ')',
   };
 
   if (operators[key]) {

@@ -41,7 +41,7 @@
 		<div class="row">
 			<BtnText customClass="op btn__func constanta" onclick={() => addPi()} buttonText="π" />
 			<BtnText customClass="op btn__func constanta" onclick={() => addE()} buttonText="e" />
-			<BtnText customClass="op btn__func constanta" onclick={() => addGold()} buttonText="ф" />
+			<BtnText customClass="op btn__func constanta" onclick={() => addGold()} buttonText="φ" />
 		</div>
 		<div class="row">
 			<BtnText customClass="op btn__func constanta" onclick={() => addSqrt2()} buttonText="√2" />
@@ -100,8 +100,8 @@
 			<BtnText customClass="op btn__func" onclick={() => funcLog2X()} buttonText="log2(x)" />
 		</div>
 		<div class="row">
-			<BtnText customClass="op btn__func" onclick={() => multipliers()} buttonText="A*B" />
-			<BtnText customClass="op btn__func" onclick={() => allDivisors()} buttonText="X*Y" />
+			<BtnText customClass="op btn__func" onclick={() => multipliers()} buttonText="x=A*B" />
+			<BtnText customClass="op btn__func" onclick={() => allDivisors()} buttonText="divs:X∩Y" />
 		</div>
 	</div>
 </div>
