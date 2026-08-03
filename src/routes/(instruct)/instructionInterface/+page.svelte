@@ -90,8 +90,8 @@
 			</p>
 
 			<p>
-				Press and hold a calculation result on the <strong>History</strong> page to save it to a memory
-				slot.
+				press and hold (two second) a calculation result on the <strong>History</strong> page to save
+				it to a memory slot.
 			</p>
 
 			<p>

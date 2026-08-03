@@ -32,7 +32,8 @@ import {
   transformMixedNumberWithoutDivision,
   transformNegativeMixedNumber,
   transformMixedNumberWithComplexBrackets,
-  transformMixedFractionWithDivision
+  transformMixedFractionWithDivision,
+  convertMixedToImproper,
 } from './fractionActions.js';
 
 // ============================================================
@@ -228,16 +229,16 @@ export function convertMixedToImproperInExpression(expr) {
   });
 
   // ===== ПАТТЕРН 5: число+числитель÷знаменатель (БЕЗ скобок) =====
-  result = result.replace(/(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    return `${improperNum}÷${den}`;
-  });
+  // result = result.replace(/(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
+  //   const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+  //   return `${improperNum}÷${den}`;
+  // });
 
   // ===== ПАТТЕРН 6: -число+числитель÷знаменатель =====
-  result = result.replace(/-(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    return `-${improperNum}÷${den}`;
-  });
+  // result = result.replace(/-(\d+)\+(\d+)÷(\d+)/g, (match, whole, num, den) => {
+  //   const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
+  //   return `-${improperNum}÷${den}`;
+  // });
 
   // ===== ПАТТЕРН 7: число+(числитель÷знаменатель) (со скобками) =====
   result = result.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
@@ -492,7 +493,7 @@ export function stepMixedToImproper(expr) {
   // 5. КОНВЕРТАЦИЯ РАСКРЫТЫХ СМЕШАННЫХ ДРОБЕЙ В НЕПРАВИЛЬНЫЕ
   // После преобразования маркеров могли получиться выражения вида "3+(1÷8)"
   // Их нужно преобразовать в "25÷8"
-  result = convertMixedToImproperInExpression(result);
+  result = convertMixedToImproper(result);
 
   return result;
 }
@@ -856,15 +857,6 @@ export function generateSteps(expression, resultFraction) {
     if (step3 !== currentExpr) {
       currentExpr = step3;
       steps.push(currentExpr);
-    } else {
-      // Даже если stepMixedToImproper вернул то же значение,
-      // проверяем, есть ли еще не преобразованные смешанные дроби
-      // вида "число+(дробь)" (могли появиться после предыдущих шагов)
-      const manualCheck = convertMixedToImproperInExpression(currentExpr);
-      if (manualCheck !== currentExpr) {
-        currentExpr = manualCheck;
-        steps.push(currentExpr);
-      }
     }
 
     // ===== ШАГ 1.1: Степени и корни =====
