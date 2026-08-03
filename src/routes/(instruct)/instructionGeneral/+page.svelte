@@ -115,8 +115,8 @@
 				</li>
 
 				<li>
-					Save a value from the current calculation history: press and hold the result you want to
-					save.
+					Save a value from the current calculation history: press and hold (two second) the result
+					you want to save.
 				</li>
 
 				<li>

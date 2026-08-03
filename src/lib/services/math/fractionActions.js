@@ -199,13 +199,11 @@ export function addOperatorFraction(op) {
 
   // 3. Защита для знака деления ÷
   if (op === '÷') {
-    console.log('[DEBUG addOperatorFraction] ВЕТКА ÷: display ДО =', appState.display);
     // Проверяем: если перед ÷ есть '(' и после '(' число, то это часть дроби
     const lastChar = appState.display.slice(-1);
     if (lastChar === '(') {
       // Это начало дроби, просто добавляем ÷ без дополнительной логики
       appState.display += '÷';
-      console.log('[DEBUG addOperatorFraction] ВЕТКА ÷: display ПОСЛЕ =', appState.display);
       appState.isNewInput = false;
       return;
     }
@@ -578,8 +576,17 @@ export function insertImplicitMultiplication(expr) {
 
   //  ===== Преобразуем смешанные дроби в (число+дробь) =====
   // Ищем паттерн: число(числитель÷знаменатель)
-  // Пример: Вместо '4+(1÷5)-3+(1÷7)' → '(4+(1÷5))-(3+(1÷7))' .
-  result = result.replace(/(\d+)\((\d+)÷(\d+)\)/g, (match, whole, num, den) => {
+  // Проверяем, что перед числом НЕТ ÷ или /
+  result = result.replace(/(\d+)\((\d+)÷(\d+)\)/g, (match, whole, num, den, offset) => {
+    // Проверяем, что перед match нет ÷ или /
+    const before = result.substring(0, offset);
+    const lastChar = before.trim().slice(-1);
+
+    // Если перед числом стоит ÷ или / — это не смешанная дробь, пропускаем
+    if (lastChar === '÷' || lastChar === '/') {
+      return match;
+    }
+
     return `(${whole}+(${num}÷${den}))`;
   });
 
@@ -1361,50 +1368,57 @@ function formatHistoryExpr(expr) {
 }
 
 /**
- * Преобразует все смешанные дроби вида "число+(число÷число)" в неправильные дроби "(число*знаменатель+числитель)÷знаменатель"
- * Пример: "4+(3÷4)" → "(4*4+3)÷4" → "19÷4"
+ * Преобразует все смешанные дроби вида "число+(число÷число)" в неправильные дроби
+ * Пример: "4+(3÷4)" → "19÷4"
+ * 
+ * Поддерживает контекстную проверку:
+ * - Преобразует только если это действительно смешанная дробь
+ * - Не преобразует суммы в выражениях (1÷7+3÷4 → НЕ преобразуется)
  */
 export function convertMixedToImproper(expr) {
   if (!expr) return expr;
 
-  // ===== ИСПРАВЛЕНИЕ: преобразуем ТОЛЬКО смешанные дроби =====
-  // Ищем паттерн: число+(числитель÷знаменатель)
-  // НО не преобразуем, если перед числом стоит '(' (это дробь в скобках)
   let result = expr;
-  let changed = true;
-  let guard = 0;
+  let i = 0;
+  let guard = 0; // ← ДОБАВЛЯЕМ ЗАЩИТУ
 
-  while (changed && guard < 10) {
-    changed = false;
+  while (i < result.length && guard < 20) { // ← ЛИМИТ 20 ИТЕРАЦИЙ
     guard++;
 
-    result = result.replace(/(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den, offset) => {
-      // Проверяем, что перед match нет '('
-      // Если перед match есть '(', значит это дробь в скобках, а не смешанная дробь
-      const before = result.substring(0, offset);
-      const lastChar = before.trim().slice(-1);
+    const match = result.slice(i).match(/^(\d+)\+\((\d+)÷(\d+)\)/);
+    if (!match) {
+      i++;
+      continue;
+    }
 
-      // Если перед match стоит '(', пропускаем
-      if (lastChar === '(') {
-        changed = false;
-        return match;
-      }
+    const [fullMatch, whole, num, den] = match;
+    const startPos = i;
+    const endPos = i + fullMatch.length;
 
-      // Проверяем, что перед match нет '÷' (это не часть другой дроби)
-      if (before.includes('÷')) {
-        const lastDivIndex = before.lastIndexOf('÷');
-        const afterLastDiv = before.substring(lastDivIndex + 1);
-        // Если после последнего ÷ только пробелы, то это не смешанная дробь
-        if (afterLastDiv.trim() === '') {
-          return match;
-        }
-      }
+    // Контекстная проверка
+    const before = result.substring(0, startPos);
+    const after = result.substring(endPos);
 
-      // Это смешанная дробь — преобразуем
-      changed = true;
+    const leftChar = before.trim().slice(-1);
+    const rightChar = after.trim().slice(0, 1);
+
+    // Проверяем, является ли это смешанной дробью
+    const isMixedFraction =
+      !before.endsWith('÷') &&
+      !before.endsWith('/') &&
+      !(/\d/.test(leftChar) && !/[+\-*/÷^()]/.test(leftChar)) && // ← ДОБАВИЛИ '('
+      rightChar !== '÷' &&
+      rightChar !== '/' &&
+      rightChar !== '^'; // ← ДОБАВИЛИ '^' (степень)
+
+    if (isMixedFraction) {
       const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-      return `${improperNum}÷${den}`;
-    });
+      const replacement = `${improperNum}÷${den}`;
+      result = result.substring(0, startPos) + replacement + result.substring(endPos);
+      i = startPos + replacement.length;
+    } else {
+      i++;
+    }
   }
 
   return result;
@@ -1497,24 +1511,22 @@ export function evaluateFraction() {
   // === ТРАНСФОРМАЦИИ ===
   // ============================================================
 
-  console.log('[DEBUG] НАЧАЛО ТРАНСФОРМАЦИЙ:');
-  console.log('  fullExpr ДО:', fullExpr);
 
   // 1. Обрабатываем смешанные числа с маркерами целой части (⥑...⥏)
   fullExpr = transformMixedNumberWithoutDivision(fullExpr);
-  console.log('  1. transformMixedNumberWithoutDivision:', fullExpr);
+  // console.log('  1. transformMixedNumberWithoutDivision:', fullExpr);
 
   // 2. Обрабатываем отрицательные смешанные числа
   fullExpr = transformNegativeMixedNumber(fullExpr);
-  console.log('  2. transformNegativeMixedNumber:', fullExpr);
+  // console.log('  2. transformNegativeMixedNumber:', fullExpr);
 
   // 3. Обрабатываем смешанные дроби с оператором ÷ после скобок
   fullExpr = transformMixedFractionWithDivision(fullExpr);
-  console.log('  3. transformMixedFractionWithDivision:', fullExpr);
+  // console.log('  3. transformMixedFractionWithDivision:', fullExpr);
 
   // 4. Обрабатываем сложные скобки ⥾...⥿ (число+дробь)
   fullExpr = transformMixedNumberWithComplexBrackets(fullExpr);
-  console.log('  4. transformMixedNumberWithComplexBrackets:', fullExpr);
+  // console.log('  4. transformMixedNumberWithComplexBrackets:', fullExpr);
 
   // ============================================================
   // === АВТОЗАКРЫТИЕ СКОБОК (РАНЬШЕ!) ===
@@ -1525,9 +1537,6 @@ export function evaluateFraction() {
 
   const openBrackets = (fullExpr.match(/\(/g) || []).length;
   const closeBrackets = (fullExpr.match(/\)/g) || []).length;
-  console.log('[DEBUG] АВТОЗАКРЫТИЕ:');
-  console.log('  открывающих (:', openBrackets);
-  console.log('  закрывающих ):', closeBrackets);
 
   if (openBrackets > closeBrackets) {
     const missingCount = openBrackets - closeBrackets;
@@ -1535,7 +1544,6 @@ export function evaluateFraction() {
     fullExpr += bracketsToAdd;
     console.log('  Добавлено:', bracketsToAdd);
   }
-  console.log('  fullExpr ПОСЛЕ автозакрытия:', fullExpr);
 
   // ============================================================
   // === ВСТАВКА НЕЯВНЫХ ОПЕРАТОРОВ (ТЕПЕРЬ ВИДИТ ПОЛНОЕ ВЫРАЖЕНИЕ!) ===
@@ -1543,15 +1551,13 @@ export function evaluateFraction() {
 
   // 5. Вставляем неявные операторы (работает с маркерами ⥾ и обычными скобками)
   fullExpr = insertImplicitMultiplication(fullExpr);
-  console.log('  5. insertImplicitMultiplication (1):', fullExpr);
 
   // 6. Вставляем умножение между ')' и числом
   fullExpr = fullExpr.replace(/\)(\d+)/g, ')*$1');
-  console.log('  6. replace /)(\\d+)/:', fullExpr);
 
   // 7. Повторная вставка (для случаев, появившихся после replace)
   fullExpr = insertImplicitMultiplication(fullExpr);
-  console.log('  7. insertImplicitMultiplication (2):', fullExpr);
+
 
   // ============================================================
   // === ПРЕОБРАЗОВАНИЕ МАРКЕРОВ В СКОБКИ ===
@@ -1559,28 +1565,14 @@ export function evaluateFraction() {
 
   // 8. Преобразуем маркеры в обычные скобки
   fullExpr = stripMarkers(fullExpr);
-  console.log('  8. stripMarkers:', fullExpr);
+
 
   // ============================================================
   // === ПРЕОБРАЗОВАНИЕ СМЕШАННЫХ ДРОБЕЙ В НЕПРАВИЛЬНЫЕ ===
   // ============================================================
 
-  // 9. Преобразуем смешанные дроби в неправильные
-  // Паттерн: число+(числитель÷знаменатель)
-  // НЕ захватываем, если перед числом есть ÷ или / (это не смешанная дробь)
-  fullExpr = fullExpr.replace(/(?<![÷\/])(\d+)\+\((\d+)÷(\d+)\)/g, (match, whole, num, den, offset) => {
-    const before = fullExpr.substring(0, offset);
-    const lastChar = before.trim().slice(-1);
-
-    // Если перед числом стоит '(', это дробь в скобках — пропускаем
-    if (lastChar === '(') {
-      return match;
-    }
-
-    const improperNum = parseInt(whole) * parseInt(den) + parseInt(num);
-    return `${improperNum}÷${den}`;
-  });
-  console.log('  9. convertMixedToImproper:', fullExpr);
+  // 9. Переносим целые части в числитель дроби 
+  fullExpr = convertMixedToImproper(fullExpr);
 
   // ============================================================
   // === ОСТАЛЬНЫЕ ТРАНСФОРМАЦИИ ===
@@ -1588,17 +1580,14 @@ export function evaluateFraction() {
 
   // 10. Обрабатываем случай: число*число+(дробь) → число*(число+дробь)
   fullExpr = wrapMixedNumberWithOperator(fullExpr);
-  console.log('  10. wrapMixedNumberWithOperator:', fullExpr);
 
   // 11. Обработка деления смешанной дроби: число+(дробь)÷число → (число+дробь)÷число
   fullExpr = fullExpr.replace(/(\d+)\+\(([^)]+)\)÷(\d+)/g, (match, whole, fraction, divisor) => {
     return '(' + whole + '+' + fraction + ')÷' + divisor;
   });
-  console.log('  11. mixedDivisionPattern:', fullExpr);
 
   // 12. Левоассоциативное деление: a÷b÷c → (a÷b)÷c
   fullExpr = fixLeftAssociativeDivision(fullExpr);
-  console.log('  12. fixLeftAssociativeDivision:', fullExpr);
 
   // ============================================================
   // === ФОРМАТИРОВАНИЕ ИСТОРИИ ===
@@ -1607,9 +1596,7 @@ export function evaluateFraction() {
   let historyDisplayExpr = fullExpr;
   historyDisplayExpr = formatHistoryExpr(historyDisplayExpr);
   historyDisplayExpr = historyDisplayExpr.replace(/(\d+)\+\(([^)]+)\)/g, '$1($2)');
-  console.log('[DEBUG] historyDisplayExpr:', historyDisplayExpr);
 
-  console.log('[DEBUG] fullExpr КОНЕЦ:', fullExpr);
 
   // ======== ОПРЕДЕЛЕНИЕ СЛОЖНОСТИ И ФЛАГА stepsFraction =====
   // не работает - нет шагов решения!!
@@ -1625,9 +1612,6 @@ export function evaluateFraction() {
   // }
 
   try {
-    // 8. Переносим целые части в числитель дроби 
-    // fullExpr = convertMixedToImproper(fullExpr); - Шаг 9 уже содержит эту защиту 
-
     // 1. Переводим всю строку в чистый текстовый вид для математического ядра
     // (например, конвертируем superscript-символы степени: "2^³" -> "2^3")
     let cleanExpr = fromSuperscript(fullExpr);
@@ -1690,8 +1674,8 @@ export function evaluateFraction() {
 
     // === -📝=TODO=📝- ===
     // ===== ВРЕМЕННАЯ ОТЛАДКА =====
-    // console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
-    // console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
+    console.log('📊 [DEBUG] Шаги для выражения:', cleanExpr);
+    console.log('📊 [DEBUG] Массив шагов:', finalStepsArray);
     // =============================
 
     appState.historySession.push({
@@ -1825,7 +1809,3 @@ export function backspaceFraction() {
     appState.isNewInput = true;
   }
 }
-
-
-
-

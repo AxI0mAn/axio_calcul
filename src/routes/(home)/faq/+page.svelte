@@ -111,8 +111,8 @@
 		<h3>Can I reuse previous results?</h3>
 		<p>Yes.</p>
 		<p>
-			Open the calculation history, press and hold any result, and save it into one of the four
-			memory slots.
+			Open the calculation history, press and hold (two second) any result, and save it into one of
+			the four memory slots.
 		</p>
 		<p>Stored values can later be inserted into new calculations without typing them again.</p>
 	</section>
