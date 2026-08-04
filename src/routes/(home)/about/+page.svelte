@@ -14,7 +14,7 @@
 
 	<meta property="og:type" content="website" />
 
-	<meta property="og:title" content="About the Calculator & Converter Collection" />
+	<meta property="og:title" content="About amoca" />
 
 	<meta
 		property="og:description"
