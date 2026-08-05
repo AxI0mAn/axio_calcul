@@ -11,6 +11,11 @@
 	];
 </script>
 
+<svelte:head>
+	<meta name="robots" content="index,follow" />
+	<title>amoca settings</title>
+</svelte:head>
+
 <header class="header">
 	<BtnBack />
 	<h1 class="headerSlogan">settings</h1>

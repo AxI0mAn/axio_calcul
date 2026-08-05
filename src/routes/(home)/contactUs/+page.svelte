@@ -5,6 +5,11 @@
 	import BtnText from '$lib/components/Btn/BtnText.svelte';
 </script>
 
+<svelte:head>
+	<meta name="robots" content="index,follow" />
+	<title>amoca contact us</title>
+</svelte:head>
+
 <header class="header">
 	<BtnBack />
 	<h1 class="headerSlogan">contact us</h1>

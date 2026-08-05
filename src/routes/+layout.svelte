@@ -112,7 +112,41 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>amoca</title>
+	<meta property="og:site_name" content="amoca" />
+	<meta property="og:locale" content="en_US" />
+
+	<meta
+		name="description"
+		content="One familiar interface for many Calculators that work together."
+	/>
+	<meta name="robots" content="index,follow,max-image-preview:large" />
+
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="amoca - a mobile calculator" />
+	<meta
+		property="og:description"
+		content="A growing collection of calculators, converters and practical mathematical tools designed for everyday life, education, engineering and business."
+	/>
+
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="amoca - a mobile calculator" />
+	<meta
+		name="twitter:description"
+		content="A growing collection of calculators, converters and practical mathematical tools designed for everyday life, education, engineering and business."
+	/>
+	<meta name="twitter:image" content="https://axi0man.github.io/axio_calcul/ogImage/og_home.jpeg" />
+
+	<link rel="apple-touch-icon" href="https://axi0man.github.io/axio_calcul/apple-touch-icon.png" />
+	<link rel="canonical" href="https://axi0man.github.io/axio_calcul/" />
+	<meta property="og:url" content="https://axi0man.github.io/axio_calcul/" />
+
+	<meta property="og:image" content="https://axi0man.github.io/axio_calcul/ogImage/og_home.jpeg" />
+
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:type" content="image/jpeg" />
+
+	<title>amoca | Math Tools PWA</title>
 </svelte:head>
 
 {@html pwaInfo?.webManifest.linkTag}

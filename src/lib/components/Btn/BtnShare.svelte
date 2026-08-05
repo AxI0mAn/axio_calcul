@@ -1,6 +1,7 @@
 <script>
+	import Share from '$lib/assets/svgIcon/share.svg?raw';
 	// Принимаем кастомные классы и кастомный текст для шеринга
-	let { customClass = '', shareTitle = 'Посмотрите эту страницу' } = $props();
+	let { customClass = '', shareTitle = 'Check out this page' } = $props();
 
 	// Локальное состояние для отображения тултипа "Ссылка скопирована"
 	let showTooltip = $state(false);
@@ -29,7 +30,7 @@
 				// Если пользователь сам отменил шеринг (закрыл шторку),
 				// ловим ошибку AbortError, чтобы билд и консоль не спамили ошибками
 				if (err.name !== 'AbortError') {
-					console.error('Ошибка шеринга:', err);
+					console.error('Error share:', err);
 				}
 			}
 		} else {
@@ -48,72 +49,57 @@
 					showTooltip = false;
 				}, 2500);
 			} catch (err) {
-				console.error('Не удалось скопировать ссылку:', err);
+				console.error('Failed to copy the page link:', err);
 			}
 		}
 	}
 </script>
 
-<div class="share-wrapper">
-	<button
-		type="button"
-		class="btn-share {customClass}"
-		onclick={handleShare}
-		aria-label="Поделиться страницей"
-	>
-		<!-- Иконка шеринга (универсальный узел) -->
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="20"
-			height="20"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-		>
-			<circle cx="18" cy="5" r="3"></circle>
-			<circle cx="6" cy="12" r="3"></circle>
-			<circle cx="18" cy="19" r="3"></circle>
-			<line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-			<line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-		</svg>
-		<span>Поделиться</span>
-	</button>
+<button
+	type="button"
+	class="btn-share {customClass}"
+	onclick={handleShare}
+	aria-label="Share this page"
+>
+	{@html Share}
+</button>
 
-	<!-- Всплывающее уведомление для десктопов -->
-	{#if showTooltip}
-		<div class="share-tooltip" role="status">Ссылка на страницу сохранена в памяти</div>
-	{/if}
-</div>
+<!-- Всплывающее уведомление для десктопов -->
+{#if showTooltip}
+	<div class="share-tooltip" role="status">Page link copied to clipboard.</div>
+{/if}
 
-<style>
-	.share-wrapper {
-		position: relative;
-		display: inline-block;
-	}
-
+<style lang="scss">
 	.btn-share {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
+		justify-content: center;
+		gap: 0rem;
+		cursor: pointer;
+		padding: 0.2rem;
+		font-family: inherit;
+
 		background: none;
 		border: none;
-		cursor: pointer;
-		padding: 0.5rem;
-		font-family: inherit;
-		color: inherit;
+		color: $clr-bg-card;
+		box-shadow: none;
+
+		&:hover {
+			color: $clr-text-main;
+		}
+		&:active {
+			background-color: transparent;
+		}
 	}
 
 	/* Стили всплывающей подсказки */
 	.share-tooltip {
 		position: absolute;
-		bottom: 120%;
-		left: 50%;
+		bottom: 5%;
+		right: 5%;
 		transform: translateX(-50%);
-		background-color: var(--tooltip-bg, #333);
-		color: var(--tooltip-color, #fff);
+		background-color: $clr-text-main;
+		color: inherit;
 		padding: 0.5rem 0.75rem;
 		border-radius: 4px;
 		font-size: 0.85rem;
@@ -131,6 +117,17 @@
 		to {
 			opacity: 1;
 			transform: translate(-50%, 0);
+		}
+	}
+
+	.btn__interface {
+		color: $clr-coral;
+
+		&:hover {
+			color: $clr-mint;
+		}
+		&:active {
+			background-color: transparent; // Сохраняем твою логику прозрачности
 		}
 	}
 </style>

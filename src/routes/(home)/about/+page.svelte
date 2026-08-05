@@ -3,39 +3,8 @@
 </script>
 
 <svelte:head>
-	<title>About – Calculator & Converter Collection | Math Tools PWA</title>
-
-	<meta
-		name="description"
-		content="Learn about this growing collection of calculators, converters and mathematical tools. Fast calculations, shared workspace, offline support and privacy-first design."
-	/>
-
-	<meta name="robots" content="index,follow,max-image-preview:large" />
-
-	<meta property="og:type" content="website" />
-
-	<meta property="og:title" content="About amoca" />
-
-	<meta
-		property="og:description"
-		content="A growing collection of calculators, converters and practical math tools with a unified interface, offline support and privacy-first design."
-	/>
-
-	<!-- 
-	<link rel="canonical" href="https://example.com/about" />
-	<meta property="og:image" content="https://example.com/images/about-share.png" />
-	<meta property="og:url" content="https://example.com/about" />
-	<meta name="twitter:image" content="https://example.com/images/about-share.png" />
-
-	<meta name="twitter:card" content="summary_large_image" />
- -->
-
-	<meta name="twitter:title" content="About the Calculator Collection" />
-
-	<meta
-		name="twitter:description"
-		content="Fast calculators, converters and mathematical tools in one Progressive Web App."
-	/>
+	<meta name="robots" content="index,follow" />
+	<title>amoca about</title>
 </svelte:head>
 
 <header class="header">

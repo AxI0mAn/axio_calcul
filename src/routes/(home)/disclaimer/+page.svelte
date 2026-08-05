@@ -15,6 +15,11 @@
 	});
 </script>
 
+<svelte:head>
+	<meta name="robots" content="index,follow" />
+	<title>amoca disclaimer</title>
+</svelte:head>
+
 <header class="header" id="top-anchor">
 	<BtnBack />
 	<h1 class="headerSlogan">disclaimer</h1>

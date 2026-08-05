@@ -9,6 +9,25 @@
 	import DisText from '$lib/components/Display/DisMath/DisText.svelte';
 </script>
 
+<svelte:head>
+	<meta name="description" content="Advanced Scientific and Engineering Calculator." />
+
+	<meta property="og:title" content="amoca - Fast Online Engineering Calculator." />
+	<meta property="og:description" content="Advanced Scientific and Engineering Calculator." />
+
+	<meta name="twitter:title" content="amoca - Fast Online Engineering Calculator." />
+	<meta name="twitter:description" content="Advanced Scientific and Engineering Calculator." />
+
+	<meta
+		name="twitter:image"
+		content="https://axi0man.github.io/axio_calcul/ogImage/og_engineer.png"
+	/>
+	<link rel="canonical" href="https://axi0man.github.io/axio_calcul/engineer/" />
+	<meta property="og:url" content="https://axi0man.github.io/axio_calcul/engineer/" />
+
+	<title>amoca | Engineering Calculator</title>
+</svelte:head>
+
 <MathPageLayout nowMode="ENGINEER">
 	{#snippet display()}
 		<DisText />

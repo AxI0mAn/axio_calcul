@@ -113,6 +113,11 @@
 	});
 </script>
 
+<svelte:head>
+	<meta name="robots" content="index,follow" />
+	<title>amoca history</title>
+</svelte:head>
+
 <header class="header" id="top-anchor">
 	<BtnBack />
 	<h1 class="headerSlogan">history of calculated</h1>

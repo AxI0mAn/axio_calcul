@@ -1,6 +1,6 @@
 {
   "short_name": "amoca",
-  "name": "axio mobile calculator",
+  "name": "amoca mobile calculator",
   "icons": [
     {
       "src": "icon-192.png",
@@ -17,6 +17,6 @@
   "scope": "/axio_calcul/",
   "display": "standalone",
   "background_color": "#1f1f1f",
-  "theme_color": "#1e293b",
+  "theme_color": "#0f172a",
   "description": "Offline Mobile Calculator"
 }
