@@ -16,7 +16,7 @@ let deferredPrompt; // переменная для хранения событи
 
 /**
  * Инициализация проверки возможности установки.
- * Запускается один раз в src/routes/+layout.svelte при загрузке (через $effect)
+ * Запускается один  раз в src/routes/+layout.svelte при загрузке (через $effect)
  */
 export function initPwaLogic() {
   if (typeof window === 'undefined') return;

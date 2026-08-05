@@ -30,7 +30,7 @@ class AppStore {
   historyLocal = $state(12);
 
   /** Статус на разрешение установки PWA от браузера
-   * @type {boolean} */
+   * @type {boolean}  */
   canInstall = $state(false);
 
   /** Статус установки. false или строка с датой 'YYYY.MM.DD'

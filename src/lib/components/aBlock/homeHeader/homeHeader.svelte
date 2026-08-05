@@ -1,9 +1,6 @@
 <script>
 	// src/lib/components/aBlock/homeHeader/homeHeader.svelte
 
-	// @ts-ignore
-
-	// ----------
 	import NavBurger from '$lib/components/NavBurger/NavBurger.svelte';
 	import LinkInstallReady from '$lib/components/Links/LinkInstallReady.svelte';
 	import BtnShare from '$lib/components/Btn/BtnShare.svelte';
