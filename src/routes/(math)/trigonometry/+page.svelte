@@ -33,6 +33,7 @@
 		name="twitter:image"
 		content="https://axi0man.github.io/axio_calcul/ogImage/og_trigon.png"
 	/>
+	<meta property="og:image" content="https://axi0man.github.io/axio_calcul/ogImage/og_trigon.png" />
 	<link rel="canonical" href="https://axi0man.github.io/axio_calcul/trigonometry/" />
 	<meta property="og:url" content="https://axi0man.github.io/axio_calcul/trigonometry/" />
 

@@ -22,6 +22,10 @@
 		name="twitter:image"
 		content="https://axi0man.github.io/axio_calcul/ogImage/og_engineer.png"
 	/>
+	<meta
+		property="og:image"
+		content="https://axi0man.github.io/axio_calcul/ogImage/og_engineer.png"
+	/>
 	<link rel="canonical" href="https://axi0man.github.io/axio_calcul/engineer/" />
 	<meta property="og:url" content="https://axi0man.github.io/axio_calcul/engineer/" />
 

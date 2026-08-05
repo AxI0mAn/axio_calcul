@@ -113,8 +113,14 @@
 	}
 
 	.btn.btn__install {
-		padding: 2rem;
+		margin: 1rem auto;
+		padding: 1rem 2rem;
 		color: $clr-coral;
+		font-size: 2rem;
+		text-align: center;
+		&:hover {
+			color: $clr-mint-soft;
+		}
 	}
 
 	.btn.btn__install--mini {

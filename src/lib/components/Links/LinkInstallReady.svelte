@@ -13,6 +13,7 @@
 </script>
 
 {#if appStore.canInstall && !appStore.installed}
+	<!-- // можно установить и ещё не установлено -->
 	<a
 		href="{base}/install"
 		onclick={(e) => {
@@ -24,7 +25,8 @@
 	>
 		{@html Install}</a
 	>
-{:else}
+{:else if !appStore.canInstall && !appStore.installed}
+	<!-- // не установлено и браузер не поддерживает установку PWA -->
 	<a
 		href="{base}/install"
 		class="btn btn__interface installLink {customClass}"
@@ -32,6 +34,7 @@
 	>
 		{@html Install}</a
 	>
+	<!-- // любой другой случай или установлено (installed !== false) - ничего не рендерим -->
 {/if}
 
 <style lang="scss">

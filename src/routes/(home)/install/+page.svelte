@@ -1,9 +1,12 @@
 <script>
+	// src/routes/(home)/install/+page.svelte
 	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
-	import { appStore } from '$lib/store/appStore.svelte';
-	import { installPwaAction } from '$lib/utils/initPwaLogic';
 	import BtnText from '$lib/components/Btn/BtnText.svelte';
 
+	import { appStore } from '$lib/store/appStore.svelte';
+	import { installPwaAction } from '$lib/utils/initPwaLogic';
+
+	import InstIcon from '$lib/assets/svgIcon/install_desktop.svg?raw';
 	// кнопка ВВЕРХ
 	import { createScrollTopButton } from '$lib/utils/createScrollTopButton';
 
@@ -59,6 +62,7 @@
 		</ul>
 	</section>
 	{#if appStore.canInstall && !appStore.installed}
+		<!-- // можно установить и ещё не установлено -->
 		<h2>Your browser supports direct installation.</h2>
 		<section class="card">
 			<p>Simply press the button below and follow the on-screen instructions.</p>
@@ -72,9 +76,11 @@
 			/>
 		</section>
 	{:else if appStore.installed}
+		<!-- уже установлено -->
 		<h2>The Application is already installed on this device.</h2>
 		<p>You can open it directly from your Home Screen, Desktop, or Applications list.</p>
 	{:else}
+		<!-- не возможно установить if !appStore.canInstall && !appStore.installed -->
 		<h2>Can't See the Install Button?</h2>
 		Not every browser displays the installation prompt automatically. Some browsers require installation
 		from their menu, while others use a different installation method. Choose the instructions below for
@@ -110,7 +116,7 @@
 			<h2>Windows & macOS (Chrome or Edge)</h2>
 			<ul>
 				<li>Open the Application.</li>
-				<li>Look for the Install icon in the browser address bar.</li>
+				<li>Look for the Install icon {@html InstIcon} in the browser address bar.</li>
 			</ul>
 			<p>If you don't see it:</p>
 			<ul>
