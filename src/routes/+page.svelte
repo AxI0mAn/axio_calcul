@@ -78,7 +78,7 @@
 									webp: `${srcBasic_webp}`,
 									jpeg: `${srcBasic_jpeg}`
 								}}
-								alt="Фон арифметического калькулятора"
+								alt="icon_from_calculator_basic"
 								class="catalog__card--content"
 								loading="eager"
 								decoding="sync"
@@ -96,7 +96,7 @@
 									webp: `${srcEngineer_jpeg}`,
 									jpeg: `${srcEngineer_webp}`
 								}}
-								alt="Фон инженерного калькулятора"
+								alt="icon_from_calculator_engineer"
 								class="catalog__card--content"
 								loading="eager"
 								decoding="sync"
@@ -114,7 +114,7 @@
 									webp: `${srcTrigonom_jpeg}`,
 									jpeg: `${srcTrigonom_webp}`
 								}}
-								alt="Фон тригонометрического калькулятора"
+								alt="icon_from_calculator_trigonometry"
 								class="catalog__card--content"
 								loading="eager"
 								decoding="sync"
@@ -134,7 +134,7 @@
 									webp: `${srcFraction_jpeg}`,
 									jpeg: `${srcFraction_webp}`
 								}}
-								alt="Фон калькулятора дробей"
+								alt="icon_from_calculator_fraction"
 								class="catalog__card--content"
 								loading="eager"
 								decoding="sync"
@@ -151,7 +151,7 @@
 				Learn one interface once and use it across a growing collection of calculators without
 				learning a new workflow every time.
 			</p>
-			<!-- -->
+			<!-- 
 
 			<details class="groupCalc" name="my-accordion">
 				<summary>
@@ -332,6 +332,8 @@
 					</div>
 				</section>
 			</details>
+
+-->
 		</div>
 		<h2 class="inset">Learn more</h2>
 	</main>
