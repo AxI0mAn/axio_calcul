@@ -45,7 +45,6 @@
 		{ label: 'old history', href: `${base}/history` },
 		{ label: 'settings', href: `${base}/settings` },
 		{ label: 'install', href: `${base}/install` },
-		{ label: 'share', href: `${base}/share` },
 		{ label: 'about', href: `${base}/about` },
 		{ label: 'FAQ', href: `${base}/faq` },
 		{ label: 'instruction', href: `${base}/instructionAll` },

@@ -15,7 +15,7 @@
 	import History from '$lib/assets/svgIcon/history.svg?raw';
 	import Info from '$lib/assets/svgIcon/info.svg?raw';
 
-	import InstallReady from '$lib/components/Links/LinkInstallReady.svelte';
+	import BtnShare from '../Btn/BtnShare.svelte';
 </script>
 
 <div class="rowLinks">
@@ -33,7 +33,8 @@
 	</a>
 
 	<a href="{base}/history" class="btn btn__interface" aria-label="History">{@html History}</a>
-	<InstallReady />
+
+	<BtnShare customClass="btn__interface" />
 </div>
 
 <style lang="scss">

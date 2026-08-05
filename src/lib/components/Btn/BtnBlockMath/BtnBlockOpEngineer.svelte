@@ -101,7 +101,7 @@
 		</div>
 		<div class="row">
 			<BtnText customClass="op btn__func" onclick={() => multipliers()} buttonText="x=A*B" />
-			<BtnText customClass="op btn__func" onclick={() => allDivisors()} buttonText="divs:X∩Y" />
+			<BtnText customClass="op btn__func" onclick={() => allDivisors()} buttonText="X∩Y" />
 		</div>
 	</div>
 </div>

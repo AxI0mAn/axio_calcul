@@ -6,12 +6,17 @@
 	// ----------
 	import NavBurger from '$lib/components/NavBurger/NavBurger.svelte';
 	import LinkInstallReady from '$lib/components/Links/LinkInstallReady.svelte';
+	import BtnShare from '$lib/components/Btn/BtnShare.svelte';
+	import { appStore } from '$lib/store/appStore.svelte';
 </script>
 
 <header class="home__header">
 	<div><NavBurger /></div>
 	<p class="appNameInHeader font-digits">amoca - a mobile calculator</p>
-	<div class="installReadyWrap"><LinkInstallReady customClass="mainHeaderInstallLink" /></div>
+	<div class="installReadyWrap">
+		<BtnShare />
+		<LinkInstallReady customClass="mainHeaderInstallLink" />
+	</div>
 </header>
 
 <style lang="scss">
@@ -35,12 +40,14 @@
 		}
 
 		.installReadyWrap {
+			padding-right: 1rem;
 			min-height: 100%;
 			min-width: 3rem;
 			aspect-ratio: 1/1;
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			gap: 1rem;
 		}
 	}
 </style>

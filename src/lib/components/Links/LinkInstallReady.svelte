@@ -8,7 +8,6 @@
 	import { appStore } from '$lib/store/appStore.svelte';
 	import { installPwaAction } from '$lib/utils/initPwaLogic';
 	import Install from '$lib/assets/svgIcon/download.svg?raw';
-	// import Settings from '$lib/assets/svgIcon/settings.svg?raw';
 
 	let { customClass = '' } = $props();
 </script>
@@ -33,7 +32,6 @@
 	>
 		{@html Install}</a
 	>
-	<!-- <a href="{base}/settings" class="btn btn__interface" aria-label="Settings">{@html Settings}</a> -->
 {/if}
 
 <style lang="scss">
@@ -48,7 +46,6 @@
 
 		background-color: transparent;
 		border-radius: 8px;
-		// border: 1px solid $clr-mint;
 
 		aspect-ratio: 1 / 1;
 		transition:
@@ -74,26 +71,14 @@
 				0 0 8px $clr-mint;
 		}
 
-		// --- МОДИФИКАТОР: Ссылка установки (Coral) ---
-		&.installLink {
-			color: $clr-coral;
-
-			&:hover {
-				color: $clr-mint;
-			}
-			&:active {
-				background-color: transparent; // Сохраняем твою логику прозрачности
-			}
-		}
-
 		// --- МОДИФИКАТОР: Ссылка в шапке (Белая) ---
 		&.mainHeaderInstallLink {
-			color: $clr-text-main;
+			color: $clr-bg-card;
 			border-color: transparent;
 			box-shadow: none;
 
 			&:hover {
-				color: $clr-bg-card;
+				color: $clr-text-main;
 			}
 			&:active {
 				background-color: transparent;
