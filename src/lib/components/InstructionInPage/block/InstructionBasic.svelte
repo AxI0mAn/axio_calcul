@@ -2,6 +2,7 @@
 	// @ts-ignore
 	import { base } from '$app/paths';
 	import BtnText from '$lib/components/Btn/BtnText.svelte';
+	import FineFraction from '../element/FineFraction.svelte';
 
 	// может быть открыт только один <details>
 	import { onMount } from 'svelte';
@@ -211,93 +212,6 @@
 			</ul>
 			<ul>
 				<li class="example">
-					<strong>Percentage of a Number</strong>
-				</li>
-				<li>150 * 20% = (150 * 0.2) = 30</li>
-				<li class="withIcon">
-					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op" onclick={() => {}} buttonText="*" />
-					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
-					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
-					<strong class="answer font-digits">30</strong>
-				</li>
-				<li>
-					<strong>Subtract a Percentage. Percentage Decrease.</strong>
-				</li>
-				<li>150 − 20% = 150 − (150 * 20%) = 150 - 30 = 120</li>
-				<li class="withIcon">
-					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op" onclick={() => {}} buttonText="-" />
-					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
-					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
-					<strong class="answer font-digits">120</strong>
-				</li>
-				<li>
-					<strong>Add a Percentage. Percentage Increase.</strong>
-				</li>
-				<li>Increase 150 by 20%</li>
-				<li>150 + 20% = 150 + (150 * 20%) = 150 + 30 = 180</li>
-				<li class="withIcon">
-					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op" onclick={() => {}} buttonText="+" />
-					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
-					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
-					<strong class="answer font-digits">180</strong>
-				</li>
-				<li>
-					<strong> Divide by a Percentage</strong>
-				</li>
-				<li>150 / 20% = 150 / 0.2 = 750</li>
-				<li class="withIcon">
-					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op" onclick={() => {}} buttonText="/" />
-					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
-					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
-					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
-					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
-					<strong class="answer font-digits">750</strong>
-				</li>
-				<li>
-					<strong> What Percentage Is One Number of Another?</strong>
-				</li>
-				<li>30 is what percent of 150?</li>
-				<li>100 * 30 / 150 = 20</li>
-				<li>
-					<strong> Reverse Percentage</strong>
-				</li>
-				<li>120 is 80% of what number?</li>
-				<li>100 * 120 / 80 = 150</li>
-				<li>
-					<strong>Find the Original Price Before a Discount</strong>
-				</li>
-				<li>
-					After a 20% discount, the price is 150. What was the original price? Answer: 187.50.
-				</li>
-				<li>150 is 80% of the original price.</li>
-				<li>150 ÷ 80% = 187.50</li>
-				<li>
-					<strong>Find the Original Price Before a Discount</strong>
-				</li>
-				<li>The price after a 15% discount is 180. What was the original price? Answer: 211.76.</li>
-				<li>180 is 85% of the original price.</li>
-				<li>180 ÷ 85% = 211.76</li>
-			</ul>
-			<ul>
-				<li class="example">
 					<strong>Power</strong>
 				</li>
 				<li>5² = 25</li>
@@ -442,6 +356,205 @@
 					<BtnText customClass="font-digits" buttonText="4" onclick={() => {}} />
 					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
 					<strong class="answer font-digits">0.04167</strong>
+				</li>
+			</ul>
+
+			<ul>
+				<li class="example">
+					<strong>Percentage of a Number</strong>
+				</li>
+				<li>150 * 20% = (150 * 0.2) = 30</li>
+				<li class="withIcon">
+					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op" onclick={() => {}} buttonText="*" />
+					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
+					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
+					<strong class="answer font-digits">30</strong>
+				</li>
+				<li>
+					<strong>Subtract a Percentage. Percentage Decrease.</strong>
+				</li>
+				<li>150 − 20% = 150 − (150 * 20%) = 150 - 30 = 120</li>
+				<li class="withIcon">
+					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op" onclick={() => {}} buttonText="-" />
+					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
+					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
+					<strong class="answer font-digits">120</strong>
+				</li>
+				<li>
+					<strong>Add a Percentage. Percentage Increase.</strong>
+				</li>
+				<li>Increase 150 by 20%</li>
+				<li>150 + 20% = 150 + (150 * 20%) = 150 + 30 = 180</li>
+				<li class="withIcon">
+					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op" onclick={() => {}} buttonText="+" />
+					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
+					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
+					<strong class="answer font-digits">180</strong>
+				</li>
+				<li>
+					<strong> Divide by a Percentage</strong>
+				</li>
+				<li>150 / 20% = 150 / 0.2 = 750</li>
+				<li class="withIcon">
+					<BtnText customClass="font-digits" buttonText="1" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="5" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op" onclick={() => {}} buttonText="/" />
+					<BtnText customClass="font-digits" buttonText="2" onclick={() => {}} />
+					<BtnText customClass="font-digits" buttonText="0" onclick={() => {}} />
+					<BtnText customClass="op btn__func" onclick={() => {}} buttonText="%" />
+					<BtnText customClass="equal-btn btn__op" onclick={() => {}} buttonText="=" />
+					<strong class="answer font-digits">750</strong>
+				</li>
+				<li>
+					<strong> What Percentage Is One Number of Another?</strong>
+				</li>
+				<li>30 is what percent of 150?</li>
+				<li>100 * 30 / 150 = 20</li>
+				<li>
+					<strong> Reverse Percentage</strong>
+				</li>
+				<li>120 is 80% of what number?</li>
+				<li>100 * 120 / 80 = 150</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="card" id="ConstantsBasic">
+		<h2>Using Percentages in real-life</h2>
+		<div>
+			<p>
+				Explore practical examples of using percentages in real-life situations, including
+				discounts, tips, interest, and other everyday calculations.
+			</p>
+
+			<ul>
+				<li class="example">
+					<h2>💰 1. Tips (Restaurant Bill).</h2>
+				</li>
+				<li class="example"><strong>Situation:</strong></li>
+				<li>
+					You had dinner with your family at a restaurant. Your bill before the tip was
+					<strong>$84.50</strong>. Since the service was excellent, you want to leave a
+					<strong>20%</strong> tip.
+				</li>
+				<li class="example"><strong>Question:</strong></li>
+				<li>
+					How much should you leave as a tip? What will be the total amount you pay, including the
+					tip?
+				</li>
+				<li class="example"><strong>Solution:</strong></li>
+				<li>
+					Find <strong>20%</strong> of <strong>$84.50</strong>:
+					<strong>$84.50 × 20% = $16.90</strong>.
+				</li>
+				<li>
+					Add the bill and the tip:
+					<strong>$84.50 + $16.90 = $101.40</strong>.
+				</li>
+				<li>Or else: <strong>$84.50 × 120% = $101.40</strong></li>
+				<li class="example"><strong>Answer:</strong></li>
+				<li>
+					Leave a tip of <strong>$16.90</strong>. The total amount to pay is
+					<strong>$101.40</strong>.
+				</li>
+			</ul>
+
+			<ul>
+				<li class="example">
+					<h2>🛍️ 2. Sales Tax (Shopping).</h2>
+				</li>
+				<li class="example"><strong>Situation:</strong></li>
+				<li>
+					You are buying a new laptop for <strong>$1,200</strong>. The sales tax rate in your state
+					is <strong>8.25%</strong>.
+				</li>
+				<li class="example"><strong>Question:</strong></li>
+				<li>How much sales tax will you pay? What will be the final price at checkout?</li>
+				<li class="example"><strong>Solution:</strong></li>
+				<li>
+					Find <strong>8.25%</strong> of <strong>$1,200</strong>:
+					<strong>$1,200 × 0.0825 = $99.00</strong>.
+				</li>
+				<li>
+					Add the tax to the original price:
+					<strong>$1,200 + $99.00 = $1,299.00</strong>.
+				</li>
+				<li class="example"><strong>Answer:</strong></li>
+				<li>
+					The sales tax is <strong>$99.00</strong>. The final price is
+					<strong>$1,299.00</strong>.
+				</li>
+			</ul>
+
+			<ul>
+				<li class="example">
+					<h2>🏷️ 3. Discount (Seasonal Sale).</h2>
+				</li>
+				<li class="example"><strong>Situation:</strong></li>
+				<li>
+					You found a winter coat at a department store. The original price is
+					<strong>$250.00</strong>. It is on sale with a <strong>35%</strong> discount.
+				</li>
+				<li class="example"><strong>Question:</strong></li>
+				<li>How much money will you save? What is the final sale price of the coat?</li>
+				<li class="example"><strong>Solution:</strong></li>
+				<li>
+					Find the discount amount:
+					<strong>$250.00 × 0.35 = $87.50</strong>.
+				</li>
+				<li>
+					Subtract the discount from the original price:
+					<strong>$250.00 − $87.50 = $162.50</strong>.
+				</li>
+				<li class="example"><strong>Answer:</strong></li>
+				<li>
+					You save <strong>$87.50</strong>. The discounted price is
+					<strong>$162.50</strong>.
+				</li>
+			</ul>
+
+			<ul>
+				<li class="example">
+					<h2>📈 4. Price Change (Inflation).</h2>
+				</li>
+				<li class="example"><strong>Situation:</strong></li>
+				<li>
+					Last year, a carton of eggs cost <strong>$4.00</strong>. Today, the same carton costs
+					<strong>$5.20</strong>.
+				</li>
+				<li class="example"><strong>Question:</strong></li>
+				<li>By what percentage has the price of eggs increased over the past year?</li>
+				<li class="example"><strong>Solution:</strong></li>
+				<li>
+					Find the difference in price:
+					<strong>$5.20 − $4.00 = $1.20</strong>.
+				</li>
+				<li>
+					Divide the increase by the original price and multiply by
+					<strong>100%</strong>:
+				</li>
+				<li>
+					<strong>($1.20 ÷ $4.00) × 100% = 0.30 × 100% = 30%</strong>.
+				</li>
+				<li class="example"><strong>Answer:</strong></li>
+				<li>
+					The price of eggs has increased by <strong>30%</strong> over the past year.
 				</li>
 			</ul>
 		</div>
