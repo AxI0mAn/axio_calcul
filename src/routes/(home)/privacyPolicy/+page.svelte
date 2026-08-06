@@ -1,4 +1,6 @@
 <script>
+	// @ts-ignore
+	import { base } from '$app/paths';
 	import BtnBack from '$lib/components/Btn/BtnBack.svelte';
 
 	// кнопка ВВЕРХ
@@ -196,8 +198,15 @@
 			information. Because the Application stores most information locally on your own device, you
 			can generally exercise control over your data by clearing your browser's site storage or
 			uninstalling the Application. If you contact us by email and wish us to delete your
-			correspondence, you may request this at any time. --- ## 15. Contact If you have any questions
-			about this Privacy Policy or the Application, you may contact us using the contact form
+			correspondence, you may request this at any time.
+		</p>
+	</section>
+	<section class="card">
+		<h2>15. Contact If you have any questions</h2>
+		<p>
+			about this Privacy Policy or the Application, you may contact us using the <a
+				href="{base}/contactUs">contact form</a
+			>
 			available within the Application.
 		</p>
 	</section>
@@ -214,5 +223,8 @@
 		&:hover {
 			box-shadow: $shadow-neon-coral;
 		}
+	}
+	a {
+		color: $clr-text-main;
 	}
 </style>

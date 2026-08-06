@@ -26,22 +26,68 @@
 		}
 	});
 
-	//============ встроенные эффекты Svelte5
-	import { fade } from 'svelte/transition';
-	import { blur } from 'svelte/transition';
-	import { cubicInOut } from 'svelte/easing';
+	//============  без салатового фона на мобильном при прокрутка по якорной ссылке
+
+	// onMount гарантирует, что код выполнится в браузере после монтирования
+	onMount(() => {
+		function handleAnchorClick(e) {
+			const link = e.target.closest('a');
+			if (!link) return;
+
+			const href = link.getAttribute('href');
+			// Проверяем, что это якорная ссылка (начинается с # и содержит что-то после)
+			if (href && href.startsWith('#') && href.length > 1) {
+				const targetElement = document.querySelector(href);
+
+				if (targetElement) {
+					e.preventDefault(); // Отменяем резкий дефолтный прыжок
+
+					targetElement.scrollIntoView({
+						// плавный скролл через scrollIntoView заставляет движок телефона отрисовывать кадры пошагово, благодаря чему салатовый (технический) экран буфера графического процессора больше не просвечивает.
+						behavior: 'smooth',
+						block: 'start'
+					});
+
+					// Аккуратно обновляем URL в адресной строке без дерганья страницы
+					history.pushState(null, '', href);
+				}
+			}
+		}
+
+		// Вешаем глобальный слушатель на весь документ
+		document.addEventListener('click', handleAnchorClick);
+
+		// Обязательно удаляем слушатель при размонтировании (хорошая практика)
+		return () => {
+			document.removeEventListener('click', handleAnchorClick);
+		};
+	});
 
 	// ===========  Для плавного появления модалки с ячейками памяти
+	//============ встроенные эффекты Svelte5
+	import { cubicInOut } from 'svelte/easing';
 
 	import { appState } from '$lib/store/appState.svelte';
 	import BtnBlockMemo from '$lib/components/Btn/BtnBlockBase/BtnBlockMemo.svelte';
-	// export const prerender = true;
-	// export const trailingSlash = 'always';
+
+	import ModalBackdrop from '$lib/components/aBlock/modal/ModalBackdrop.svelte';
+
+	// ============ модалка согласия появится через время наxождения на сайте
+	let isTimerReady = $state(false);
+
+	onMount(() => {
+		// Таймер только для модалки соглашения (60 секунд)
+		const timer = setTimeout(() => {
+			isTimerReady = true;
+		}, 100000);
+
+		return () => clearTimeout(timer);
+	});
 
 	// ============ плавные переходы для работы QuickMenu.svelte
 	import { menuMaps } from '$lib/config/mathMenuMaps';
 	// АВТОМАТИЧЕСКАЯ ЛОГИКА:
-	// 1. Берем все массивы из menuMaps (math, geometry, date и т.д.)
+	// 1. Берем все массивы из menuMaps (basic, engineer, и т.д.)
 	// 2. Объединяем их в один плоский массив .flat()
 	// 3. Проверяем, есть ли текущий путь в этом списке
 	let isGroupPage = $derived(
@@ -170,31 +216,49 @@
 {/key}
 
 <!--  модалка, которая откроется при наведении и удержании на строке истории, если все ячейки памяти заняты  -->
-{#if appState.isMemoModalOpen}
-	<div class="modal-backdrop" transition:fade={{ duration: 150 }}>
-		<div class="modal-content">
-			<h3>Select slot to overwrite</h3>
+<ModalBackdrop isOpen={appState.isMemoModalOpen}>
+	<h3>Select slot to overwrite</h3>
 
-			<div class="modal-grid">
-				<BtnBlockMemo />
-			</div>
-
-			<div class="modal-actions">
-				<button class="btn btn__op btn__clear-all" onclick={() => appState.clearAllMemory()}>
-					CLEAR ALL
-				</button>
-
-				<button class="btn btn__cancel" onclick={() => (appState.isMemoModalOpen = false)}>
-					Cancel
-				</button>
-			</div>
-		</div>
+	<div class="modal-grid">
+		<BtnBlockMemo />
 	</div>
-{/if}
+
+	<div class="modal-actions">
+		<button class="btn btn__op btn__clear-all" onclick={() => appState.clearAllMemory()}>
+			CLEAR ALL
+		</button>
+
+		<button class="btn btn__cancel" onclick={() => (appState.isMemoModalOpen = false)}>
+			Cancel
+		</button>
+	</div>
+</ModalBackdrop>
+
+<!-- Модалка согласие с PrivatePolise i disclaimer -->
+
+<ModalBackdrop isOpen={isTimerReady && !appStore.iAgree}>
+	<h3 class="youAgree">
+		By continuing to use this app, you acknowledge that you have read and agree to the <strong
+			>Privacy Policy</strong
+		>
+		and <strong>Disclaimer</strong>.
+	</h3>
+
+	<div class="modal-actions">
+		<button class="btn btn__op btn__clear-all" onclick={() => (appStore.iAgree = true)}>
+			I AGREE
+		</button>
+	</div>
+</ModalBackdrop>
 
 <style>
 	.page-wrapper {
 		width: 100%;
+	}
+
+	h3.youAgree {
+		letter-spacing: 0.2rem;
+		line-height: 1.5rem;
 	}
 
 	/* Применяем абсолютное позиционирование только во время анимации групповых страниц */

@@ -37,6 +37,10 @@ class AppStore {
    * @type {string | boolean} */
   installed = $state(false);
 
+  /** Cогласие с PrivatePolise i disclaimer
+   * @type {boolean}   */
+  iAgree = $state(false);
+
   constructor() {
     if (browser) {
       this.initFromStorage();
@@ -68,6 +72,9 @@ class AppStore {
       if (parsed.toFix) this.toFix = parsed.toFix;
       if (parsed.historyLocal) this.historyLocal = parsed.historyLocal;
       if (parsed.installed) this.installed = parsed.installed;
+      if (parsed.iAgree) this.iAgree = parsed.iAgree;
+
+
 
       console.log('AppStore: Настройки успешно загружены из localStorage');
     } catch (err) {
@@ -83,7 +90,8 @@ class AppStore {
       fontSize: this.fontSize,
       toFix: this.toFix,
       historyLocal: this.historyLocal,
-      installed: this.installed
+      installed: this.installed,
+      iAgree: this.iAgree,
     };
   }
 
