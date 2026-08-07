@@ -1,19 +1,18 @@
 <script>
 	/**
 	 * src/lib/components/advertisement/advertisementLine.svelte
+	 * РАБОТАЕТ С ГРУППОЙ КАРТИНОК И ОДНОЙ ССЫЛКОЙ
 	 * Компонент для рекламного объявления узкая полоса между блоками
 	 * одна картинка исчезает и вторая падает сверху вниз
 	 */
 	import { onMount } from 'svelte';
 
-	import src0 from '$lib/assets/banerLineH72_15puzzle/15puzzle.png';
-	import src1 from '$lib/assets/banerLineH72_15puzzle/15puzzle1.png';
-	import src2 from '$lib/assets/banerLineH72_15puzzle/15puzzle2.png';
-	import src3 from '$lib/assets/banerLineH72_15puzzle/15puzzle3.png';
-	import src4 from '$lib/assets/banerLineH72_15puzzle/15puzzle4.png';
+	import src0 from '$lib/assets/banerLineH72/pazGor2.png';
+	import src1 from '$lib/assets/banerLineH72/pazGor1.png';
+	import src2 from '$lib/assets/banerLineH72/pazGor3.png';
 
 	// Массив изображений
-	const images = [src0, src1, src2, src3, src4];
+	const images = [src0, src1, src2];
 	let currentIndex = $state(0);
 
 	onMount(() => {
