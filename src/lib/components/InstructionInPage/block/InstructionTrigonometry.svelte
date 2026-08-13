@@ -14,6 +14,9 @@
 
 	// плавное открытие  и мгновенное закрытие <details>
 	import AccordionDetails from '$lib/components/aBlock/AccordionDetails.svelte';
+
+	//реклама
+	import AdvertisementGor from '$lib/components/advertisement/advertisementGor.svelte';
 </script>
 
 <header class="header">
@@ -127,7 +130,7 @@
 			</ul>
 		</div>
 	</div>
-
+	<AdvertisementGor setBanners="2" />
 	<div class="card" id="FeaturesTrigonometry">
 		<h2>Features</h2>
 		<p>The calculator includes:</p>
@@ -352,7 +355,7 @@
 			</p>
 		</div>
 	</div>
-
+	<AdvertisementGor setBanners="1" />
 	<div class="card" id="ExamplesTrigonometry">
 		<h2>Examples:</h2>
 		<div>

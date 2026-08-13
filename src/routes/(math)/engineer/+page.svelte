@@ -2,7 +2,7 @@
 	// src/routes/(math)/engineer/+page.svelte
 	import MathPageLayout from '$lib/components/aPage/MathPageLayout.svelte';
 	import BtnBlockOpEngineer from '$lib/components/Btn/BtnBlockMath/BtnBlockOpEngineer.svelte';
-	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
+	import AdvertisementGor from '$lib/components/advertisement/advertisementGor.svelte';
 
 	import BtnBlockDigit from '$lib/components/Btn/BtnBlockBase/BtnBlockDigit.svelte';
 	import BtnBlockOp from '$lib/components/Btn/BtnBlockBase/BtnBlockOp.svelte';
@@ -50,7 +50,7 @@
 	{/snippet}
 
 	{#snippet ads()}
-		<AdvertisementLine2 />
+		<AdvertisementGor setBanners="1" />
 	{/snippet}
 </MathPageLayout>
 

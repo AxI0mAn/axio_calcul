@@ -13,14 +13,26 @@
    чтобы у браузера не было прозрачных "дыр" при скролле */
 html,
 body {
-  background: $clr-bg;
   /* Замените на цвет фона вашего сайта */
   overscroll-behavior-y: none;
   /* Убирает лишние системные эффекты резинового скролла */
 }
 
 html {
+  background: rgba($clr-bg-rgb, .95);
   scroll-behavior: smooth;
+  min-height: 100%;
+  /* Путь к вашей картинке */
+  background-image: url('$lib/assets/body_bg.png');
+
+  /* Повторяем только по вертикали (Y) */
+  background-repeat: repeat-y;
+
+  /* Ширина 100vw, а высоту оставляем автоматической, чтобы не искажать пропорции */
+  background-size: 100vw auto;
+
+  /* Центрируем по горизонтали, чтобы картинка не прижималась только к левому краю */
+  background-position: top center;
 }
 
 a {

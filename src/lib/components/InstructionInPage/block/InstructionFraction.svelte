@@ -15,6 +15,9 @@
 
 	// плавное открытие  и мгновенное закрытие <details>
 	import AccordionDetails from '$lib/components/aBlock/AccordionDetails.svelte';
+
+	//реклама
+	import AdvertisementGor from '$lib/components/advertisement/advertisementGor.svelte';
 </script>
 
 <!-- <AccordionDetails castomClass="optionCalc" name="my-accordion">
@@ -140,7 +143,7 @@
 			</p>
 		</div>
 	</div>
-
+	<AdvertisementGor setBanners="1" />
 	<div class="card" id="FeaturesFraction">
 		<h2>Features</h2>
 		<p>The calculator supports:</p>
@@ -300,7 +303,7 @@
 			</ul>
 		</div>
 	</div>
-
+	<AdvertisementGor setBanners="2" />
 	<div class="card" id="ImproperFraction">
 		<h2>Improper Fraction</h2>
 		<div>
@@ -721,7 +724,7 @@
 			</ul>
 		</div>
 	</div>
-
+	<AdvertisementGor setBanners="1" />
 	<div class="card" id="StepMode">
 		<h2>Step-by-Step Mode</h2>
 		<h2>
@@ -939,7 +942,7 @@
 
 		<h2>Enjoy using the fraction calculator! 🎉</h2>
 	</div>
-
+	<AdvertisementGor setBanners="2" />
 	<h2>Use fraction in real-world!!</h2>
 
 	<div class="card" id="instructionFractiionExamples">

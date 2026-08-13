@@ -1,7 +1,7 @@
 <script>
 	// src/routes/(math)/fraction/+page.svelte
 	import MathPageLayout from '$lib/components/aPage/MathPageLayout.svelte';
-	import AdvertisementLine2 from '$lib/components/advertisement/advertisementLine2.svelte';
+	import AdvertisementGor from '$lib/components/advertisement/advertisementGor.svelte';
 
 	import DisFraction from '$lib/components/Display/DisFraction/DisFraction.svelte';
 	import BtnBlockDigitFraction from '$lib/components/Btn/BtnBlockMath/BtnBlockFraction/BtnBlockDigitFraction.svelte';
@@ -53,6 +53,6 @@
 	{/snippet}
 
 	{#snippet ads()}
-		<AdvertisementLine2 />
+		<AdvertisementGor setBanners="1" />
 	{/snippet}
 </MathPageLayout>

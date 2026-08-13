@@ -1,6 +1,7 @@
 <script>
 	/**
-	 * домашняя страница src/routes/+page.svelte
+	 * домашняя страница
+	$routes/+page.svelte
 	 */
 
 	// ------------- ссылки с учётом локализации в будущем
@@ -55,10 +56,22 @@
 	import srcTrigonom_webp from '$lib/assets/iconPic/512/png_math_trigonometry.webp';
 	import srcFraction_jpeg from '$lib/assets/iconPic/512/png_Fraction.jpeg';
 	import srcFraction_webp from '$lib/assets/iconPic/512/png_Fraction.webp';
+
+	// ----------------
+
+	// -------------- рекламные вертикальные банеры для десктоп шире 1023
+
+	import AdvertisementVert from '$lib/components/advertisement/AdvertisementVert.svelte';
+
+	// -------------- рекламные горизонтальные банеры для не десктоп уже 1023
+
+	import AdvertisementGor from '$lib/components/advertisement/advertisementGor.svelte';
 </script>
 
 <div class="app-wrapper">
-	<aside class="field_left"></aside>
+	<aside class="field_left">
+		<AdvertisementVert setBanners="1" />
+	</aside>
 	<main class="field_main catalog" id="catalogAllFeatures">
 		<div class="headerWrapper" id="top-anchor"><HomeHeader /></div>
 		<h1 class="slogan font-digits">
@@ -358,7 +371,9 @@
 				<li>Keep working without retyping expressions.</li>
 			</ul>
 		</div>
-
+		<div class="advertisementGor">
+			<AdvertisementGor setBanners="1" />
+		</div>
 		<div class="card">
 			<h2>Four Memory Cell.</h2>
 			<p>Frequently used values can be saved into memory and reused later.</p>
@@ -374,6 +389,9 @@
 			<p>Previous calculations remain available in the calculation history.</p>
 		</div>
 
+		<div class="advertisementGor">
+			<AdvertisementGor setBanners="2" />
+		</div>
 		<div class="card">
 			<h2>More facts for this App.</h2>
 			<p>
@@ -389,6 +407,7 @@
 
 	<section class="reviews__old"></section>
 	<aside class="field_right">
+		<AdvertisementVert setBanners="2" />
 		<!-- advertisement картинки и банеры ?? -->
 		<!-- <div class="realExamples">
 			<h2>Real-World Examples</h2>
@@ -439,6 +458,19 @@
 		color: $clr-mint-soft;
 	}
 
+	.advertisementGor {
+		display: none;
+	}
+	// --- РЕЖИМ: MOBILE & TABLET PORTRAIT ---
+	@media (max-width: 1023px) and (orientation: portrait), (max-width: 767px) {
+		.field_left,
+		.field_right {
+			display: none;
+		}
+		.advertisementGor {
+			display: block;
+		}
+	}
 	.instruction {
 		display: flex;
 		flex-flow: column;

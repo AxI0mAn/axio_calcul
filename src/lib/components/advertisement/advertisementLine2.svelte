@@ -11,11 +11,11 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 
-	import src0 from '$lib/assets/banerLineH72/pazGor2.png';
-	import src1 from '$lib/assets/banerLineH72/citrusGor.png';
-	import src2 from '$lib/assets/banerLineH72/pazGor1.png';
-	import src3 from '$lib/assets/banerLineH72/ascetxtGor.png';
-	import src4 from '$lib/assets/banerLineH72/pazGor3.png';
+	import src0 from '$lib/assets/banerLineH72/pazGor2.jpeg';
+	import src1 from '$lib/assets/banerLineH72/citrusGor.jpeg';
+	import src2 from '$lib/assets/banerLineH72/pazGor1.jpeg';
+	import src3 from '$lib/assets/banerLineH72/ascetxtGor.jpeg';
+	import src4 from '$lib/assets/banerLineH72/pazGor3.jpeg';
 
 	// Массив баннеров с картинками и индивидуальными ссылками
 	const baners = [

@@ -2,7 +2,6 @@
 	// @ts-ignore
 	import { base } from '$app/paths';
 	import BtnText from '$lib/components/Btn/BtnText.svelte';
-	import FineFraction from '../element/FineFraction.svelte';
 
 	// может быть открыт только один <details>
 	import { onMount } from 'svelte';
@@ -12,6 +11,9 @@
 		// Код внутри onMount никогда не запустится на сервере
 		initAccordion(); // аккордеон из нескольких <details> для домашнего каталога
 	});
+
+	// реклама
+	import AdvertisementGor from '$lib/components/advertisement/advertisementGor.svelte';
 </script>
 
 <header class="header">
@@ -32,6 +34,12 @@
 		<li>
 			<a class="learnMore_goTo" href="{base}/basic/#ExamplesBasic">
 				<h3>How to Use. Examples.</h3></a
+			>
+		</li>
+
+		<li>
+			<a class="learnMore_goTo" href="{base}/basic/#ExamplesPercentages">
+				<h3>Percentages in real-world.</h3></a
 			>
 		</li>
 
@@ -66,7 +74,7 @@
 			</p>
 		</div>
 	</div>
-
+	<AdvertisementGor setBanners="1" />
 	<div class="card" id="FeaturesBasic">
 		<h2>Features</h2>
 		<div>
@@ -435,7 +443,7 @@
 		</div>
 	</div>
 
-	<div class="card" id="ConstantsBasic">
+	<div class="card" id="ExamplesPercentages">
 		<h2>Using Percentages in real-life</h2>
 		<div>
 			<p>
@@ -560,6 +568,7 @@
 		</div>
 	</div>
 
+	<AdvertisementGor setBanners="2" />
 	<div class="card" id="ConstantsBasic">
 		<h2>Mathematical Constants</h2>
 		<div>
