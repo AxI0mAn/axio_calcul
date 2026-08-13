@@ -51,18 +51,7 @@
 	 * @property {number} [height]
 	 */
 
-	import { appStore } from '$lib/store/appStore.svelte.js'; // Импортируем твой стор
-
-	/**
-	 * @typedef {Object} Props
-	 * @property {{webp?: string, jpeg: string}} src
-	 * @property {string} [alt]
-	 * @property {import('svelte/elements').HTMLImgAttributes['loading']} [loading]
-	 * @property {import('svelte/elements').HTMLImgAttributes['decoding']} [decoding]
-	 * @property {string} [class] - В Svelte 5 лучше использовать явное имя props.class или деструктуризацию
-	 * @property {number} [width]
-	 * @property {number} [height]
-	 */
+	import { appStore } from '$lib/store/appStore.svelte.js'; // Импортируем  стор
 
 	let props = $props();
 

@@ -14,6 +14,9 @@
 
 	// плавное открытие  и мгновенное закрытие <details>
 	import AccordionDetails from '$lib/components/aBlock/AccordionDetails.svelte';
+
+	//реклама
+	import AdvertisementGor from '$lib/components/advertisement/advertisementGor.svelte';
 </script>
 
 <!-- <AccordionDetails castomClass="optionCalc" name="my-accordion">
@@ -81,6 +84,8 @@
 			</p>
 		</div>
 	</div>
+
+	<AdvertisementGor setBanners="1" />
 
 	<div class="card" id="FeaturesEngineer">
 		<h2>Features</h2>
@@ -665,6 +670,8 @@
 		</ul>
 	</div>
 
+	<AdvertisementGor setBanners="2" />
+
 	<div class="card" id="AreaCircle">
 		<ul>
 			<li class="example">
@@ -847,6 +854,7 @@
 		</ul>
 	</div>
 
+	<AdvertisementGor setBanners="1" />
 	<div class="card" id="AreaTrapezoid">
 		<ul>
 			<li class="example">
@@ -1017,6 +1025,7 @@
 		</ul>
 	</div>
 
+	<AdvertisementGor setBanners="2" />
 	<div class="card" id="SurfAreaRectPrism">
 		<ul>
 			<li class="example">

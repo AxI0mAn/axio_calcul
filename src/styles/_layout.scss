@@ -24,17 +24,25 @@
       top: 0;
       height: 100vh; // Теперь они занимают экран и "залипают" при скролле
       width: calc((100vw - 52vh) / 2); // ширина центральной части 50vh
+      min-width: 0; // разрешаем колонкам с fr сжиматься и отдавать ширину для дочернего рекламного блока
+
+      display: flex;
+      flex-flow: column wrap;
+      justify-content: center;
+      align-items: center;
+
     }
 
     .field_left {
-      background: linear-gradient(to right, $clr-black 0%, rgba($clr-bg-darker-rgb, 0.4) 100%);
-      box-shadow: -8px 0px 16px 8px rgba(0, 0, 0, 0.75);
+      // background: linear-gradient(to right, $clr-black 0%, rgba($clr-bg-darker-rgb, 0.4) 100%);
+      background-color: transparent;
       left: 0;
       grid-area: left;
     }
 
     .field_right {
-      background: linear-gradient(to left, $clr-black 0%, rgba($clr-bg-darker-rgb, 0.4) 100%);
+      // background: linear-gradient(to left, $clr-black 0%, rgba($clr-bg-darker-rgb, 0.4) 100%);
+      background-color: transparent;
       right: 0;
       grid-area: right;
     }
@@ -49,7 +57,7 @@
     }
 
     .instruction {
-      background: linear-gradient(180deg, rgba($clr-mint-rgb, 0.05) 0%, rgba($clr-bg-darker-rgb, 0.8) 100%);
+      // background: linear-gradient(180deg, rgba($clr-mint-rgb, 0.05) 0%, rgba($clr-bg-darker-rgb, 0.8) 100%);
       border-top: 1px solid rgba($clr-mint-rgb, 0.2);
       grid-area: instr;
       width: 50vh;
@@ -58,7 +66,7 @@
     }
 
     .reviews__old {
-      background: linear-gradient(180deg, rgba($clr-coral-rgb, 0.01) 0%, rgba($clr-bg-darker-rgb, 0.8) 5%, rgba($clr-coral-rgb, 0.001) 100%);
+      // background: linear-gradient(180deg, rgba($clr-coral-rgb, 0.01) 0%, rgba($clr-bg-darker-rgb, 0.8) 5%, rgba($clr-coral-rgb, 0.001) 100%);
       // border-bottom: 1px solid rgba($clr-coral-rgb, 0.2);
       grid-area: revi;
       width: 50vh;
@@ -86,12 +94,13 @@
 
     .field_main {
       grid-area: calc;
+      min-height: 100vh;
     }
 
     .field_left {
       grid-area: left;
       min-height: 4rem;
-      background: linear-gradient(90deg, $clr-bg-darker 0%, $clr-blue-light 100%);
+      // background: linear-gradient(90deg, $clr-bg-darker 0%, $clr-blue-light 100%);
       border-radius: 8px;
     }
 
@@ -99,7 +108,7 @@
       grid-area: instr;
       padding: 1rem;
       min-height: 4rem;
-      background: $clr-bg-darker;
+      // background: $clr-bg-darker;
       border: 1px solid rgba($clr-mint-rgb, 0.3);
       border-radius: 8px;
     }
@@ -108,7 +117,7 @@
       grid-area: right;
       padding: 1rem;
       min-height: 4rem;
-      background: $clr-bg-darker;
+      // background: rgb($clr-bg-rgb, .5);
       border: 1px solid rgba($clr-coral-rgb, 0.3);
       border-radius: 8px;
     }
@@ -117,7 +126,7 @@
       grid-area: revi;
       padding: 1rem;
       min-height: 4rem;
-      background: linear-gradient(180deg, $clr-bg-darker 0%, $clr-blue-mid 100%);
+      // background: linear-gradient(180deg, $clr-bg-darker 0%, $clr-blue-mid 100%);
       border-radius: 8px;
     }
   }
